@@ -379,6 +379,115 @@
   .ios .closing-row:last-child { border-bottom: none; }
   .ios .closing-row .cr-name { font-weight: 600; }
   .ios .closing-row .cr-date { color: var(--muted); font-size: 12px; }
+
+  /* ═══════════════════════════════════════════════════
+     LIGHT THEME OVERRIDES
+     ═══════════════════════════════════════════════════ */
+  .ios.light {
+    background: #f8f9fb; color: #1a1a2e;
+    --accent: #0ea5e9; --accent2: #7c3aed; --glow: rgba(14,165,233,0.1);
+    --surface: #ffffff; --surface2: #f1f5f9; --border: #e2e8f0;
+    --muted: #64748b; --green: #10b981; --red: #ef4444; --amber: #f59e0b;
+  }
+  .ios.light .sidebar { background: #fff; border-right-color: #e2e8f0; }
+  .ios.light .sidebar .s-logo { background: linear-gradient(135deg, #0ea5e9, #7c3aed); -webkit-background-clip: text; }
+  .ios.light .sidebar .s-section { color: #94a3b8; }
+  .ios.light .sidebar .s-item { color: #64748b; }
+  .ios.light .sidebar .s-item:hover { background: #f1f5f9; color: #1a1a2e; }
+  .ios.light .sidebar .s-item.active {
+    background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(124,58,237,0.08));
+    color: #1a1a2e; border: 1px solid rgba(14,165,233,0.15);
+  }
+  .ios.light .sidebar .s-badge.red { background: #fef2f2; color: #ef4444; }
+  .ios.light .sidebar .s-user { border-top-color: #e2e8f0; color: #1a1a2e; }
+  .ios.light .c-head { border-bottom-color: #e2e8f0; }
+  .ios.light .c-head h2 { background: linear-gradient(135deg, #1a1a2e, #64748b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .ios.light .cmd-k { background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+  .ios.light .cmd-k kbd { background: #fff; border-color: #e2e8f0; color: #94a3b8; }
+
+  .ios.light .glow-card { background: #fff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .ios.light .glow-card.accent::before { background: linear-gradient(90deg, #0ea5e9, #7c3aed); }
+  .ios.light .panel-head { border-bottom-color: #f1f5f9; }
+  .ios.light .panel-head h3 { color: #64748b; }
+  .ios.light .panel-head .p-badge { background: #fef2f2; color: #ef4444; }
+
+  .ios.light .stream-item { border-bottom-color: #f1f5f9; }
+  .ios.light .stream-item:hover { background: #f8fafc; }
+  .ios.light .stream-item .si-title { color: #1a1a2e; }
+  .ios.light .stream-item .si-sub { color: #94a3b8; }
+  .ios.light .stream-item .si-btn { border-color: #e2e8f0; color: #0ea5e9; background: #fff; }
+  .ios.light .stream-item .si-btn:hover { background: rgba(14,165,233,0.06); border-color: #0ea5e9; }
+
+  .ios.light .kpi-tile { background: #fff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .ios.light .kpi-tile .kt-label { color: #94a3b8; }
+  .ios.light .kpi-tile .kt-val { color: #1a1a2e; }
+
+  .ios.light .pipe-row .pr-label { color: #94a3b8; }
+  .ios.light .pipe-row .pr-bar { background: #f1f5f9; }
+  .ios.light .pipe-row .pr-n { color: #1a1a2e; }
+  .ios.light .pipe-row .pr-v { color: #94a3b8; }
+
+  .ios.light .aria-hero {
+    background: linear-gradient(135deg, rgba(14,165,233,0.04), rgba(124,58,237,0.04));
+    border-color: rgba(14,165,233,0.12);
+  }
+  .ios.light .aria-hero .ah-icon { box-shadow: 0 0 20px rgba(14,165,233,0.1); }
+  .ios.light .aria-hero p { color: #475569; }
+  .ios.light .aria-hero p strong { color: #1a1a2e; }
+  .ios.light .aria-hero .ah-chip { border-color: #e2e8f0; background: #fff; color: #64748b; }
+  .ios.light .aria-hero .ah-chip:hover { border-color: #0ea5e9; color: #0ea5e9; background: rgba(14,165,233,0.04); }
+
+  .ios.light .aria-chat { background: #fff; border-color: #e2e8f0; }
+  .ios.light .aria-chat .ac-head { border-bottom-color: #f1f5f9; }
+  .ios.light .aria-chat .ac-bubble { background: linear-gradient(135deg, rgba(14,165,233,0.05), rgba(124,58,237,0.05)); border-color: rgba(14,165,233,0.1); color: #475569; }
+  .ios.light .aria-chat .ac-bubble strong { color: #1a1a2e; }
+  .ios.light .aria-chat .ac-input { border-top-color: #f1f5f9; }
+  .ios.light .aria-chat .ac-field { background: #f8f9fb; border-color: #e2e8f0; color: #1a1a2e; }
+  .ios.light .aria-chat .ac-name { color: #1a1a2e; }
+
+  .ios.light .kanban .k-col-head { color: #94a3b8; }
+  .ios.light .kanban .k-col-head .k-cnt { background: #f1f5f9; }
+  .ios.light .kanban .k-card { background: #fff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .ios.light .kanban .k-card:hover { border-color: #0ea5e9; background: #fafbff; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .ios.light .kanban .k-card .kc-name { color: #1a1a2e; }
+  .ios.light .kanban .k-card .kc-detail { color: #94a3b8; }
+  .ios.light .kanban .k-card .kc-action { background: rgba(14,165,233,0.06); }
+
+  .ios.light .alert-strip { background: linear-gradient(90deg, rgba(239,68,68,0.04), rgba(245,158,11,0.04)); border-color: rgba(239,68,68,0.1); color: #64748b; }
+  .ios.light .alert-strip .as-btn { background: #fef2f2; color: #ef4444; }
+
+  .ios.light .tl-item { border-bottom-color: #f1f5f9; }
+  .ios.light .tl-item:hover { background: #f8fafc; }
+  .ios.light .tl-connector { background: #e2e8f0; }
+  .ios.light .tl-title { color: #1a1a2e; }
+  .ios.light .tl-sub { color: #64748b; }
+  .ios.light .tl-time { color: #94a3b8; }
+
+  .ios.light .ring-grid circle[stroke="#27272a"] { stroke: #e2e8f0; }
+  .ios.light .ring-text .rv { color: #1a1a2e; }
+  .ios.light .ring-text .rl { color: #94a3b8; }
+  .ios.light .ring-label { color: #94a3b8; }
+
+  .ios.light .lb-row { border-bottom-color: #f1f5f9; }
+  .ios.light .lb-rank.g { background: #fef3c7; }
+  .ios.light .lb-rank.s { background: #f1f5f9; }
+  .ios.light .lb-rank.b { background: #fff7ed; }
+  .ios.light .lb-rank.n { background: #f8fafc; }
+  .ios.light .lb-name { color: #1a1a2e; }
+
+  .ios.light .detail-panel { background: #fff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .ios.light .dp-header { border-bottom-color: #f1f5f9; }
+  .ios.light .dp-name { color: #1a1a2e; }
+  .ios.light .dp-sub { color: #64748b; }
+  .ios.light .dp-btn { border-color: #e2e8f0; color: #64748b; }
+  .ios.light .dp-field { border-bottom-color: #f1f5f9; color: #1a1a2e; }
+  .ios.light .dp-field .df-label { color: #94a3b8; }
+
+  .ios.light .closing-row { border-bottom-color: #f1f5f9; color: #1a1a2e; }
+  .ios.light .closing-row .cr-date { color: #94a3b8; }
+
+  .ios.light .panel-tab { color: #94a3b8; }
+  .ios.light .panel-tab.active { background: #f1f5f9; color: #1a1a2e; }
 </style>
 </head>
 <body>
@@ -394,6 +503,15 @@
     <button class="tab" onclick="show('v6',this)">6: Rings</button>
     <button class="tab" onclick="show('v7',this)">7: Compact</button>
     <button class="tab" onclick="show('v8',this)">8: Leaderboard</button>
+    <span style="color:#444;margin:0 4px">│</span>
+    <button class="tab" onclick="show('w1',this)" style="border-color:#bbb;color:#666">1: Light</button>
+    <button class="tab" onclick="show('w2',this)" style="border-color:#bbb;color:#666">2: Light Split</button>
+    <button class="tab" onclick="show('w3',this)" style="border-color:#bbb;color:#666">3: Light Chat</button>
+    <button class="tab" onclick="show('w4',this)" style="border-color:#bbb;color:#666">4: Light Kanban</button>
+    <button class="tab" onclick="show('w5',this)" style="border-color:#bbb;color:#666">5: Light Timeline</button>
+    <button class="tab" onclick="show('w6',this)" style="border-color:#bbb;color:#666">6: Light Rings</button>
+    <button class="tab" onclick="show('w7',this)" style="border-color:#bbb;color:#666">7: Light Compact</button>
+    <button class="tab" onclick="show('w8',this)" style="border-color:#bbb;color:#666">8: Light Leader</button>
   </div>
 </div>
 
@@ -938,6 +1056,626 @@
 
 <!-- ═══ V8 — LEADERBOARD + GAMIFIED ═══ -->
 <div id="v8" class="mockup ios">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Production Dashboard</h2><div class="ch-right"><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="aria-hero glow-card accent">
+          <div class="ah-row">
+            <div class="ah-icon">✦</div>
+            <div class="ah-body">
+              <div class="ah-label">Aria Intelligence</div>
+              <p>You're in <strong>1st place</strong> this month with <strong>$8.2M volume</strong>. Focus on <strong>Garcia's lock</strong> (expiring tomorrow) and converting <strong>5+ of 39 stale leads</strong> could add <strong>$1.5M+</strong> to your pipeline.</p>
+              <div class="ah-chips"><span class="ah-chip">📞 Call Garcia</span><span class="ah-chip">🔒 Extend lock</span><span class="ah-chip">👥 Stale leads</span><span class="ah-chip">💬 Ask Aria</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="kpi-row c4">
+          <div class="kpi-tile"><div class="kt-label">Volume</div><div class="kt-val" style="color:var(--accent)">$8.2M</div><div class="kt-delta up">↑ 15%</div></div>
+          <div class="kpi-tile"><div class="kt-label">Units</div><div class="kt-val">7</div><div class="kt-delta up">↑ 2</div></div>
+          <div class="kpi-tile"><div class="kt-label">Projected</div><div class="kt-val" style="color:var(--accent2)">19</div><div class="kt-delta up">on track</div></div>
+          <div class="kpi-tile"><div class="kt-label">Commission</div><div class="kt-val">$24.6K</div><div class="kt-delta up">↑ 8%</div></div>
+        </div>
+        <div class="grid2">
+          <div>
+            <div class="glow-card" style="margin-bottom:10px">
+              <div class="panel-head"><h3>🏆 Team Leaderboard — May</h3></div>
+              <div class="lb-row" style="background:rgba(251,191,36,0.04)"><div class="lb-rank g">1</div><div class="lb-name">Tim Loss</div><div class="lb-val">$8.2M</div><div class="lb-units">7 units</div></div>
+              <div class="lb-row"><div class="lb-rank s">2</div><div class="lb-name">Sarah Mitchell</div><div class="lb-val">$6.1M</div><div class="lb-units">5 units</div></div>
+              <div class="lb-row"><div class="lb-rank b">3</div><div class="lb-name">Jake Rivera</div><div class="lb-val">$4.8M</div><div class="lb-units">4 units</div></div>
+              <div class="lb-row"><div class="lb-rank n">4</div><div class="lb-name">Emma Nguyen</div><div class="lb-val">$3.2M</div><div class="lb-units">3 units</div></div>
+              <div class="lb-row"><div class="lb-rank n">5</div><div class="lb-name">Chris Patel</div><div class="lb-val">$2.7M</div><div class="lb-units">2 units</div></div>
+            </div>
+            <div class="glow-card">
+              <div class="panel-head"><h3>Pipeline</h3><a href="#">Full view →</a></div>
+              <div style="padding:6px 0">
+                <div class="pipe-row"><div class="pr-label">App</div><div class="pr-bar"><div class="fill" style="width:35%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div></div><div class="pr-n">4</div><div class="pr-v">$1.24M</div></div>
+                <div class="pipe-row"><div class="pr-label">Proc</div><div class="pr-bar"><div class="fill" style="width:25%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="pr-n">3</div><div class="pr-v">$1.09M</div></div>
+                <div class="pipe-row"><div class="pr-label">UW</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="pr-n">2</div><div class="pr-v">$455K</div></div>
+                <div class="pipe-row"><div class="pr-label">CTC</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="pr-n">2</div><div class="pr-v">$860K</div></div>
+                <div class="pipe-row"><div class="pr-label">Closing</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#ec4899,#f472b6)"></div></div><div class="pr-n">2</div><div class="pr-v">$675K</div></div>
+                <div class="pipe-row"><div class="pr-label" style="color:#34d399">Funded</div><div class="pr-bar"><div class="fill" style="width:40%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="pr-n" style="color:#34d399">5</div><div class="pr-v" style="color:#34d399">$1.85M</div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="glow-card" style="margin-bottom:10px">
+              <div class="panel-head"><h3>Action Required</h3><span class="p-badge">5</span></div>
+              <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔴</div><div class="si-body"><div class="si-title">39 leads overdue</div><div class="si-sub">Maria Chen — $380K</div></div><button class="si-btn">Contact</button></div>
+              <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔒</div><div class="si-body"><div class="si-title">Garcia lock tmrw</div><div class="si-sub">$520K • 6.25%</div></div><button class="si-btn">Extend</button></div>
+              <div class="stream-item"><div class="si-icon" style="background:rgba(129,140,248,0.1)">📋</div><div class="si-body"><div class="si-title">Doe 1003</div><div class="si-sub">$450K • 2h ago</div></div><button class="si-btn">Review</button></div>
+              <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">📄</div><div class="si-body"><div class="si-title">Doc reviews</div><div class="si-sub">Williams & Park</div></div><button class="si-btn">Review</button></div>
+              <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">⚠️</div><div class="si-body"><div class="si-title">Foster stale</div><div class="si-sub">$415K • 8 days</div></div><button class="si-btn">Follow up</button></div>
+            </div>
+            <div class="glow-card">
+              <div class="panel-head"><h3>Closing This Week</h3></div>
+              <div class="closing-row"><span class="cr-name">Williams (Refi)</span><span class="cr-date">May 15</span></div>
+              <div class="closing-row"><span class="cr-name">Patel (Purchase)</span><span class="cr-date">May 16</span></div>
+              <div class="closing-row"><span class="cr-name" style="color:var(--red)">Garcia (Purchase)</span><span class="cr-date" style="color:var(--red)">TBD</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="w1" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rate Monitor</div>
+      <div class="s-item">🧠 AI Underwriter</div>
+      <div class="s-item">🎯 Scorecard</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Smart Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-section">Operations</div>
+      <div class="s-item">👤 Team</div>
+      <div class="s-item">⚙️ Settings</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Command Center</h2><div class="ch-right"><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="aria-hero glow-card accent">
+          <div class="ah-row">
+            <div class="ah-icon">✦</div>
+            <div class="ah-body">
+              <div class="ah-label">Aria Intelligence</div>
+              <p>Good afternoon, Tim. <strong>Garcia's rate lock expires tomorrow</strong> — extend or close today. You have <strong>39 stale leads</strong> (Maria Chen highest, $380K). Pipeline: <strong>7 units MTD</strong>, <strong>19 projected</strong>, 3 deals within 10 days.</p>
+              <div class="ah-chips">
+                <span class="ah-chip">📞 Call Garcia</span>
+                <span class="ah-chip">🔒 Extend rate lock</span>
+                <span class="ah-chip">👥 View stale leads</span>
+                <span class="ah-chip">📋 Review Doe 1003</span>
+                <span class="ah-chip">💬 Ask Aria</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="kpi-row c4">
+          <div class="kpi-tile"><div class="kt-label">Pipeline Volume</div><div class="kt-val" style="color:var(--accent)">$8.2M</div><div class="kt-delta up">↑ 15%</div></div>
+          <div class="kpi-tile"><div class="kt-label">MTD Units</div><div class="kt-val">7</div><div class="kt-delta up">↑ 2 this week</div></div>
+          <div class="kpi-tile"><div class="kt-label">Projected</div><div class="kt-val" style="color:var(--accent2)">19</div><div class="kt-delta up">on track</div></div>
+          <div class="kpi-tile"><div class="kt-label">Commission</div><div class="kt-val">$24.6K</div><div class="kt-delta up">↑ 8%</div></div>
+        </div>
+        <div class="grid2">
+          <div class="glow-card">
+            <div class="panel-head"><h3>Action Required</h3><span class="p-badge">5</span></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔴</div><div class="si-body"><div class="si-title">39 leads — no contact in 24h</div><div class="si-sub">Maria Chen highest — 3 days, $380K</div></div><button class="si-btn">Contact</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔒</div><div class="si-body"><div class="si-title">Rate lock — Garcia $520K</div><div class="si-sub">6.25% • expires tomorrow</div></div><button class="si-btn">Extend</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(129,140,248,0.1)">📋</div><div class="si-body"><div class="si-title">New 1003 — Doe $450K</div><div class="si-sub">Purchase • 2h ago</div></div><button class="si-btn">Review</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">📄</div><div class="si-body"><div class="si-title">Doc reviews — Williams & Park</div><div class="si-sub">Bank stmts • tax returns</div></div><button class="si-btn">Review</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">⚠️</div><div class="si-body"><div class="si-title">Foster loan stale — 8 days</div><div class="si-sub">$415K • awaiting appraisal</div></div><button class="si-btn">Follow up</button></div>
+          </div>
+          <div class="glow-card">
+            <div class="panel-head"><h3>Pipeline</h3><a href="#">Full view →</a></div>
+            <div style="padding:8px 0">
+              <div class="pipe-row"><div class="pr-label">Application</div><div class="pr-bar"><div class="fill" style="width:35%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div></div><div class="pr-n">4</div><div class="pr-v">$1.24M</div></div>
+              <div class="pipe-row"><div class="pr-label">Processing</div><div class="pr-bar"><div class="fill" style="width:25%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="pr-n">3</div><div class="pr-v">$1.09M</div></div>
+              <div class="pipe-row"><div class="pr-label">Underwriting</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="pr-n">2</div><div class="pr-v">$455K</div></div>
+              <div class="pipe-row"><div class="pr-label">CTC</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="pr-n">2</div><div class="pr-v">$860K</div></div>
+              <div class="pipe-row"><div class="pr-label">Closing</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#ec4899,#f472b6)"></div></div><div class="pr-n">2</div><div class="pr-v">$675K</div></div>
+              <div class="pipe-row"><div class="pr-label" style="color:#34d399">Funded</div><div class="pr-bar"><div class="fill" style="width:40%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="pr-n" style="color:#34d399">5</div><div class="pr-v" style="color:#34d399">$1.85M</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V2 — SPLIT FOCUS ═══ -->
+<div id="w2" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-item">🎯 Scorecard</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-section">Ops</div>
+      <div class="s-item">👤 Team</div>
+      <div class="s-item">⚙️ Settings</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content" style="display:flex">
+      <!-- List pane -->
+      <div style="width:340px;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <h3 style="font-size:14px;font-weight:700">Active Pipeline</h3>
+          <span style="font-size:12px;color:var(--muted)">13 loans</span>
+        </div>
+        <div style="padding:10px 18px"><input style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:#fff;font-size:12px;outline:none;font-family:inherit" placeholder="🔍 Filter loans..." readonly></div>
+        <div class="stream-item" style="background:rgba(14,165,233,0.06);border-left:3px solid var(--accent)"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔒</div><div class="si-body"><div class="si-title">Carlos Garcia</div><div class="si-sub">$520K • CTC • Lock tmrw</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(129,140,248,0.1)">📋</div><div class="si-body"><div class="si-title">John Doe</div><div class="si-sub">$450K • Application • 2h ago</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">⚠️</div><div class="si-body"><div class="si-title">Amy Foster</div><div class="si-sub">$415K • Processing • 8 days</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(14,165,233,0.1)">💰</div><div class="si-body"><div class="si-title">Tom Williams</div><div class="si-sub">$380K • Closing May 15</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(14,165,233,0.1)">💰</div><div class="si-body"><div class="si-title">Maria Chen</div><div class="si-sub">$380K • Processing</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(52,211,153,0.1)">✅</div><div class="si-body"><div class="si-title">Emily Scott</div><div class="si-sub">$340K • CTC • 3 days</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(14,165,233,0.1)">💰</div><div class="si-body"><div class="si-title">Nina Patel</div><div class="si-sub">$295K • Closing May 16</div></div></div>
+        <div class="stream-item"><div class="si-icon" style="background:rgba(139,92,246,0.1)">📝</div><div class="si-body"><div class="si-title">David Park</div><div class="si-sub">$275K • UW • 3 conditions</div></div></div>
+      </div>
+      <!-- Detail pane -->
+      <div style="flex:1;overflow-y:auto;padding:24px 28px">
+        <div class="detail-panel" style="margin-bottom:16px">
+          <div class="dp-header">
+            <div class="dp-avatar">CG</div>
+            <div><div class="dp-name">Carlos Garcia</div><div class="dp-sub">Purchase • $520K • 6.25% locked • Clear to Close</div></div>
+            <div class="dp-actions"><button class="dp-btn">📞 Call</button><button class="dp-btn">💬 SMS</button><button class="dp-btn primary">Open Loan</button></div>
+          </div>
+          <div class="dp-field"><span class="df-label">Rate Lock</span><span class="df-val" style="color:var(--red)">Expires Tomorrow</span></div>
+          <div class="dp-field"><span class="df-label">Loan Type</span><span class="df-val">Conventional</span></div>
+          <div class="dp-field"><span class="df-label">Target Close</span><span class="df-val">May 20, 2026</span></div>
+          <div class="dp-field"><span class="df-label">FICO</span><span class="df-val">748</span></div>
+          <div class="dp-field"><span class="df-label">DTI / LTV</span><span class="df-val">38.2% / 80%</span></div>
+          <div class="dp-field"><span class="df-label">Days in Stage</span><span class="df-val">4 days</span></div>
+        </div>
+        <div class="glow-card">
+          <div class="panel-head"><h3>Activity</h3></div>
+          <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">Rate lock expires tomorrow</div><div class="tl-sub">Extend ($650 est.) or schedule closing</div><div class="tl-time">Alert • Just now</div></div></div>
+          <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--green)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">Clear to Close issued</div><div class="tl-sub">All conditions satisfied</div><div class="tl-time">Yesterday 3:42 PM</div></div></div>
+          <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--accent)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">Appraisal received — $655K</div><div class="tl-sub">Met value</div><div class="tl-time">May 8 at 9:20 AM</div></div></div>
+          <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--accent2)"></div></div><div class="tl-body"><div class="tl-title">Final bank statement uploaded</div><div class="tl-time">May 7 at 2:55 PM</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V3 — ARIA CHAT CENTER ═══ -->
+<div id="w3" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">✦ Aria</div>
+      <div class="s-item">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-section">Ops</div>
+      <div class="s-item">👤 Team</div>
+      <div class="s-item">⚙️ Settings</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content" style="display:flex">
+      <!-- Chat main -->
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="c-head"><h2>Aria</h2></div>
+        <div class="aria-chat" style="flex:1;border:none;border-radius:0">
+          <div class="ac-head">
+            <div class="ac-av">✦</div>
+            <div><div class="ac-name">Aria Intelligence</div><div class="ac-status">Online</div></div>
+          </div>
+          <div class="ac-msgs" style="flex:1">
+            <div class="ac-msg"><div class="ac-bubble">Good afternoon, Tim! Here's your daily briefing:<br><br><strong>🔴 Urgent:</strong> Garcia's rate lock expires tomorrow ($520K, 6.25%). Extend or schedule closing today.<br><br><strong>👥 Leads:</strong> 39 leads haven't been contacted in 24+ hours. Maria Chen is highest priority — $380K, 3 days silent.<br><br><strong>📄 Pending:</strong> 2 document reviews (Williams bank statements, Park tax returns) and 1 new 1003 from John Doe ($450K).<br><br><strong>📊 Production:</strong> 7 units MTD, projecting 19 for May. 3 deals closing within 10 days.<br><br>What would you like to focus on first?</div></div>
+          </div>
+          <div style="padding:6px 18px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="ah-chip" style="border:1px solid var(--border);background:var(--surface);padding:7px 14px;border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer">📞 Call Garcia</span>
+            <span class="ah-chip" style="border:1px solid var(--border);background:var(--surface);padding:7px 14px;border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer">🔒 Extend lock</span>
+            <span class="ah-chip" style="border:1px solid var(--border);background:var(--surface);padding:7px 14px;border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer">👥 Show stale leads</span>
+            <span class="ah-chip" style="border:1px solid var(--border);background:var(--surface);padding:7px 14px;border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer">📋 Review 1003</span>
+            <span class="ah-chip" style="border:1px solid var(--border);background:var(--surface);padding:7px 14px;border-radius:8px;font-size:11px;color:var(--muted);cursor:pointer">📊 Full briefing</span>
+          </div>
+          <div class="ac-input"><input class="ac-field" placeholder="Ask Aria anything about your pipeline..." readonly><button class="ac-send">Send</button></div>
+        </div>
+      </div>
+      <!-- Stats sidebar -->
+      <div style="width:300px;border-left:1px solid var(--border);overflow-y:auto;padding:18px">
+        <div class="glow-card" style="margin-bottom:12px">
+          <div class="panel-head"><h3>Today's Numbers</h3></div>
+          <div class="dp-field"><span class="df-label">Pipeline</span><span class="df-val" style="color:var(--accent)">$8.2M</span></div>
+          <div class="dp-field"><span class="df-label">MTD Units</span><span class="df-val">7</span></div>
+          <div class="dp-field"><span class="df-label">Projected</span><span class="df-val" style="color:var(--accent)">19</span></div>
+          <div class="dp-field"><span class="df-label">Commission</span><span class="df-val">$24.6K</span></div>
+          <div class="dp-field"><span class="df-label">Pull-Through</span><span class="df-val" style="color:var(--green)">78%</span></div>
+        </div>
+        <div class="glow-card" style="margin-bottom:12px">
+          <div class="panel-head"><h3>Alerts</h3><span class="p-badge">5</span></div>
+          <div class="closing-row"><span style="font-size:12px">🔴 39 leads need contact</span></div>
+          <div class="closing-row"><span style="font-size:12px">🔒 Rate lock expiring</span></div>
+          <div class="closing-row"><span style="font-size:12px">📄 2 doc reviews</span></div>
+          <div class="closing-row"><span style="font-size:12px">📋 New 1003</span></div>
+          <div class="closing-row"><span style="font-size:12px">⚠️ Foster stale</span></div>
+        </div>
+        <div class="glow-card">
+          <div class="panel-head"><h3>Closing This Week</h3></div>
+          <div class="closing-row"><span class="cr-name">Williams</span><span class="cr-date">May 15</span></div>
+          <div class="closing-row"><span class="cr-name">Patel</span><span class="cr-date">May 16</span></div>
+          <div class="closing-row"><span class="cr-name" style="color:var(--red)">Garcia</span><span class="cr-date" style="color:var(--red)">TBD</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V4 — KANBAN OS ═══ -->
+<div id="w4" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Pipeline Board</h2><div class="ch-right"><div class="panel-tabs"><button class="panel-tab active">Board</button><button class="panel-tab">List</button><button class="panel-tab">Chart</button></div><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="alert-strip">
+          <div class="as-items">
+            <div class="as-item">🔴 <span>39 leads overdue</span></div>
+            <div class="as-item">🔒 <span>1 lock expiring</span></div>
+            <div class="as-item">📄 <span>2 doc reviews</span></div>
+            <div class="as-item">📋 <span>1 new 1003</span></div>
+          </div>
+          <button class="as-btn">Ask Aria ✦</button>
+        </div>
+        <div class="kpi-row c5">
+          <div class="kpi-tile"><div class="kt-label">Volume</div><div class="kt-val" style="color:var(--accent)">$8.2M</div><div class="kt-delta up">↑ 15%</div></div>
+          <div class="kpi-tile"><div class="kt-label">Units</div><div class="kt-val">7</div><div class="kt-delta up">↑ 2</div></div>
+          <div class="kpi-tile"><div class="kt-label">Projected</div><div class="kt-val" style="color:var(--accent2)">19</div><div class="kt-delta up">on track</div></div>
+          <div class="kpi-tile"><div class="kt-label">Pull-Through</div><div class="kt-val" style="color:var(--green)">78%</div><div class="kt-delta up">↑ 3pts</div></div>
+          <div class="kpi-tile"><div class="kt-label">Commission</div><div class="kt-val">$24.6K</div><div class="kt-delta up">↑ 8%</div></div>
+        </div>
+        <div class="kanban">
+          <div class="k-col">
+            <div class="k-col-head">Application <span class="k-cnt">4</span></div>
+            <div class="k-card" style="border-left-color:var(--accent)"><div class="kc-top"><span class="kc-name">John Doe</span><span class="kc-amt">$450K</span></div><div class="kc-detail">Purchase • 2h ago</div><div class="kc-action">📋 Review 1003</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Sarah Kim</span><span class="kc-amt">$320K</span></div><div class="kc-detail">Purchase • 1 day</div><div class="kc-action">📄 Disclosures</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Mike Torres</span><span class="kc-amt">$275K</span></div><div class="kc-detail">Refi • 2 days</div><div class="kc-action">📄 Disclosures</div></div>
+            <div class="k-card" style="border-left-color:var(--amber)"><div class="kc-top"><span class="kc-name">Lisa Wang</span><span class="kc-amt">$195K</span></div><div class="kc-detail">Purchase • 5 days</div><div class="kc-action">⚠️ Missing VOE</div></div>
+          </div>
+          <div class="k-col">
+            <div class="k-col-head">Processing <span class="k-cnt">3</span></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Maria Chen</span><span class="kc-amt">$380K</span></div><div class="kc-detail">Purchase • 4 days</div><div class="kc-action">📄 Review docs</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">James Wright</span><span class="kc-amt">$290K</span></div><div class="kc-detail">Refi • 3 days</div><div class="kc-action">✓ Title ordered</div></div>
+            <div class="k-card" style="border-left-color:var(--red)"><div class="kc-top"><span class="kc-name">Amy Foster</span><span class="kc-amt">$415K</span></div><div class="kc-detail">Purchase • <span style="color:var(--red);font-weight:600">8 days</span></div><div class="kc-action">⚠️ Appraisal</div></div>
+          </div>
+          <div class="k-col">
+            <div class="k-col-head">Underwriting <span class="k-cnt">2</span></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">David Park</span><span class="kc-amt">$275K</span></div><div class="kc-detail">Purchase • 2 days</div><div class="kc-action">📝 3 conditions</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Rachel Adams</span><span class="kc-amt">$180K</span></div><div class="kc-detail">Refi • 1 day</div><div class="kc-action">⏳ Pending</div></div>
+          </div>
+          <div class="k-col">
+            <div class="k-col-head" style="color:var(--green)">CTC <span class="k-cnt">2</span></div>
+            <div class="k-card" style="border-left-color:var(--red)"><div class="kc-top"><span class="kc-name">Carlos Garcia</span><span class="kc-amt">$520K</span></div><div class="kc-detail"><span style="color:var(--red);font-weight:600">🔒 Lock tmrw</span></div><div class="kc-action">🔒 Extend/close</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Emily Scott</span><span class="kc-amt">$340K</span></div><div class="kc-detail">Purchase • 3 days</div><div class="kc-action">📅 Schedule</div></div>
+          </div>
+          <div class="k-col">
+            <div class="k-col-head">Closing <span class="k-cnt">2</span></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Tom Williams</span><span class="kc-amt">$380K</span></div><div class="kc-detail">Refi • May 15</div><div class="kc-action">📄 Docs out</div></div>
+            <div class="k-card"><div class="kc-top"><span class="kc-name">Nina Patel</span><span class="kc-amt">$295K</span></div><div class="kc-detail">Purchase • May 16</div><div class="kc-action">💰 Wire pending</div></div>
+          </div>
+          <div class="k-col">
+            <div class="k-col-head" style="color:var(--green)">Funded <span class="k-cnt" style="background:rgba(52,211,153,0.15);color:var(--green)">5</span></div>
+            <div class="k-card" style="border-left-color:var(--green);opacity:0.6"><div class="kc-top"><span class="kc-name">Robert Lee</span><span class="kc-amt">$425K</span></div><div class="kc-detail" style="color:var(--green)">Funded May 9</div></div>
+            <div class="k-card" style="border-left-color:var(--green);opacity:0.6"><div class="kc-top"><span class="kc-name">Diana Cruz</span><span class="kc-amt">$310K</span></div><div class="kc-detail" style="color:var(--green)">Funded May 7</div></div>
+            <div style="text-align:center;padding:8px;font-size:11px;color:var(--muted)">+3 more funded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V5 — TIMELINE FEED ═══ -->
+<div id="w5" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Activity Feed</h2><div class="ch-right"><div class="panel-tabs"><button class="panel-tab active">All</button><button class="panel-tab">Urgent</button><button class="panel-tab">Loans</button><button class="panel-tab">Leads</button></div><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="kpi-row c4">
+          <div class="kpi-tile"><div class="kt-label">Volume</div><div class="kt-val" style="color:var(--accent)">$8.2M</div><div class="kt-delta up">↑ 15%</div></div>
+          <div class="kpi-tile"><div class="kt-label">Units</div><div class="kt-val">7</div><div class="kt-delta up">↑ 2</div></div>
+          <div class="kpi-tile"><div class="kt-label">Projected</div><div class="kt-val" style="color:var(--accent2)">19</div><div class="kt-delta up">on track</div></div>
+          <div class="kpi-tile"><div class="kt-label">Commission</div><div class="kt-val">$24.6K</div><div class="kt-delta up">↑ 8%</div></div>
+        </div>
+        <div class="grid3-1">
+          <div class="glow-card">
+            <div class="panel-head"><h3>Timeline</h3></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title" style="color:var(--red)">🔒 Rate lock expiring — Garcia $520K</div><div class="tl-sub">6.25% locked. Extend ($650 est.) or schedule closing today.</div><div class="tl-time">Alert • Just now</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--accent)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">📋 New 1003 — John Doe $450K</div><div class="tl-sub">Purchase application via POS portal. MISMO 3.4 attached.</div><div class="tl-time">2 hours ago</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title" style="color:var(--red)">👥 39 leads overdue for contact</div><div class="tl-sub">Maria Chen highest priority — 3 days, $380K pre-approval.</div><div class="tl-time">Ongoing</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--green)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">✅ CTC issued — Rachel Adams</div><div class="tl-sub">$180K refi cleared. Schedule closing.</div><div class="tl-time">Today 10:15 AM</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--amber)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">📄 Doc reviews — Williams & Park</div><div class="tl-sub">Bank statements and tax returns uploaded. LO review needed.</div><div class="tl-time">Yesterday</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--amber)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">⚠️ Foster loan stale — 8 days</div><div class="tl-sub">$415K purchase stuck in Processing. Waiting on appraisal.</div><div class="tl-time">8 days in stage</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--accent2)"></div><div class="tl-connector"></div></div><div class="tl-body"><div class="tl-title">📅 Closing scheduled — Williams</div><div class="tl-sub">$380K refi closing May 15. Docs out.</div><div class="tl-time">Yesterday 4:30 PM</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot" style="background:var(--green)"></div></div><div class="tl-body"><div class="tl-title">🎉 Funded — Robert Lee $425K</div><div class="tl-sub">Purchase funded. Post-closing survey sent.</div><div class="tl-time">May 9</div></div></div>
+          </div>
+          <div>
+            <div class="aria-hero glow-card accent" style="margin-bottom:10px">
+              <div class="ah-row">
+                <div class="ah-icon" style="width:36px;height:36px;border-radius:10px;font-size:16px">✦</div>
+                <div class="ah-body">
+                  <div class="ah-label" style="font-size:10px">Aria</div>
+                  <p style="font-size:13px">Focus on <strong>Garcia's lock</strong> and <strong>stale leads</strong>. You're trending toward <strong>19 units</strong>.</p>
+                  <div class="ah-chips"><span class="ah-chip">💬 Ask Aria</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="glow-card" style="margin-bottom:10px">
+              <div class="panel-head"><h3>Closing</h3></div>
+              <div class="closing-row"><span class="cr-name">Williams</span><span class="cr-date">May 15</span></div>
+              <div class="closing-row"><span class="cr-name">Patel</span><span class="cr-date">May 16</span></div>
+              <div class="closing-row"><span class="cr-name" style="color:var(--red)">Garcia</span><span class="cr-date" style="color:var(--red)">TBD</span></div>
+            </div>
+            <div class="glow-card">
+              <div class="panel-head"><h3>Pipeline</h3></div>
+              <div class="pipe-row"><div class="pr-label">App</div><div class="pr-bar"><div class="fill" style="width:35%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div></div><div class="pr-n">4</div></div>
+              <div class="pipe-row"><div class="pr-label">Proc</div><div class="pr-bar"><div class="fill" style="width:25%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="pr-n">3</div></div>
+              <div class="pipe-row"><div class="pr-label">UW</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="pr-n">2</div></div>
+              <div class="pipe-row"><div class="pr-label">CTC</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="pr-n">2</div></div>
+              <div class="pipe-row"><div class="pr-label">Closing</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#ec4899,#f472b6)"></div></div><div class="pr-n">2</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V6 — PROGRESS RINGS ═══ -->
+<div id="w6" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Performance Dashboard</h2><div class="ch-right"><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="aria-hero glow-card accent">
+          <div class="ah-row">
+            <div class="ah-icon">✦</div>
+            <div class="ah-body">
+              <div class="ah-label">Aria Intelligence</div>
+              <p><strong>Garcia's lock expires tomorrow.</strong> You have <strong>39 stale leads</strong> and <strong>3 deals closing</strong> within 10 days. You're at 35% of your monthly goal.</p>
+              <div class="ah-chips"><span class="ah-chip">📞 Call Garcia</span><span class="ah-chip">🔒 Extend lock</span><span class="ah-chip">👥 Stale leads</span><span class="ah-chip">💬 Ask Aria</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="glow-card" style="margin-bottom:18px">
+          <div class="panel-head"><h3>Monthly Goals</h3><a href="#">Edit goals →</a></div>
+          <div class="ring-grid">
+            <div class="ring-item">
+              <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="6"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#rg1)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="163"/><defs><linearGradient id="rg1"><stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg><div class="ring-text"><div class="rv">7</div><div class="rl">of 20</div></div></div>
+              <div class="ring-label">Units</div>
+            </div>
+            <div class="ring-item">
+              <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="6"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#rg2)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="148"/><defs><linearGradient id="rg2"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs></svg><div class="ring-text"><div class="rv">$8.2M</div><div class="rl">of $20M</div></div></div>
+              <div class="ring-label">Volume</div>
+            </div>
+            <div class="ring-item">
+              <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="6"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#rg3)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="148"/><defs><linearGradient id="rg3"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs></svg><div class="ring-text"><div class="rv">$24.6K</div><div class="rl">of $60K</div></div></div>
+              <div class="ring-label">Commission</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="glow-card">
+            <div class="panel-head"><h3>Action Required</h3><span class="p-badge">5</span></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔴</div><div class="si-body"><div class="si-title">39 leads overdue</div><div class="si-sub">Maria Chen — 3 days, $380K</div></div><button class="si-btn">Contact</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(248,113,113,0.1)">🔒</div><div class="si-body"><div class="si-title">Rate lock — Garcia $520K</div><div class="si-sub">Expires tomorrow</div></div><button class="si-btn">Extend</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(129,140,248,0.1)">📋</div><div class="si-body"><div class="si-title">New 1003 — Doe $450K</div><div class="si-sub">2h ago</div></div><button class="si-btn">Review</button></div>
+            <div class="stream-item"><div class="si-icon" style="background:rgba(251,191,36,0.1)">📄</div><div class="si-body"><div class="si-title">Doc reviews</div><div class="si-sub">Williams & Park</div></div><button class="si-btn">Review</button></div>
+          </div>
+          <div class="glow-card">
+            <div class="panel-head"><h3>Pipeline</h3><a href="#">Full view →</a></div>
+            <div style="padding:8px 0">
+              <div class="pipe-row"><div class="pr-label">Application</div><div class="pr-bar"><div class="fill" style="width:35%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div></div><div class="pr-n">4</div><div class="pr-v">$1.24M</div></div>
+              <div class="pipe-row"><div class="pr-label">Processing</div><div class="pr-bar"><div class="fill" style="width:25%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="pr-n">3</div><div class="pr-v">$1.09M</div></div>
+              <div class="pipe-row"><div class="pr-label">UW</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="pr-n">2</div><div class="pr-v">$455K</div></div>
+              <div class="pipe-row"><div class="pr-label">CTC</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="pr-n">2</div><div class="pr-v">$860K</div></div>
+              <div class="pipe-row"><div class="pr-label">Closing</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#ec4899,#f472b6)"></div></div><div class="pr-n">2</div><div class="pr-v">$675K</div></div>
+              <div class="pipe-row"><div class="pr-label" style="color:#34d399">Funded</div><div class="pr-bar"><div class="fill" style="width:40%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="pr-n" style="color:#34d399">5</div><div class="pr-v" style="color:#34d399">$1.85M</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V7 — COMPACT DENSE ═══ -->
+<div id="w7" class="mockup ios light">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="s-head"><div class="s-logo">Perennia</div></div>
+      <div class="s-section">Core</div>
+      <div class="s-item active">📊 Dashboard</div>
+      <div class="s-item">👥 Leads <span class="s-badge red">39</span></div>
+      <div class="s-item">💰 Pipeline</div>
+      <div class="s-item">📋 Tasks <span class="s-badge red">4</span></div>
+      <div class="s-item">📅 Calendar</div>
+      <div class="s-section">Intelligence</div>
+      <div class="s-item">📈 Rates</div>
+      <div class="s-item">🧠 AI UW</div>
+      <div class="s-section">Marketing</div>
+      <div class="s-item">📄 Docs</div>
+      <div class="s-item">📱 Content</div>
+      <div class="s-item">🤝 Partners</div>
+      <div class="s-spacer"></div>
+      <div class="s-user"><div class="s-av">TL</div><div>Tim Loss</div></div>
+    </div>
+    <div class="content">
+      <div class="c-head"><h2>Overview</h2><div class="ch-right"><div class="cmd-k"><span>Search...</span> <kbd>⌘K</kbd></div></div></div>
+      <div class="dash">
+        <div class="alert-strip">
+          <div class="as-items">
+            <div class="as-item">🔴 39 leads</div>
+            <div class="as-item">🔒 Lock expiring</div>
+            <div class="as-item">📄 2 doc reviews</div>
+            <div class="as-item">📋 New 1003</div>
+            <div class="as-item">⚠️ Stale loan</div>
+          </div>
+          <button class="as-btn">Aria ✦</button>
+        </div>
+        <div class="kpi-row c5">
+          <div class="kpi-tile" style="padding:14px"><div class="kt-label">Volume</div><div class="kt-val" style="font-size:24px;color:var(--accent)">$8.2M</div><div class="kt-delta up">↑ 15%</div></div>
+          <div class="kpi-tile" style="padding:14px"><div class="kt-label">Units</div><div class="kt-val" style="font-size:24px">7</div><div class="kt-delta up">↑ 2</div></div>
+          <div class="kpi-tile" style="padding:14px"><div class="kt-label">Projected</div><div class="kt-val" style="font-size:24px;color:var(--accent2)">19</div><div class="kt-delta up">on track</div></div>
+          <div class="kpi-tile" style="padding:14px"><div class="kt-label">Pull-Through</div><div class="kt-val" style="font-size:24px;color:var(--green)">78%</div><div class="kt-delta up">↑ 3pts</div></div>
+          <div class="kpi-tile" style="padding:14px"><div class="kt-label">Commission</div><div class="kt-val" style="font-size:24px">$24.6K</div><div class="kt-delta up">↑ 8%</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="glow-card">
+            <div class="panel-head"><h3>Actions</h3><span class="p-badge">5</span></div>
+            <div class="stream-item" style="padding:10px 16px"><div class="si-body"><div class="si-title" style="font-size:12px">🔴 39 leads overdue</div><div class="si-sub" style="font-size:10px">Maria Chen — $380K</div></div><button class="si-btn" style="font-size:10px;padding:4px 10px">Go</button></div>
+            <div class="stream-item" style="padding:10px 16px"><div class="si-body"><div class="si-title" style="font-size:12px">🔒 Garcia lock tmrw</div><div class="si-sub" style="font-size:10px">$520K • 6.25%</div></div><button class="si-btn" style="font-size:10px;padding:4px 10px">Go</button></div>
+            <div class="stream-item" style="padding:10px 16px"><div class="si-body"><div class="si-title" style="font-size:12px">📋 Doe 1003 review</div><div class="si-sub" style="font-size:10px">$450K • 2h ago</div></div><button class="si-btn" style="font-size:10px;padding:4px 10px">Go</button></div>
+            <div class="stream-item" style="padding:10px 16px"><div class="si-body"><div class="si-title" style="font-size:12px">📄 Doc reviews (2)</div><div class="si-sub" style="font-size:10px">Williams & Park</div></div><button class="si-btn" style="font-size:10px;padding:4px 10px">Go</button></div>
+            <div class="stream-item" style="padding:10px 16px"><div class="si-body"><div class="si-title" style="font-size:12px">⚠️ Foster stale 8d</div><div class="si-sub" style="font-size:10px">$415K • appraisal</div></div><button class="si-btn" style="font-size:10px;padding:4px 10px">Go</button></div>
+          </div>
+          <div class="glow-card">
+            <div class="panel-head"><h3>Pipeline</h3></div>
+            <div style="padding:6px 0">
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px">App</div><div class="pr-bar"><div class="fill" style="width:35%;background:linear-gradient(90deg,#0ea5e9,#38bdf8)"></div></div><div class="pr-n" style="font-size:12px">4</div><div class="pr-v" style="font-size:10px">$1.24M</div></div>
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px">Proc</div><div class="pr-bar"><div class="fill" style="width:25%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div><div class="pr-n" style="font-size:12px">3</div><div class="pr-v" style="font-size:10px">$1.09M</div></div>
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px">UW</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="pr-n" style="font-size:12px">2</div><div class="pr-v" style="font-size:10px">$455K</div></div>
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px">CTC</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="pr-n" style="font-size:12px">2</div><div class="pr-v" style="font-size:10px">$860K</div></div>
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px">Close</div><div class="pr-bar"><div class="fill" style="width:18%;background:linear-gradient(90deg,#ec4899,#f472b6)"></div></div><div class="pr-n" style="font-size:12px">2</div><div class="pr-v" style="font-size:10px">$675K</div></div>
+              <div class="pipe-row" style="padding:7px 16px"><div class="pr-label" style="font-size:10px;color:#34d399">Funded</div><div class="pr-bar"><div class="fill" style="width:40%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="pr-n" style="font-size:12px;color:#34d399">5</div><div class="pr-v" style="font-size:10px;color:#34d399">$1.85M</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="glow-card" style="margin-bottom:10px">
+              <div class="panel-head"><h3>Closing</h3></div>
+              <div class="closing-row" style="padding:8px 16px;font-size:12px"><span class="cr-name">Williams</span><span class="cr-date">May 15</span></div>
+              <div class="closing-row" style="padding:8px 16px;font-size:12px"><span class="cr-name">Patel</span><span class="cr-date">May 16</span></div>
+              <div class="closing-row" style="padding:8px 16px;font-size:12px"><span class="cr-name" style="color:var(--red)">Garcia</span><span class="cr-date" style="color:var(--red)">TBD</span></div>
+            </div>
+            <div class="aria-hero glow-card accent" style="padding:16px;margin-bottom:0">
+              <div class="ah-row">
+                <div class="ah-icon" style="width:32px;height:32px;border-radius:8px;font-size:14px">✦</div>
+                <div class="ah-body">
+                  <div class="ah-label" style="font-size:9px">Aria</div>
+                  <p style="font-size:12px;line-height:1.5">Focus on <strong>Garcia's lock</strong> and <strong>39 stale leads</strong>. 3 deals closing within 10 days.</p>
+                  <div class="ah-chips" style="margin-top:10px"><span class="ah-chip" style="font-size:10px;padding:5px 10px">💬 Ask Aria</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ V8 — LEADERBOARD + GAMIFIED ═══ -->
+<div id="w8" class="mockup ios light">
   <div class="layout">
     <div class="sidebar">
       <div class="s-head"><div class="s-logo">Perennia</div></div>

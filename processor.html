@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processor Dashboard — Perennia AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #1A1F1B; }
+
+  /* ── Tab Switcher ── */
+  .selector {
+    position: sticky; top: 0; z-index: 9999;
+    background: #1F3D2E; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .selector h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #F5EDD9; font-size: 15px; font-weight: 500; white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  .selector .role-tag {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: rgba(184,146,74,0.25); color: #F5EDD9; white-space: nowrap;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .selector .tabs { display: flex; gap: 5px; flex-shrink: 0; }
+  .selector .tab {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s;
+    white-space: nowrap; font-family: inherit;
+  }
+  .selector .tab:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+  .selector .tab.active { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .mockup { display: none; }
+  .mockup.active { display: block; }
+
+  /* ═══════════════════════════════════════════════════
+     SHARED — Borrower Theme Design System
+     ═══════════════════════════════════════════════════ */
+  :root {
+    --bt-font-display: 'Fraunces', Georgia, serif;
+    --bt-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --bt-bg-page: #FAF7F1;
+    --bt-bg-surface: #FFFFFF;
+    --bt-bg-sidebar: #F6F2EA;
+    --bt-bg-elevated: #F2EDE2;
+    --bt-bg-soft: #FBF8F2;
+    --bt-border: #ECE6D8;
+    --bt-border-strong: #D8D0BD;
+    --bt-text-primary: #1A1F1B;
+    --bt-text-secondary: #4F554E;
+    --bt-text-muted: #8B8A7E;
+    --bt-text-faint: #B5B2A4;
+    --bt-primary: #1F3D2E;
+    --bt-primary-hover: #2A4F3D;
+    --bt-primary-light: #E5EDE6;
+    --bt-primary-tint: #EFF3EE;
+    --bt-accent: #B8924A;
+    --bt-accent-light: #F5EDD9;
+    --bt-success: #2D7A52;
+    --bt-warning: #B25F18;
+    --bt-error: #9B2C2C;
+    --bt-info: #3182CE;
+    --bt-radius-sm: 6px;
+    --bt-radius-md: 10px;
+    --bt-radius-lg: 14px;
+    --bt-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --bt-shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --bt-shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .bt {
+    background: var(--bt-bg-page); color: var(--bt-text-primary);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+    letter-spacing: -0.005em;
+  }
+  .bt .layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .bt .sidebar {
+    width: 240px; background: var(--bt-bg-sidebar);
+    border-right: 1px solid var(--bt-border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    overflow-y: auto; max-height: 100vh; position: sticky; top: 44px;
+    height: calc(100vh - 44px);
+  }
+  .bt .sidebar::-webkit-scrollbar { width: 4px; }
+  .bt .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .bt .sidebar::-webkit-scrollbar-thumb { background: var(--bt-border-strong); border-radius: 2px; }
+
+  .bt .s-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--bt-border); position: sticky; top: 0;
+    background: var(--bt-bg-sidebar); z-index: 2;
+  }
+  .bt .s-logo {
+    font-family: var(--bt-font-display); font-weight: 500; font-size: 17px;
+    letter-spacing: -0.02em; color: var(--bt-primary);
+  }
+  .bt .s-version {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--bt-primary-tint);
+    color: var(--bt-primary); margin-left: auto;
+  }
+  .bt .s-section {
+    padding: 18px 20px 6px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--bt-text-muted); font-weight: 600;
+  }
+  .bt .s-item {
+    padding: 8px 12px 8px 20px; font-size: 13px; color: var(--bt-text-secondary);
+    cursor: pointer; display: flex; align-items: center; gap: 9px;
+    transition: all 0.12s; margin: 1px 8px; border-radius: 8px;
+    font-weight: 500;
+  }
+  .bt .s-item:hover { background: var(--bt-bg-elevated); color: var(--bt-text-primary); }
+  .bt .s-item.active {
+    background: var(--bt-bg-elevated); color: var(--bt-text-primary);
+    font-weight: 600;
+  }
+  .bt .s-icon { width: 16px; text-align: center; opacity: 0.5; font-size: 12px; }
+  .bt .s-badge {
+    margin-left: auto; font-size: 10px; padding: 2px 7px;
+    border-radius: 10px; font-weight: 700; min-width: 18px; text-align: center;
+  }
+  .bt .s-badge.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .s-badge.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .s-badge.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .s-badge.primary { background: var(--bt-primary); color: #fff; }
+  .bt .s-spacer { flex: 1; min-height: 12px; }
+  .bt .s-user {
+    padding: 14px 20px; border-top: 1px solid var(--bt-border);
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    position: sticky; bottom: 0; background: var(--bt-bg-sidebar);
+  }
+  .bt .s-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bt-accent); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff;
+  }
+
+  /* ── Main Content ── */
+  .bt .content { flex: 1; overflow-y: auto; }
+  .bt .c-head {
+    padding: 20px 32px; display: flex; align-items: center;
+    border-bottom: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+  }
+  .bt .c-head h2 {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--bt-text-primary);
+  }
+  .bt .c-head .ch-sub {
+    font-size: 13px; color: var(--bt-text-muted); margin-left: 12px;
+  }
+  .bt .c-head .ch-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .bt .search-bar {
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 8px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-soft); font-size: 13px; color: var(--bt-text-muted);
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .bt .search-bar:hover { border-color: var(--bt-border-strong); }
+  .bt .search-bar kbd {
+    font-size: 10px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-muted);
+    font-family: inherit;
+  }
+
+  .bt .btn {
+    font-size: 13px; font-weight: 600; padding: 8px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer;
+    font-family: inherit; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-primary);
+    transition: all 0.15s;
+  }
+  .bt .btn:hover { border-color: var(--bt-border-strong); }
+  .bt .btn.primary { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .btn.primary:hover { background: var(--bt-primary-hover); }
+  .bt .btn.accent { background: var(--bt-accent); color: #fff; border-color: var(--bt-accent); }
+
+  .bt .card {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); box-shadow: var(--bt-shadow-sm);
+  }
+  .bt .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .card-header h3 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted);
+  }
+  .bt .card-header .link {
+    font-size: 12px; font-weight: 500; color: var(--bt-primary);
+    cursor: pointer; text-decoration: none;
+  }
+  .bt .card-body { padding: 16px 20px; }
+
+  .bt .hero {
+    background: var(--bt-primary); border-radius: var(--bt-radius-lg);
+    padding: 24px 28px; color: #F5EDD9; position: relative; overflow: hidden;
+  }
+  .bt .hero::after {
+    content: ''; position: absolute; top: -60px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .bt .hero .greeting {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 500; letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .bt .hero .subtitle { font-size: 14px; color: rgba(245,237,217,0.7); }
+  .bt .hero-stats { display: flex; gap: 28px; margin-top: 16px; }
+  .bt .hero-stat .label { font-size: 11px; color: rgba(245,237,217,0.5); text-transform: uppercase; letter-spacing: 0.05em; }
+  .bt .hero-stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  .bt .metric { padding: 16px 20px; }
+  .bt .metric .m-label { font-size: 11px; font-weight: 500; color: var(--bt-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bt .metric .m-value { font-size: 26px; font-weight: 700; color: var(--bt-text-primary); margin-top: 4px; letter-spacing: -0.02em; }
+  .bt .metric .m-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .bt .metric .m-change.up { color: var(--bt-success); }
+  .bt .metric .m-change.down { color: var(--bt-error); }
+
+  .bt .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bt .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-3-1 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .bt .main-area { padding: 24px 32px; }
+
+  .bt .pipeline-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bt-bg-elevated); }
+  .bt .pipeline-bar .segment { height: 100%; transition: width 0.5s; }
+
+  .bt .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .list-item:last-child { border-bottom: none; }
+  .bt .list-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bt-primary-light); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--bt-primary); flex-shrink: 0;
+  }
+  .bt .list-info { flex: 1; min-width: 0; }
+  .bt .list-info .name { font-size: 13px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .list-info .detail { font-size: 12px; color: var(--bt-text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bt .tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; display: inline-block;
+  }
+  .bt .tag.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .tag.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .tag.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .tag.blue { background: #DBEAFE; color: var(--bt-info); }
+  .bt .tag.muted { background: var(--bt-bg-elevated); color: var(--bt-text-muted); }
+
+  .bt .task-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .task-item:last-child { border-bottom: none; }
+  .bt .task-check {
+    width: 16px; height: 16px; border: 2px solid var(--bt-border-strong);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .bt .task-item.urgent .task-check { border-color: var(--bt-warning); }
+
+  .bt .aria-bar {
+    padding: 14px 20px; background: var(--bt-bg-surface);
+    border: 1px solid var(--bt-border); border-radius: var(--bt-radius-lg);
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bt .aria-bar:hover { border-color: var(--bt-primary); box-shadow: 0 0 0 3px var(--bt-primary-tint); }
+  .bt .aria-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .bt .aria-bar .prompt { flex: 1; font-size: 14px; color: var(--bt-text-muted); }
+  .bt .aria-bar .aria-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary);
+  }
+
+  .bt .cal-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bt-border); }
+  .bt .cal-item:last-child { border-bottom: none; }
+  .bt .cal-date {
+    width: 42px; height: 42px; border-radius: var(--bt-radius-md);
+    background: var(--bt-primary-tint); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .bt .cal-date .month { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--bt-primary); letter-spacing: 0.04em; }
+  .bt .cal-date .day { font-size: 15px; font-weight: 700; color: var(--bt-primary); line-height: 1; }
+
+  .bt table { width: 100%; border-collapse: collapse; }
+  .bt table th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--bt-text-muted); padding: 10px 14px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table td {
+    padding: 10px 14px; font-size: 13px; color: var(--bt-text-primary);
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table tr:last-child td { border-bottom: none; }
+  .bt table tr:hover td { background: var(--bt-bg-soft); }
+
+  .bt .progress-ring { width: 56px; height: 56px; position: relative; }
+  .bt .progress-ring svg { transform: rotate(-90deg); width: 56px; height: 56px; }
+  .bt .progress-ring .bg { fill: none; stroke: var(--bt-bg-elevated); stroke-width: 5; }
+  .bt .progress-ring .fg { fill: none; stroke: var(--bt-accent); stroke-width: 5; stroke-linecap: round; }
+  .bt .progress-ring .pct {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--bt-text-primary);
+  }
+
+  /* Condition tracker */
+  .bt .cond-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--bt-border);
+    font-size: 13px;
+  }
+  .bt .cond-item:last-child { border-bottom: none; }
+  .bt .cond-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .bt .cond-dot.received { background: var(--bt-success); }
+  .bt .cond-dot.pending { background: var(--bt-warning); }
+  .bt .cond-dot.missing { background: var(--bt-error); }
+  .bt .cond-dot.waived { background: var(--bt-text-faint); }
+  .bt .cond-dot.ordered { background: var(--bt-info); }
+
+  /* LO assignment tag */
+  .bt .lo-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: var(--bt-accent-light);
+    color: var(--bt-accent); white-space: nowrap;
+  }
+
+  /* Progress bar */
+  .bt .progress-bar {
+    height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden;
+  }
+  .bt .progress-bar .fill {
+    height: 100%; border-radius: 3px; transition: width 0.3s;
+  }
+
+  /* Service dot legend */
+  .bt .dot-legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+  }
+  .bt .dot-legend-item {
+    display: flex; align-items: center; gap: 5px; font-size: 11px;
+    color: var(--bt-text-muted); font-weight: 500;
+  }
+  .bt .dot-sm { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* File card compact */
+  .bt .file-card {
+    border: 1px solid var(--bt-border); border-radius: var(--bt-radius-md);
+    padding: 14px 16px; background: var(--bt-bg-surface); margin-bottom: 10px;
+    box-shadow: var(--bt-shadow-sm);
+  }
+  .bt .file-card:last-child { margin-bottom: 0; }
+  .bt .file-card .file-top {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+  }
+  .bt .file-card .file-borrower { font-size: 14px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .file-card .file-detail { font-size: 12px; color: var(--bt-text-muted); }
+
+  /* Priority banner */
+  .bt .priority-banner {
+    background: linear-gradient(135deg, #9B2C2C 0%, #B25F18 100%);
+    border-radius: var(--bt-radius-lg); padding: 18px 24px; color: #fff;
+    margin-bottom: 16px;
+  }
+  .bt .priority-banner h3 {
+    font-family: var(--bt-font-display); font-size: 16px; font-weight: 600;
+    margin-bottom: 4px; letter-spacing: -0.01em;
+  }
+  .bt .priority-banner p { font-size: 13px; opacity: 0.85; }
+
+  /* Checklist */
+  .bt .check-row {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    font-size: 13px; color: var(--bt-text-primary);
+  }
+  .bt .check-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+  .bt .check-icon.done { color: var(--bt-success); }
+  .bt .check-icon.missing { color: var(--bt-error); }
+  .bt .check-icon.pending { color: var(--bt-warning); }
+
+  /* Communication timeline */
+  .bt .comm-item {
+    display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .comm-item:last-child { border-bottom: none; }
+  .bt .comm-icon {
+    width: 28px; height: 28px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* Turn time bar */
+  .bt .turn-bar {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .bt .turn-label { font-size: 13px; font-weight: 500; width: 80px; flex-shrink: 0; color: var(--bt-text-secondary); }
+  .bt .turn-track { flex: 1; height: 20px; background: var(--bt-bg-elevated); border-radius: 4px; overflow: hidden; position: relative; }
+  .bt .turn-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10px; font-weight: 700; color: #fff; }
+  .bt .turn-target { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--bt-text-muted); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TAB SWITCHER
+     ════════════════════════════════════════════════════════════════ -->
+<div class="selector">
+  <h1>Perennia Dashboard</h1>
+  <span class="role-tag">Processor</span>
+  <div class="tabs">
+    <button class="tab active" onclick="show(1)">1 — Processing Queue</button>
+    <button class="tab" onclick="show(2)">2 — Service Orders</button>
+    <button class="tab" onclick="show(3)">3 — Doc Checklist</button>
+    <button class="tab" onclick="show(4)">4 — Conditions</button>
+    <button class="tab" onclick="show(5)">5 — File Packaging</button>
+    <button class="tab" onclick="show(6)">6 — Communications</button>
+    <button class="tab" onclick="show(7)">7 — Turn Times</button>
+    <button class="tab" onclick="show(8)">8 — Morning Focus</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 1 — Processing Queue
+     Main workhorse view: files assigned, sorted by priority
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v1" class="mockup active">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Processing Queue</h2>
+      <span class="ch-sub">Tuesday, May 13</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search files... <kbd>&#8984;K</kbd></div>
+        <button class="btn primary">+ New File</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Hero -->
+      <div class="hero" style="margin-bottom:20px">
+        <div class="greeting">Good morning, Maria</div>
+        <div class="subtitle">21 active files across 4 LOs. 8 conditions need clearing today.</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="label">New Files</div><div class="value">3</div></div>
+          <div class="hero-stat"><div class="label">In Processing</div><div class="value">6</div></div>
+          <div class="hero-stat"><div class="label">Submitted to UW</div><div class="value">4</div></div>
+          <div class="hero-stat"><div class="label">Conditions</div><div class="value">8</div></div>
+        </div>
+      </div>
+
+      <!-- Metrics row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">New Files</div><div class="m-value" style="color:var(--bt-info)">3</div><div class="m-change up">Assigned today</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">In Processing</div><div class="m-value">6</div><div class="m-change down">2 approaching SLA</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-primary)">
+          <div class="metric"><div class="m-label">Submitted to UW</div><div class="m-value">4</div><div class="m-change up">1 returned w/ conditions</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Conditions to Clear</div><div class="m-value" style="color:var(--bt-error)">8</div><div class="m-change down">3 overdue</div></div>
+        </div>
+      </div>
+
+      <!-- Queue table -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Active Processing Queue</h3>
+          <span class="link">Sort by Priority</span>
+        </div>
+        <table>
+          <tr><th>Borrower</th><th>LO</th><th>Loan Type</th><th>Amount</th><th>Stage</th><th>Days</th><th>Next Action</th></tr>
+          <tr>
+            <td><span style="font-weight:600">Martinez, R.</span></td>
+            <td><span class="lo-tag">T. Loss</span></td>
+            <td>FHA</td>
+            <td>$285,000</td>
+            <td><span class="tag red">Conditions</span></td>
+            <td style="font-weight:600;color:var(--bt-error)">18</td>
+            <td style="font-size:12px">Clear PTD #3 &mdash; VOE from employer</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Richardson, A.</span></td>
+            <td><span class="lo-tag">M. Davis</span></td>
+            <td>Conv</td>
+            <td>$425,000</td>
+            <td><span class="tag amber">Submitted to UW</span></td>
+            <td style="font-weight:600;color:var(--bt-warning)">14</td>
+            <td style="font-size:12px">Awaiting UW decision</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Kim, J.</span></td>
+            <td><span class="lo-tag">S. Park</span></td>
+            <td>VA</td>
+            <td>$315,000</td>
+            <td><span class="tag amber">In Processing</span></td>
+            <td>10</td>
+            <td style="font-size:12px">Waiting on COE from VA</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Johnson, T.</span></td>
+            <td><span class="lo-tag">T. Loss</span></td>
+            <td>Jumbo</td>
+            <td>$780,000</td>
+            <td><span class="tag amber">In Processing</span></td>
+            <td>8</td>
+            <td style="font-size:12px">Income calc &mdash; self-employed, 2 yrs returns</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Watson, D.</span></td>
+            <td><span class="lo-tag">J. Wilson</span></td>
+            <td>Conv</td>
+            <td>$350,000</td>
+            <td><span class="tag blue">New File</span></td>
+            <td>1</td>
+            <td style="font-size:12px">Order appraisal &amp; title</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Chen, L.</span></td>
+            <td><span class="lo-tag">M. Davis</span></td>
+            <td>FHA</td>
+            <td>$245,000</td>
+            <td><span class="tag green">Conditions</span></td>
+            <td>15</td>
+            <td style="font-size:12px">2 of 4 PTD conditions cleared</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">O'Brien, K.</span></td>
+            <td><span class="lo-tag">S. Park</span></td>
+            <td>USDA</td>
+            <td>$198,000</td>
+            <td><span class="tag amber">In Processing</span></td>
+            <td>6</td>
+            <td style="font-size:12px">Waiting on USDA eligibility check</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Nguyen, P.</span></td>
+            <td><span class="lo-tag">T. Loss</span></td>
+            <td>Conv</td>
+            <td>$520,000</td>
+            <td><span class="tag blue">New File</span></td>
+            <td>0</td>
+            <td style="font-size:12px">Initial doc collection &mdash; pull credit</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Patterson, B.</span></td>
+            <td><span class="lo-tag">J. Wilson</span></td>
+            <td>VA</td>
+            <td>$290,000</td>
+            <td><span class="tag amber">Submitted to UW</span></td>
+            <td>12</td>
+            <td style="font-size:12px">Awaiting UW decision</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Brooks, S.</span></td>
+            <td><span class="lo-tag">M. Davis</span></td>
+            <td>Conv</td>
+            <td>$375,000</td>
+            <td><span class="tag blue">New File</span></td>
+            <td>0</td>
+            <td style="font-size:12px">Review 1003, order services</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Aria -->
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, what's missing from the Martinez file for UW submission?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 2 — Service Order Tracker
+     Third-party service orders across all files
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v2" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Service Order Tracker</h2>
+      <span class="ch-sub">All Active Files</span>
+      <div class="ch-right">
+        <button class="btn">Export Report</button>
+        <button class="btn primary">+ Order Service</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Legend -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body" style="padding:10px 20px">
+          <div class="dot-legend">
+            <div class="dot-legend-item"><div class="dot-sm" style="background:var(--bt-info)"></div> Ordered</div>
+            <div class="dot-legend-item"><div class="dot-sm" style="background:var(--bt-warning)"></div> Pending</div>
+            <div class="dot-legend-item"><div class="dot-sm" style="background:var(--bt-success)"></div> Received</div>
+            <div class="dot-legend-item"><div class="dot-sm" style="background:var(--bt-error)"></div> Overdue</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary metrics -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">Ordered</div><div class="m-value">12</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">Pending</div><div class="m-value">8</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Received</div><div class="m-value">19</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Overdue</div><div class="m-value" style="color:var(--bt-error)">4</div></div>
+        </div>
+      </div>
+
+      <!-- Service order table -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Service Orders by File</h3>
+          <span class="link">Filter by Status</span>
+        </div>
+        <table>
+          <tr><th>Borrower</th><th>Appraisal</th><th>Title</th><th>Flood</th><th>VOE</th><th>VOD</th><th>HOI</th><th>Survey</th><th>Pest</th></tr>
+          <tr>
+            <td><span style="font-weight:600">Martinez, R.</span> <span class="lo-tag">T. Loss</span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot missing" title="Overdue - 6 days"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Richardson, A.</span> <span class="lo-tag">M. Davis</span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot pending" title="Commitment pending"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Kim, J.</span> <span class="lo-tag">S. Park</span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/8"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/9"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot pending" title="Sent to employer 5/6"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/10"></span></td>
+            <td><span class="cond-dot pending" title="Requested from borrower"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Johnson, T.</span> <span class="lo-tag">T. Loss</span></td>
+            <td><span class="cond-dot pending" title="Scheduled 5/15"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/10"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot missing" title="Overdue - self-emp, CPA unresponsive"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/11"></span></td>
+            <td><span class="cond-dot pending" title="Requested"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Watson, D.</span> <span class="lo-tag">J. Wilson</span></td>
+            <td><span class="cond-dot ordered" title="Ordered today"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered today"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered today"></span></td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Chen, L.</span> <span class="lo-tag">M. Davis</span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot pending" title="Requested from agent"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">O'Brien, K.</span> <span class="lo-tag">S. Park</span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/11"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered 5/11"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot pending" title="Sent 5/9"></span></td>
+            <td><span class="cond-dot pending" title="Sent 5/9"></span></td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td><span class="cond-dot ordered" title="Ordered"></span></td>
+            <td><span class="cond-dot ordered" title="Ordered"></span></td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Nguyen, P.</span> <span class="lo-tag">T. Loss</span></td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">&mdash;</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+          <tr>
+            <td><span style="font-weight:600">Patterson, B.</span> <span class="lo-tag">J. Wilson</span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td><span class="cond-dot received" title="Received"></span></td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+            <td style="color:var(--bt-text-faint)">N/A</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Overdue detail -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Overdue Service Orders</h3>
+          <span class="tag red">4 Overdue</span>
+        </div>
+        <div class="card-body">
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="font-weight:600;flex:1">Martinez &mdash; VOE (Primary Employer)</span>
+            <span style="font-size:12px;color:var(--bt-text-muted)">Sent 5/3 &middot; 10 days ago</span>
+            <span class="tag red" style="font-size:10px;margin-left:8px">Follow up #3</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="font-weight:600;flex:1">Johnson &mdash; VOE (CPA verification for self-emp)</span>
+            <span style="font-size:12px;color:var(--bt-text-muted)">Sent 5/5 &middot; 8 days ago</span>
+            <span class="tag red" style="font-size:10px;margin-left:8px">Follow up #2</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="font-weight:600;flex:1">Park, M. &mdash; Appraisal (inspector scheduling conflict)</span>
+            <span style="font-size:12px;color:var(--bt-text-muted)">Ordered 4/28 &middot; 15 days ago</span>
+            <span class="tag red" style="font-size:10px;margin-left:8px">Escalate</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="font-weight:600;flex:1">Wilson, R. &mdash; Title Commitment (title company backlog)</span>
+            <span style="font-size:12px;color:var(--bt-text-muted)">Ordered 5/1 &middot; 12 days ago</span>
+            <span class="tag red" style="font-size:10px;margin-left:8px">Follow up #3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which files are waiting on appraisals and when were they ordered?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 3 — Document Checklist
+     Per-file document collection status
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v3" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Document Checklist</h2>
+      <span class="ch-sub">Per-File Collection Status</span>
+      <div class="ch-right">
+        <button class="btn">Send Reminders</button>
+        <button class="btn primary">Upload Docs</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- File: Martinez -->
+      <div class="file-card" style="margin-bottom:16px">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Martinez, R.</span>
+            <span class="lo-tag" style="margin-left:8px">T. Loss</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">FHA &middot; $285,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag amber">82% Complete</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:82%;background:var(--bt-warning)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 16px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 Application</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit Report</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> W-2s (2 years)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Pay Stubs (30 day)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Tax Returns (2 yrs)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Bank Statements</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Purchase Contract</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Appraisal</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Title Commitment</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">VOE (primary employer)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Flood Cert</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> HOI Binder</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures Signed</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">ECOA Notice</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> DU Findings</div>
+        </div>
+      </div>
+
+      <!-- File: Johnson -->
+      <div class="file-card" style="margin-bottom:16px">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Johnson, T.</span>
+            <span class="lo-tag" style="margin-left:8px">T. Loss</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">Jumbo &middot; $780,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag amber">65% Complete</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:65%;background:var(--bt-warning)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 16px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 Application</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit Report</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Business Returns (2 yrs)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Personal Returns (2 yrs)</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">P&L (YTD)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Bank Statements (personal)</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Bank Statements (business)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Purchase Contract</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Appraisal (scheduled 5/15)</span></div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Title Search (ordered)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Flood Cert</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">HOI Binder</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures Signed</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">CPA Letter (self-emp)</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">DU Findings (not yet run)</span></div>
+        </div>
+      </div>
+
+      <!-- File: Watson -->
+      <div class="file-card" style="margin-bottom:16px">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Watson, D.</span>
+            <span class="lo-tag" style="margin-left:8px">J. Wilson</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">Conv &middot; $350,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag blue">35% Complete</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:35%;background:var(--bt-info)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 16px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 Application</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit Report</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">W-2s (requested)</span></div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Pay Stubs (requested)</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Tax Returns</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Bank Statements</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Purchase Contract</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Appraisal (ordered)</span></div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Title (ordered)</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">VOE</span></div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Flood Cert (ordered)</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">HOI Binder</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Disclosures</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">ECOA</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">AUS (not run)</span></div>
+        </div>
+      </div>
+
+      <!-- File: Kim -->
+      <div class="file-card" style="margin-bottom:16px">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Kim, J.</span>
+            <span class="lo-tag" style="margin-left:8px">S. Park</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">VA &middot; $315,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag amber">72% Complete</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:72%;background:var(--bt-warning)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 16px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 Application</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit Report</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> W-2s (2 years)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Pay Stubs (LES)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Tax Returns</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Bank Statements</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Purchase Contract</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Appraisal (ordered)</span></div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">Title (ordered)</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">COE (VA Certificate)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Flood Cert</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">HOI (requested)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures Signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> DD-214</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">AUS (not run)</span></div>
+        </div>
+      </div>
+
+      <div class="aria-bar" style="margin-top:20px">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, generate a missing document list for all files under 80% complete"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 4 — Condition Clearing Board
+     UW conditions grouped by file, PTD/PTF
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v4" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Condition Clearing Board</h2>
+      <span class="ch-sub">UW Conditions</span>
+      <div class="ch-right">
+        <button class="btn">Export All</button>
+        <button class="btn primary">Submit Cleared</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Summary -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Outstanding</div><div class="m-value" style="color:var(--bt-error)">11</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">Submitted</div><div class="m-value">5</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Cleared</div><div class="m-value" style="color:var(--bt-success)">18</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-text-faint)">
+          <div class="metric"><div class="m-label">Waived</div><div class="m-value">3</div></div>
+        </div>
+      </div>
+
+      <!-- File: Martinez -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>Martinez, R.</h3>
+            <span class="lo-tag">T. Loss</span>
+            <span style="font-size:11px;color:var(--bt-text-muted)">FHA &middot; $285,000</span>
+          </div>
+          <span class="tag red">3 Outstanding</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Prior to Docs (PTD)</div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Provide written VOE from current employer (Acme Corp)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag red" style="font-size:10px">10 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Letter of explanation for large deposit ($8,200 on 4/15)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag amber" style="font-size:10px">5 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot pending"></span>
+            <span style="flex:1">Updated title commitment with legal description correction</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Title Co.</span>
+            <span class="tag blue" style="font-size:10px">Submitted</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot received"></span>
+            <span style="flex:1;color:var(--bt-text-muted);text-decoration:line-through">Provide 2 most recent pay stubs</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag green" style="font-size:10px">Cleared</span>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px">Prior to Fund (PTF)</div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Final inspection certificate</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag amber" style="font-size:10px">3 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot received"></span>
+            <span style="flex:1;color:var(--bt-text-muted);text-decoration:line-through">Proof of homeowner's insurance</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag green" style="font-size:10px">Cleared</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- File: Richardson -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>Richardson, A.</h3>
+            <span class="lo-tag">M. Davis</span>
+            <span style="font-size:11px;color:var(--bt-text-muted)">Conv &middot; $425,000</span>
+          </div>
+          <span class="tag amber">2 Outstanding</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Prior to Docs (PTD)</div>
+          <div class="cond-item">
+            <span class="cond-dot pending"></span>
+            <span style="flex:1">Updated appraisal with comp adjustment (appraiser revising)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Appraiser</span>
+            <span class="tag blue" style="font-size:10px">Submitted</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Verify rental income &mdash; provide 12 months cancelled checks</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag amber" style="font-size:10px">4 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot received"></span>
+            <span style="flex:1;color:var(--bt-text-muted);text-decoration:line-through">Provide divorce decree (property settlement)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag green" style="font-size:10px">Cleared</span>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px">Prior to Fund (PTF)</div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Final VOE within 10 business days of closing</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Employer</span>
+            <span class="tag muted" style="font-size:10px">Not yet due</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- File: Chen -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>Chen, L.</h3>
+            <span class="lo-tag">M. Davis</span>
+            <span style="font-size:11px;color:var(--bt-text-muted)">FHA &middot; $245,000</span>
+          </div>
+          <span class="tag amber">2 Outstanding</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Prior to Docs (PTD)</div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Gift letter and donor bank statement showing withdrawal</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag amber" style="font-size:10px">6 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot pending"></span>
+            <span style="flex:1">FHA case number assignment verification</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">LO</span>
+            <span class="tag blue" style="font-size:10px">Submitted</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot received"></span>
+            <span style="flex:1;color:var(--bt-text-muted);text-decoration:line-through">Provide most recent retirement account statement</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag green" style="font-size:10px">Cleared</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot received"></span>
+            <span style="flex:1;color:var(--bt-text-muted);text-decoration:line-through">Explanation of credit inquiry (auto dealer 3/22)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag green" style="font-size:10px">Cleared</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- File: Patterson -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>Patterson, B.</h3>
+            <span class="lo-tag">J. Wilson</span>
+            <span style="font-size:11px;color:var(--bt-text-muted)">VA &middot; $290,000</span>
+          </div>
+          <span class="tag amber">2 Outstanding</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Prior to Docs (PTD)</div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">Provide updated DD-214 (member 4 copy, not member 1)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">Borrower</span>
+            <span class="tag amber" style="font-size:10px">3 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot missing"></span>
+            <span style="flex:1">VA funding fee exemption documentation</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">VA</span>
+            <span class="tag amber" style="font-size:10px">7 days</span>
+          </div>
+          <div class="cond-item">
+            <span class="cond-dot waived"></span>
+            <span style="flex:1;color:var(--bt-text-muted)">Termite inspection (waived per VA guidelines for this region)</span>
+            <span style="font-size:11px;color:var(--bt-text-muted);width:80px">&mdash;</span>
+            <span class="tag muted" style="font-size:10px">Waived</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, generate a condition status report for all my files"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 5 — File Packaging View
+     Getting files ready for UW submission
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v5" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>File Packaging</h2>
+      <span class="ch-sub">UW Submission Readiness</span>
+      <div class="ch-right">
+        <button class="btn">Run AUS Check</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- File: O'Brien — almost ready -->
+      <div class="file-card" style="margin-bottom:16px;border-left:3px solid var(--bt-success)">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">O'Brien, K.</span>
+            <span class="lo-tag" style="margin-left:8px">S. Park</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">USDA &middot; $198,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag green">92% Ready</span>
+            <button class="btn primary" style="padding:5px 12px;font-size:12px">Submit to UW</button>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:92%;background:var(--bt-success)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 complete and signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit pulled (742 mid-score)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Income calculated &amp; verified</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Assets verified</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Property docs complete</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures sent &amp; signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> AUS: GUS Accept</div>
+          <div class="check-row"><span class="check-icon pending">&#9679;</span> <span style="color:var(--bt-warning)">File notes (in progress)</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> USDA eligibility confirmed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Income limits verified</div>
+        </div>
+      </div>
+
+      <!-- File: Kim — needs work -->
+      <div class="file-card" style="margin-bottom:16px;border-left:3px solid var(--bt-warning)">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Kim, J.</span>
+            <span class="lo-tag" style="margin-left:8px">S. Park</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">VA &middot; $315,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag amber">68% Ready</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:68%;background:var(--bt-warning)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 complete and signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit pulled (698 mid-score)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Income calculated &amp; verified</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Assets verified</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Property docs &mdash; appraisal pending</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures sent &amp; signed</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">AUS not run &mdash; awaiting appraisal</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">COE from VA not received</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">File notes not started</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> DD-214 on file</div>
+        </div>
+      </div>
+
+      <!-- File: Johnson — not ready -->
+      <div class="file-card" style="margin-bottom:16px;border-left:3px solid var(--bt-error)">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Johnson, T.</span>
+            <span class="lo-tag" style="margin-left:8px">T. Loss</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">Jumbo &middot; $780,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag red">42% Ready</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:42%;background:var(--bt-error)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 complete and signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit pulled (756 mid-score)</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Income calc &mdash; self-emp, need P&L + CPA letter</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Assets &mdash; business bank stmts missing</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Property &mdash; appraisal scheduled 5/15</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures sent &amp; signed</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">AUS not run</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">File notes not started</span></div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">HOI binder not received</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Title search ordered</div>
+        </div>
+      </div>
+
+      <!-- File: Chen — close -->
+      <div class="file-card" style="margin-bottom:16px;border-left:3px solid var(--bt-success)">
+        <div class="file-top">
+          <div>
+            <span class="file-borrower">Chen, L.</span>
+            <span class="lo-tag" style="margin-left:8px">M. Davis</span>
+            <span style="font-size:12px;color:var(--bt-text-muted);margin-left:8px">FHA &middot; $245,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag green">88% Ready</span>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="fill" style="width:88%;background:var(--bt-success)"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px">
+          <div class="check-row"><span class="check-icon done">&#10003;</span> 1003 complete and signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Credit pulled (685 mid-score)</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Income calculated &amp; verified</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Assets verified</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Property docs complete</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> Disclosures sent &amp; signed</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> AUS: DU Approve/Eligible</div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> File notes written</div>
+          <div class="check-row"><span class="check-icon missing">&#10007;</span> <span style="color:var(--bt-error)">Gift letter &mdash; awaiting from borrower</span></div>
+          <div class="check-row"><span class="check-icon done">&#10003;</span> FHA case number assigned</div>
+        </div>
+      </div>
+
+      <div class="aria-bar" style="margin-top:20px">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, run income calculation on the Johnson file &mdash; self-employed, 2 yrs returns"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 6 — Communication Hub
+     Borrower/LO/vendor communications for active files
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v6" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Communication Hub</h2>
+      <span class="ch-sub">All Active Files</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search messages... <kbd>&#8984;K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Summary row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Unresponsive (3+ days)</div><div class="m-value" style="color:var(--bt-error)">3</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">Pending Requests</div><div class="m-value">7</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">Unread SMS</div><div class="m-value">4</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Doc Uploads Today</div><div class="m-value">6</div></div>
+        </div>
+      </div>
+
+      <!-- Unresponsive borrowers -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3>Unresponsive Borrowers</h3>
+          <span class="tag red">Needs Follow-up</span>
+        </div>
+        <div class="card-body">
+          <div class="list-item">
+            <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error)">MR</div>
+            <div class="list-info">
+              <div class="name">Martinez, R. <span class="lo-tag" style="margin-left:6px">T. Loss</span></div>
+              <div class="detail">Requested VOE and LOX for large deposit &mdash; no response since 5/7</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--bt-error)">6 days</span>
+          </div>
+          <div class="list-item">
+            <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error)">TJ</div>
+            <div class="list-info">
+              <div class="name">Johnson, T. <span class="lo-tag" style="margin-left:6px">T. Loss</span></div>
+              <div class="detail">Requested business bank statements and P&L &mdash; no response since 5/9</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--bt-error)">4 days</span>
+          </div>
+          <div class="list-item">
+            <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error)">BP</div>
+            <div class="list-info">
+              <div class="name">Patterson, B. <span class="lo-tag" style="margin-left:6px">J. Wilson</span></div>
+              <div class="detail">Requested DD-214 member 4 copy &mdash; no response since 5/10</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--bt-error)">3 days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent activity timeline -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>Recent Activity</h3><span class="link">View All</span></div>
+          <div class="card-body">
+            <div class="comm-item">
+              <div class="comm-icon" style="background:#DFF0E3;color:var(--bt-success)">&#8593;</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">Doc uploaded &mdash; Chen, L.</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">Gift letter received from borrower &middot; 22 min ago</div>
+              </div>
+            </div>
+            <div class="comm-item">
+              <div class="comm-icon" style="background:#DBEAFE;color:var(--bt-info)">&#9993;</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">Email from title co. &mdash; Richardson</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">Updated commitment ready for download &middot; 1 hr ago</div>
+              </div>
+            </div>
+            <div class="comm-item">
+              <div class="comm-icon" style="background:#FEF3C7;color:var(--bt-warning)">&#9993;</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">SMS from Watson, D.</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">"Will the W-2s from my portal work or do you need originals?" &middot; 2 hrs ago</div>
+              </div>
+            </div>
+            <div class="comm-item">
+              <div class="comm-icon" style="background:#DFF0E3;color:var(--bt-success)">&#8593;</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">Doc uploaded &mdash; O'Brien, K.</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">Survey and pest inspection received &middot; 3 hrs ago</div>
+              </div>
+            </div>
+            <div class="comm-item">
+              <div class="comm-icon" style="background:#DBEAFE;color:var(--bt-info)">&#9993;</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">Email from LO &mdash; S. Park</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">"Kim borrower says COE was sent to VA last week" &middot; 4 hrs ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Pending Outbound Requests</h3><span class="tag amber">7 pending</span></div>
+          <div class="card-body">
+            <div class="cond-item">
+              <span class="cond-dot missing"></span>
+              <span style="flex:1;font-size:13px">VOE follow-up #3 to Acme Corp (Martinez)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">10 days</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot missing"></span>
+              <span style="flex:1;font-size:13px">CPA follow-up #2 for Johnson self-emp</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">8 days</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot pending"></span>
+              <span style="flex:1;font-size:13px">Request HOI binder from agent (Kim)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">4 days</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot pending"></span>
+              <span style="flex:1;font-size:13px">Request DD-214 from borrower (Patterson)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">3 days</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot ordered"></span>
+              <span style="flex:1;font-size:13px">Request tax returns from borrower (Watson)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">1 day</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot ordered"></span>
+              <span style="flex:1;font-size:13px">Request bank statements from borrower (Watson)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">1 day</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-dot ordered"></span>
+              <span style="flex:1;font-size:13px">Email VOD to Chase Bank (Nguyen)</span>
+              <span style="font-size:11px;color:var(--bt-text-muted)">Today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which borrowers haven't responded in 3+ days?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 7 — Turn Time Dashboard
+     Processor efficiency metrics and SLA tracking
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v7" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Turn Time Dashboard</h2>
+      <span class="ch-sub">Processing Efficiency</span>
+      <div class="ch-right">
+        <button class="btn">This Month</button>
+        <button class="btn">Export</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Summary metrics -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card">
+          <div class="metric">
+            <div class="m-label">Avg Turn Time</div>
+            <div class="m-value">14.2<span style="font-size:14px;font-weight:500;color:var(--bt-text-muted)"> days</span></div>
+            <div class="m-change up">-1.3 days vs last month</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="metric">
+            <div class="m-label">Files Completed (May)</div>
+            <div class="m-value">8</div>
+            <div class="m-change up">+2 vs April</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="metric">
+            <div class="m-label">This Week</div>
+            <div class="m-value">3</div>
+            <div class="m-change up">On pace</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="metric">
+            <div class="m-label">SLA Compliance</div>
+            <div class="m-value" style="color:var(--bt-success)">89%</div>
+            <div class="m-change up">Team avg: 82%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Average by loan type -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><h3>Avg Processing Time by Loan Type</h3><span style="font-size:11px;color:var(--bt-text-muted)">SLA target shown</span></div>
+          <div class="card-body">
+            <div class="turn-bar">
+              <span class="turn-label">Conv</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:60%;background:var(--bt-success)">12 days</div>
+                <div class="turn-target" style="left:75%" title="SLA: 15 days"></div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">FHA</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:75%;background:var(--bt-warning)">15 days</div>
+                <div class="turn-target" style="left:80%" title="SLA: 16 days"></div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">VA</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:85%;background:var(--bt-warning)">17 days</div>
+                <div class="turn-target" style="left:90%" title="SLA: 18 days"></div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">Jumbo</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:90%;background:var(--bt-error)">18 days</div>
+                <div class="turn-target" style="left:85%" title="SLA: 17 days"></div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">USDA</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:80%;background:var(--bt-warning)">16 days</div>
+                <div class="turn-target" style="left:100%" title="SLA: 20 days"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Team Comparison</h3><span style="font-size:11px;color:var(--bt-text-muted)">May 2026</span></div>
+          <div class="card-body">
+            <div class="turn-bar">
+              <span class="turn-label" style="font-weight:700;color:var(--bt-primary)">You</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:58%;background:var(--bt-primary)">14.2 days</div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">J. Reyes</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:65%;background:var(--bt-accent)">15.8 days</div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">K. Tran</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:52%;background:var(--bt-accent)">12.7 days</div>
+              </div>
+            </div>
+            <div class="turn-bar">
+              <span class="turn-label">R. Adams</span>
+              <div class="turn-track">
+                <div class="turn-fill" style="width:72%;background:var(--bt-warning)">17.5 days</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bt-border)">
+              <div class="turn-bar">
+                <span class="turn-label" style="color:var(--bt-text-muted)">Team Avg</span>
+                <div class="turn-track">
+                  <div class="turn-fill" style="width:62%;background:var(--bt-bg-elevated);color:var(--bt-text-muted)">15.1 days</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-file age tracker -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>File Age Tracker</h3>
+          <span class="link">Sort by Days in Processing</span>
+        </div>
+        <table>
+          <tr><th>Borrower</th><th>Type</th><th>Days Total</th><th>Current Sub-Stage</th><th>Days in Sub-Stage</th><th>SLA Limit</th><th>Status</th></tr>
+          <tr>
+            <td style="font-weight:600">Martinez, R.</td>
+            <td>FHA</td>
+            <td style="font-weight:700;color:var(--bt-error)">18</td>
+            <td>Conditions</td>
+            <td>6</td>
+            <td>16 days</td>
+            <td><span class="tag red">Over SLA</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Chen, L.</td>
+            <td>FHA</td>
+            <td style="font-weight:700;color:var(--bt-warning)">15</td>
+            <td>Conditions</td>
+            <td>4</td>
+            <td>16 days</td>
+            <td><span class="tag amber">Approaching</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Richardson, A.</td>
+            <td>Conv</td>
+            <td>14</td>
+            <td>Submitted to UW</td>
+            <td>5</td>
+            <td>15 days</td>
+            <td><span class="tag amber">Approaching</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Patterson, B.</td>
+            <td>VA</td>
+            <td>12</td>
+            <td>Submitted to UW</td>
+            <td>3</td>
+            <td>18 days</td>
+            <td><span class="tag green">On Track</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Kim, J.</td>
+            <td>VA</td>
+            <td>10</td>
+            <td>Service Orders</td>
+            <td>4</td>
+            <td>18 days</td>
+            <td><span class="tag green">On Track</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Johnson, T.</td>
+            <td>Jumbo</td>
+            <td>8</td>
+            <td>Income Review</td>
+            <td>3</td>
+            <td>17 days</td>
+            <td><span class="tag green">On Track</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">O'Brien, K.</td>
+            <td>USDA</td>
+            <td>6</td>
+            <td>Packaging</td>
+            <td>2</td>
+            <td>20 days</td>
+            <td><span class="tag green">On Track</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Watson, D.</td>
+            <td>Conv</td>
+            <td>1</td>
+            <td>New File</td>
+            <td>1</td>
+            <td>15 days</td>
+            <td><span class="tag green">On Track</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which files are at risk of missing their SLA this week?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 8 — Morning Focus
+     Clean, action-first daily view
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v8" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">21</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">3</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">6</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MS</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Maria Santos</div><div style="font-size:11px;color:var(--bt-text-muted)">Processor</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Morning Focus</h2>
+      <span class="ch-sub">Tuesday, May 13</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search... <kbd>&#8984;K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Priority banner -->
+      <div class="priority-banner">
+        <h3>Start Here &mdash; 4 Urgent Items</h3>
+        <p>SLA risk on Martinez (18 days), 3 unresponsive borrowers, and O'Brien file ready for UW submission.</p>
+      </div>
+
+      <!-- Urgent items -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3>Priority Actions</h3>
+          <span class="tag red">Do First</span>
+        </div>
+        <div class="card-body">
+          <div class="task-item urgent">
+            <div class="task-check"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--bt-error)">Martinez file over SLA &mdash; escalate VOE to LO</div>
+              <div style="font-size:12px;color:var(--bt-text-muted)">18 days in processing. VOE from Acme Corp 10 days overdue. Alert T. Loss to call employer directly.</div>
+            </div>
+            <span class="lo-tag">T. Loss</span>
+          </div>
+          <div class="task-item urgent">
+            <div class="task-check"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--bt-warning)">Submit O'Brien file to underwriting</div>
+              <div style="font-size:12px;color:var(--bt-text-muted)">92% ready. Finish file notes and submit. GUS Accept on file.</div>
+            </div>
+            <span class="lo-tag">S. Park</span>
+          </div>
+          <div class="task-item urgent">
+            <div class="task-check"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--bt-warning)">Follow up with Johnson &mdash; self-emp docs</div>
+              <div style="font-size:12px;color:var(--bt-text-muted)">Borrower unresponsive 4 days. Need business bank stmts and P&L. CPA also unresponsive.</div>
+            </div>
+            <span class="lo-tag">T. Loss</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600">Set up Watson file &mdash; new assignment</div>
+              <div style="font-size:12px;color:var(--bt-text-muted)">Conv $350K. Pull credit, order appraisal/title/flood, send initial doc request to borrower.</div>
+            </div>
+            <span class="lo-tag">J. Wilson</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3-1" style="margin-bottom:20px">
+        <div>
+          <!-- Today's schedule -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Today's Schedule</h3><span class="link">View Calendar</span></div>
+            <div class="card-body">
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Team standup with UW</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted)">9:00 AM &middot; 15 min &middot; Conference Room B</div>
+                </div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Call borrower &mdash; Patterson re: DD-214</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted)">10:30 AM &middot; Scheduled follow-up</div>
+                </div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">UW submission deadline &mdash; O'Brien</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted)">2:00 PM &middot; USDA file, GUS Accept</div>
+                </div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">LO sync call &mdash; T. Loss (3 files)</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted)">3:30 PM &middot; Martinez, Johnson, Nguyen status</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="card">
+            <div class="card-header"><h3>Quick Stats</h3></div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="padding:10px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-sm)">
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">Active Files</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:2px">21</div>
+                </div>
+                <div style="padding:10px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-sm)">
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">Files Closed (May)</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:2px">8</div>
+                </div>
+                <div style="padding:10px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-sm)">
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">Avg Turn Time</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:2px">14.2d</div>
+                </div>
+                <div style="padding:10px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-sm)">
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">SLA Compliance</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:2px;color:var(--bt-success)">89%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: pipeline summary -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Pipeline by Stage</h3></div>
+            <div class="card-body">
+              <div style="margin-bottom:12px">
+                <div class="pipeline-bar">
+                  <div class="segment" style="width:14%;background:var(--bt-info)" title="New File: 3"></div>
+                  <div class="segment" style="width:29%;background:var(--bt-warning)" title="In Processing: 6"></div>
+                  <div class="segment" style="width:19%;background:var(--bt-primary)" title="Submitted to UW: 4"></div>
+                  <div class="segment" style="width:38%;background:var(--bt-error)" title="Conditions: 8"></div>
+                </div>
+              </div>
+              <div style="font-size:12px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--bt-info)">New File</span><span style="font-weight:600">3</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--bt-warning)">In Processing</span><span style="font-weight:600">6</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--bt-primary)">Submitted to UW</span><span style="font-weight:600">4</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--bt-error)">Conditions</span><span style="font-weight:600">8</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>By LO</h3></div>
+            <div class="card-body" style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="lo-tag">T. Loss</span><span style="font-weight:600">6 files</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="lo-tag">M. Davis</span><span style="font-weight:600">5 files</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="lo-tag">S. Park</span><span style="font-weight:600">5 files</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0">
+                <span class="lo-tag">J. Wilson</span><span style="font-weight:600">5 files</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Upcoming Deadlines</h3></div>
+            <div class="card-body" style="font-size:12px">
+              <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="tag red" style="font-size:10px;padding:2px 6px">Today</span>
+                <span>O'Brien UW submission</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="tag amber" style="font-size:10px;padding:2px 6px">Thu</span>
+                <span>Johnson appraisal (5/15)</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--bt-border)">
+                <span class="tag amber" style="font-size:10px;padding:2px 6px">Fri</span>
+                <span>Richardson SLA limit (15d)</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;padding:5px 0">
+                <span class="tag blue" style="font-size:10px;padding:2px 6px">Mon</span>
+                <span>Chen conditions re-submit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, give me a morning briefing on all files with overdue items"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<script>
+function show(n) {
+  document.querySelectorAll('.mockup').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v' + n).classList.add('active');
+  document.querySelectorAll('.tab')[n - 1].classList.add('active');
+}
+</script>
+
+</body>
+</html>

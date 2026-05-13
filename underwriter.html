@@ -376,6 +376,147 @@
   }
   .bt .detail-row .label { color: var(--bt-text-secondary); }
   .bt .detail-row .val { font-weight: 600; color: var(--bt-text-primary); }
+  /* ── AI Tasks Feed ── */
+  .bt .ai-summary {
+    padding: 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .ai-summary h3 {
+    font-family: var(--bt-font-display); font-size: 14px; font-weight: 600;
+    color: var(--bt-text-primary); margin-bottom: 14px;
+  }
+  .bt .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; font-size: 13px;
+  }
+  .bt .sum-row + .sum-row { border-top: 1px solid var(--bt-border); }
+  .bt .sum-label { color: var(--bt-text-secondary); }
+  .bt .sum-val { font-weight: 700; }
+  .bt .filters {
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .bt .chip {
+    font-size: 11px; font-weight: 600; padding: 5px 12px;
+    border-radius: 20px; cursor: pointer; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-secondary);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .bt .chip:hover { border-color: var(--bt-border-strong); }
+  .bt .chip.active { background: var(--bt-primary); color: #fff; border-color: var(--bt-primary); }
+  .bt .chip.needs-review { background: #FEF3C7; color: var(--bt-warning); border-color: #F0D9B5; }
+  .bt .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--bt-success);
+    animation: pulse 2s infinite; display: inline-block;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .bt .feed { padding: 20px 32px; }
+  .bt .feed-item {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); margin-bottom: 14px;
+    box-shadow: var(--bt-shadow-sm); overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .bt .feed-item:hover { box-shadow: var(--bt-shadow-md); }
+  .bt .feed-item.needs-human { border-left: 4px solid var(--bt-warning); }
+  .bt .feed-item.ai-complete { border-left: 4px solid var(--bt-success); }
+  .bt .feed-item.ai-working { border-left: 4px solid var(--bt-info); }
+  .bt .feed-item.ai-error { border-left: 4px solid var(--bt-error); }
+  .bt .fi-header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .fi-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .bt .fi-meta { flex: 1; }
+  .bt .fi-title { font-size: 14px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .fi-time { font-size: 11px; color: var(--bt-text-muted); margin-top: 1px; }
+  .bt .fi-status {
+    font-size: 10px; font-weight: 700; padding: 4px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .bt .fi-status.complete { background: #DFF0E3; color: var(--bt-success); }
+  .bt .fi-status.review { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .fi-status.working { background: #DBEAFE; color: var(--bt-info); }
+  .bt .fi-status.error { background: #FDE8E8; color: var(--bt-error); }
+  .bt .fi-body { padding: 16px 20px; }
+  .bt .fi-type {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bt .fi-type-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bt .fi-type-dot.doc { background: var(--bt-info); }
+  .bt .fi-type-dot.comm { background: var(--bt-accent); }
+  .bt .fi-type-dot.verify { background: var(--bt-success); }
+  .bt .fi-type-dot.cond { background: var(--bt-warning); }
+  .bt .fi-result {
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary);
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .bt .fi-result strong { color: var(--bt-text-primary); }
+  .bt .fi-confidence {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 12px; color: var(--bt-text-muted);
+  }
+  .bt .conf-bar { width: 60px; height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden; }
+  .bt .conf-fill { height: 100%; border-radius: 3px; }
+  .bt .conf-fill.high { background: var(--bt-success); }
+  .bt .conf-fill.med { background: var(--bt-accent); }
+  .bt .conf-fill.low { background: var(--bt-warning); }
+  .bt .fi-draft {
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary); position: relative;
+  }
+  .bt .fi-draft::before {
+    content: 'DRAFT'; position: absolute; top: 8px; right: 10px;
+    font-size: 9px; font-weight: 700; color: var(--bt-accent); letter-spacing: 0.06em;
+  }
+  .bt .fi-draft .draft-to { font-size: 12px; color: var(--bt-text-muted); margin-bottom: 6px; }
+  .bt .fi-draft .draft-subject { font-weight: 600; color: var(--bt-text-primary); margin-bottom: 8px; }
+  .bt .fi-actions { display: flex; gap: 8px; padding-top: 4px; }
+  .bt .fi-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer; font-family: inherit;
+    border: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+    color: var(--bt-text-primary); transition: all 0.15s;
+  }
+  .bt .fi-btn:hover { border-color: var(--bt-border-strong); }
+  .bt .fi-btn.approve { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .fi-btn.approve:hover { background: var(--bt-primary-hover); }
+  .bt .fi-btn.reject { color: var(--bt-error); border-color: #FDE8E8; }
+  .bt .fi-btn.reject:hover { background: #FDE8E8; }
+  .bt .file-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-accent-light); color: var(--bt-accent); display: inline-block; margin-right: 6px;
+  }
+  .bt .lo-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary); display: inline-block;
+  }
+  .bt .check-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .bt .check-icon {
+    width: 16px; height: 16px; border-radius: 4px; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;
+  }
+  .bt .check-icon.pass { background: #DFF0E3; color: var(--bt-success); }
+  .bt .check-icon.fail { background: #FDE8E8; color: var(--bt-error); }
+  .bt .check-icon.warn { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .feed-sep {
+    text-align: center; padding: 8px 0; font-size: 11px;
+    color: var(--bt-text-faint); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; position: relative;
+  }
+  .bt .feed-sep span { background: var(--bt-bg-page); padding: 0 12px; position: relative; }
+  .bt .feed-sep::before {
+    content: ''; position: absolute; left: 32px; right: 32px;
+    top: 50%; height: 1px; background: var(--bt-border);
+  }
+
 </style>
 </head>
 <body>
@@ -395,6 +536,7 @@
     <button class="tab" onclick="show(6)">6 — Turn Time Tracker</button>
     <button class="tab" onclick="show(7)">7 — Suspense Board</button>
     <button class="tab" onclick="show(8)">8 — Morning Briefing</button>
+    <button class="tab" onclick="show(9)">9 — AI Tasks</button>
   </div>
 </div>
 
@@ -1849,6 +1991,144 @@
 </div>
 </div>
 
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 9 — AI Tasks
+     Live AI activity feed — Aria completing tasks, human handoff
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v9" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Pre-screens completed</span><span class="sum-val" style="color:var(--bt-success)">8</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your decision</span><span class="sum-val" style="color:var(--bt-warning)">3</span></div>
+      <div class="sum-row"><span class="sum-label">Risk flags raised</span><span class="sum-val" style="color:var(--bt-error)">2</span></div>
+      <div class="sum-row"><span class="sum-label">Compliance checks</span><span class="sum-val" style="color:var(--bt-success)">12</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">6.3 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Decision 3</button>
+      <button class="chip">Risk Analysis</button>
+      <button class="chip">Compliance</button>
+      <button class="chip">Conditions</button>
+    </div>
+    <div class="s-section">Review</div>
+    <div class="s-item"><span class="s-icon">◎</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> My Queue <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Suspense <span class="s-badge amber">2</span></div>
+    <div class="s-item active"><span class="s-icon">◉</span> AI Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-section">Compliance</div>
+    <div class="s-item"><span class="s-icon">◎</span> QM/ATR</div>
+    <div class="s-item"><span class="s-icon">◎</span> Fraud Alerts <span class="s-badge red">1</span></div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">MT</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Mark Thompson</div><div style="font-size:11px;color:var(--bt-text-muted)">Underwriter</div></div></div>
+  </div>
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span class="ch-sub">Underwriter — Mark Thompson</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Pre-screen complete — Johnson Jumbo needs exception</div><div class="fi-time">4 minutes ago</div></div><span class="fi-status review">Needs Decision</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Analysis</div>
+          <div class="fi-confidence">Confidence: 88% <div class="conf-bar"><div class="conf-fill med" style="width:88%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Johnson</span> <span class="lo-ref">Jumbo $675K</span>
+            <div style="margin-top:10px">
+              <strong>Automated risk assessment:</strong>
+              <div class="check-row" style="margin-top:6px"><div class="check-icon pass">✓</div> FICO: 762 — Exceeds jumbo minimum (720)</div>
+              <div class="check-row"><div class="check-icon warn">!</div> DTI: 44.8% — <strong>Exceeds jumbo guideline of 43%.</strong> Exception required.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> LTV: 78.5% — Within limits</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Reserves: 14 months PITIA — Exceeds 6-month requirement</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Employment: 8 years current employer, stable income trend</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Property: Primary residence, SFR, appraised value supports</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Aria recommendation:</strong> Strong compensating factors (high FICO, 14 months reserves, low LTV, stable employment). DTI exception is supportable. Recommend approval with PTD condition for reserves verification at closing.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Approve with Exception</button>
+            <button class="fi-btn">Suspend — Need More Info</button>
+            <button class="fi-btn reject">Deny</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">QM/ATR compliance verified — Richardson refi</div><div class="fi-time">20 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance Check</div>
+          <div class="fi-result">
+            <span class="file-ref">Richardson</span> <span class="lo-ref">Conv Refi $380K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> QM Safe Harbor: Qualified — DTI 36.2%, fixed rate, fully amortizing</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> ATR 8 factors: All documented and verified</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Points & fees: 1.8% — Below 3% threshold</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Net tangible benefit: Rate reduction 1.25%, savings $312/mo — Meets standard</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> HMDA data: Complete and validated</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Full QM compliance confirmed. No issues.</div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-error">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Fraud signal detected — Garcia new submission</div><div class="fi-time">45 minutes ago</div></div><span class="fi-status error">Escalated</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Analysis</div>
+          <div class="fi-confidence">Confidence: 72% <div class="conf-bar"><div class="conf-fill low" style="width:72%"></div></div><span style="color:var(--bt-error);font-weight:600">Fraud indicators</span></div>
+          <div class="fi-result">
+            <span class="file-ref">Garcia</span> <span class="lo-ref">Conv $485K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>SSN alert:</strong> SSN associated with different name in credit bureau records</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>Employment:</strong> Employer phone number routes to residential line</div>
+              <div class="check-row"><div class="check-icon warn">?</div> <strong>Pay stub format:</strong> Font inconsistencies detected in earnings section</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Address history and property details appear legitimate</div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Manual investigation required.</strong> Multiple fraud indicators present. Aria recommends suspending the file and requesting additional verification: direct employer contact via independent lookup, copy of Social Security card, and original pay stubs (not scanned).
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn reject">Suspend File</button>
+            <button class="fi-btn">Request Additional Docs</button>
+            <button class="fi-btn">Flag for SAR Review</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Auto-generated conditions list — Nguyen approval</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot cond"></span> Condition Generation</div>
+          <div class="fi-result">
+            <span class="file-ref">Nguyen</span> <span class="lo-ref">Conv $365K</span> — Approved with conditions
+            <div style="margin-top:10px">
+              <strong>PTD Conditions (auto-generated):</strong>
+              <div class="check-row" style="margin-top:4px"><div class="check-icon warn">1</div> Updated pay stub within 30 days of closing</div>
+              <div class="check-row"><div class="check-icon warn">2</div> Evidence of clear pest inspection</div>
+              <div class="check-row"><div class="check-icon warn">3</div> Final title commitment with no exceptions</div>
+              <strong style="display:block;margin-top:10px">PTF Conditions:</strong>
+              <div class="check-row" style="margin-top:4px"><div class="check-icon warn">4</div> Executed closing docs</div>
+              <div class="check-row"><div class="check-icon warn">5</div> Final CD matching approved terms</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Conditions sent to processor automatically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 
 <script>
 function show(n) {

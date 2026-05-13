@@ -373,6 +373,147 @@
   .bt .alert-dot {
     width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
   }
+  /* ── AI Tasks Feed ── */
+  .bt .ai-summary {
+    padding: 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .ai-summary h3 {
+    font-family: var(--bt-font-display); font-size: 14px; font-weight: 600;
+    color: var(--bt-text-primary); margin-bottom: 14px;
+  }
+  .bt .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; font-size: 13px;
+  }
+  .bt .sum-row + .sum-row { border-top: 1px solid var(--bt-border); }
+  .bt .sum-label { color: var(--bt-text-secondary); }
+  .bt .sum-val { font-weight: 700; }
+  .bt .filters {
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .bt .chip {
+    font-size: 11px; font-weight: 600; padding: 5px 12px;
+    border-radius: 20px; cursor: pointer; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-secondary);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .bt .chip:hover { border-color: var(--bt-border-strong); }
+  .bt .chip.active { background: var(--bt-primary); color: #fff; border-color: var(--bt-primary); }
+  .bt .chip.needs-review { background: #FEF3C7; color: var(--bt-warning); border-color: #F0D9B5; }
+  .bt .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--bt-success);
+    animation: pulse 2s infinite; display: inline-block;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .bt .feed { padding: 20px 32px; }
+  .bt .feed-item {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); margin-bottom: 14px;
+    box-shadow: var(--bt-shadow-sm); overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .bt .feed-item:hover { box-shadow: var(--bt-shadow-md); }
+  .bt .feed-item.needs-human { border-left: 4px solid var(--bt-warning); }
+  .bt .feed-item.ai-complete { border-left: 4px solid var(--bt-success); }
+  .bt .feed-item.ai-working { border-left: 4px solid var(--bt-info); }
+  .bt .feed-item.ai-error { border-left: 4px solid var(--bt-error); }
+  .bt .fi-header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .fi-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .bt .fi-meta { flex: 1; }
+  .bt .fi-title { font-size: 14px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .fi-time { font-size: 11px; color: var(--bt-text-muted); margin-top: 1px; }
+  .bt .fi-status {
+    font-size: 10px; font-weight: 700; padding: 4px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .bt .fi-status.complete { background: #DFF0E3; color: var(--bt-success); }
+  .bt .fi-status.review { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .fi-status.working { background: #DBEAFE; color: var(--bt-info); }
+  .bt .fi-status.error { background: #FDE8E8; color: var(--bt-error); }
+  .bt .fi-body { padding: 16px 20px; }
+  .bt .fi-type {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bt .fi-type-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bt .fi-type-dot.doc { background: var(--bt-info); }
+  .bt .fi-type-dot.comm { background: var(--bt-accent); }
+  .bt .fi-type-dot.verify { background: var(--bt-success); }
+  .bt .fi-type-dot.cond { background: var(--bt-warning); }
+  .bt .fi-result {
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary);
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .bt .fi-result strong { color: var(--bt-text-primary); }
+  .bt .fi-confidence {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 12px; color: var(--bt-text-muted);
+  }
+  .bt .conf-bar { width: 60px; height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden; }
+  .bt .conf-fill { height: 100%; border-radius: 3px; }
+  .bt .conf-fill.high { background: var(--bt-success); }
+  .bt .conf-fill.med { background: var(--bt-accent); }
+  .bt .conf-fill.low { background: var(--bt-warning); }
+  .bt .fi-draft {
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary); position: relative;
+  }
+  .bt .fi-draft::before {
+    content: 'DRAFT'; position: absolute; top: 8px; right: 10px;
+    font-size: 9px; font-weight: 700; color: var(--bt-accent); letter-spacing: 0.06em;
+  }
+  .bt .fi-draft .draft-to { font-size: 12px; color: var(--bt-text-muted); margin-bottom: 6px; }
+  .bt .fi-draft .draft-subject { font-weight: 600; color: var(--bt-text-primary); margin-bottom: 8px; }
+  .bt .fi-actions { display: flex; gap: 8px; padding-top: 4px; }
+  .bt .fi-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer; font-family: inherit;
+    border: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+    color: var(--bt-text-primary); transition: all 0.15s;
+  }
+  .bt .fi-btn:hover { border-color: var(--bt-border-strong); }
+  .bt .fi-btn.approve { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .fi-btn.approve:hover { background: var(--bt-primary-hover); }
+  .bt .fi-btn.reject { color: var(--bt-error); border-color: #FDE8E8; }
+  .bt .fi-btn.reject:hover { background: #FDE8E8; }
+  .bt .file-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-accent-light); color: var(--bt-accent); display: inline-block; margin-right: 6px;
+  }
+  .bt .lo-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary); display: inline-block;
+  }
+  .bt .check-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .bt .check-icon {
+    width: 16px; height: 16px; border-radius: 4px; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;
+  }
+  .bt .check-icon.pass { background: #DFF0E3; color: var(--bt-success); }
+  .bt .check-icon.fail { background: #FDE8E8; color: var(--bt-error); }
+  .bt .check-icon.warn { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .feed-sep {
+    text-align: center; padding: 8px 0; font-size: 11px;
+    color: var(--bt-text-faint); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; position: relative;
+  }
+  .bt .feed-sep span { background: var(--bt-bg-page); padding: 0 12px; position: relative; }
+  .bt .feed-sep::before {
+    content: ''; position: absolute; left: 32px; right: 32px;
+    top: 50%; height: 1px; background: var(--bt-border);
+  }
+
 </style>
 </head>
 <body>
@@ -392,6 +533,7 @@
     <button class="tab" onclick="show(6)">6 — Compliance Overview</button>
     <button class="tab" onclick="show(7)">7 — Profitability View</button>
     <button class="tab" onclick="show(8)">8 — Morning Briefing</button>
+    <button class="tab" onclick="show(9)">9 — AI Tasks</button>
   </div>
 </div>
 
@@ -1898,6 +2040,158 @@
 </div></div>
 </div>
 
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 9 — AI Tasks
+     Live AI activity feed — Aria completing tasks, human handoff
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v9" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">AI tasks today (all staff)</span><span class="sum-val" style="color:var(--bt-success)">83</span></div>
+      <div class="sum-row"><span class="sum-label">Pending human review</span><span class="sum-val" style="color:var(--bt-warning)">12</span></div>
+      <div class="sum-row"><span class="sum-label">Escalations</span><span class="sum-val" style="color:var(--bt-error)">3</span></div>
+      <div class="sum-row"><span class="sum-label">Conditions auto-cleared</span><span class="sum-val" style="color:var(--bt-success)">24</span></div>
+      <div class="sum-row"><span class="sum-label">Total time saved</span><span class="sum-val">28.4 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All Roles</button>
+      <button class="chip">Processors</button>
+      <button class="chip">Underwriters</button>
+      <button class="chip">Closers</button>
+      <button class="chip needs-review">Escalations 3</button>
+    </div>
+    <div class="s-section">Operations</div>
+    <div class="s-item"><span class="s-icon">◎</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Team Overview</div>
+    <div class="s-item"><span class="s-icon">◎</span> SLA Monitor <span class="s-badge red">3</span></div>
+    <div class="s-item active"><span class="s-icon">◉</span> AI Tasks <span class="s-badge amber">12</span></div>
+    <div class="s-section">Analytics</div>
+    <div class="s-item"><span class="s-icon">◎</span> Performance</div>
+    <div class="s-item"><span class="s-icon">◎</span> Compliance</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Adoption</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>AI Operations Overview</h2></div>
+      <span class="ch-sub">Ops Management — Karen Mitchell</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+    <div class="feed">
+      <!-- Org-wide AI summary -->
+      <div class="feed-item" style="border-left:4px solid var(--bt-primary)">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Daily AI Operations Report</div><div class="fi-time">Generated just now</div></div><span class="fi-status" style="background:var(--bt-primary-tint);color:var(--bt-primary)">Summary</span></div>
+        <div class="fi-body">
+          <div class="fi-result">
+            <strong>Today's AI Activity Across All Teams:</strong>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+              <div>
+                <div style="font-size:12px;color:var(--bt-text-muted);margin-bottom:6px">BY TASK TYPE</div>
+                <div class="check-row"><div class="check-icon" style="background:#DBEAFE;color:var(--bt-info)">📄</div> Document processing: <strong>31 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:var(--bt-accent-light);color:var(--bt-accent)">✉</div> Communication drafts: <strong>18 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:#DFF0E3;color:var(--bt-success)">✓</div> Data verification: <strong>22 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:#FEF3C7;color:var(--bt-warning)">◎</div> Condition clearing: <strong>12 tasks</strong></div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--bt-text-muted);margin-bottom:6px">BY TEAM</div>
+                <div class="check-row"><div class="check-icon pass">P</div> Processors: <strong>34 tasks</strong> (5 pending review)</div>
+                <div class="check-row"><div class="check-icon pass">U</div> Underwriters: <strong>18 tasks</strong> (3 pending)</div>
+                <div class="check-row"><div class="check-icon pass">C</div> Closers: <strong>16 tasks</strong> (2 pending)</div>
+                <div class="check-row"><div class="check-icon pass">F</div> Funders: <strong>9 tasks</strong> (1 pending)</div>
+                <div class="check-row"><div class="check-icon pass">L</div> Loan Officers: <strong>6 tasks</strong> (1 pending)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-error">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Escalation: Fraud indicators — Garcia file (UW team)</div><div class="fi-time">45 minutes ago · via Mark Thompson</div></div><span class="fi-status error">Escalated</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Escalation</div>
+          <div class="fi-result">
+            <span class="file-ref">Garcia</span> <span class="lo-ref">Conv $485K</span> <span class="lo-ref" style="background:#FDE8E8;color:var(--bt-error)">UW: M. Thompson</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> SSN mismatch with credit bureau records</div>
+              <div class="check-row"><div class="check-icon fail">!</div> Employer phone routes to residential line</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Pay stub font inconsistencies detected</div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Manager attention required.</strong> UW Mark Thompson has suspended the file. May require SAR filing and LO notification. Aria recommends compliance review.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn reject">Initiate SAR Review</button>
+            <button class="fi-btn">Review Full File</button>
+            <button class="fi-btn">Notify LO & Compliance</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">SLA breach alert — 3 files approaching limits</div><div class="fi-time">1 hour ago</div></div><span class="fi-status review">Action Needed</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Pipeline Monitoring</div>
+          <div class="fi-result">
+            Aria detected 3 files approaching or exceeding SLA targets:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <span class="file-ref">Martinez</span> Processing: <strong>18 days</strong> (SLA: 10 days) — VOE bottleneck. Processor: M. Santos</div>
+              <div class="check-row"><div class="check-icon warn">!</div> <span class="file-ref">Hall</span> UW Review: <strong>6 days</strong> (SLA: 5 days) — Manual UW, complex income. UW: M. Thompson</div>
+              <div class="check-row"><div class="check-icon warn">!</div> <span class="file-ref">Rivera</span> Closing: <strong>8 days</strong> (SLA: 7 days) — Title delay. Closer: S. Chen</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Aria recommendation:</strong> Reassign Martinez to a senior processor. Hall needs UW manager override on employment gap. Rivera — contact Lowcountry Title directly for survey status.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Accept Recommendations</button>
+            <button class="fi-btn">Reassign Files</button>
+            <button class="fi-btn">Review Individually</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Team efficiency report generated</div><div class="fi-time">2 hours ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Analytics</div>
+          <div class="fi-result">
+            <strong>Weekly team AI adoption metrics:</strong>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> AI task acceptance rate: <strong>91%</strong> (↑ 3% from last week)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Auto-cleared conditions: <strong>24 this week</strong> (avg 18)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Time saved per team member: <strong>4.2 hrs/day</strong></div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Lowest AI utilization: <strong>Closers (68%)</strong> — recommend training</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Highest accuracy: <strong>Condition clearing (98.2%)</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Compliance audit — TRID violations: 0 this month</div><div class="fi-time">3 hours ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance</div>
+          <div class="fi-result">
+            <div class="check-row"><div class="check-icon pass">✓</div> TRID violations MTD: <strong>0</strong></div>
+            <div class="check-row"><div class="check-icon pass">✓</div> Tolerance cures issued: <strong>2</strong> (both auto-detected by Aria)</div>
+            <div class="check-row"><div class="check-icon pass">✓</div> QC findings rate: <strong>4.2%</strong> (below 5% target)</div>
+            <div class="check-row"><div class="check-icon pass">✓</div> HMDA data completeness: <strong>100%</strong></div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Clean compliance month. No regulatory concerns.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 
 <script>
 function show(n) {

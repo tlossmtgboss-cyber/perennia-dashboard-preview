@@ -425,6 +425,147 @@
   .bt .start-banner .start-dot {
     width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
   }
+  /* ── AI Tasks Feed ── */
+  .bt .ai-summary {
+    padding: 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .ai-summary h3 {
+    font-family: var(--bt-font-display); font-size: 14px; font-weight: 600;
+    color: var(--bt-text-primary); margin-bottom: 14px;
+  }
+  .bt .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; font-size: 13px;
+  }
+  .bt .sum-row + .sum-row { border-top: 1px solid var(--bt-border); }
+  .bt .sum-label { color: var(--bt-text-secondary); }
+  .bt .sum-val { font-weight: 700; }
+  .bt .filters {
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .bt .chip {
+    font-size: 11px; font-weight: 600; padding: 5px 12px;
+    border-radius: 20px; cursor: pointer; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-secondary);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .bt .chip:hover { border-color: var(--bt-border-strong); }
+  .bt .chip.active { background: var(--bt-primary); color: #fff; border-color: var(--bt-primary); }
+  .bt .chip.needs-review { background: #FEF3C7; color: var(--bt-warning); border-color: #F0D9B5; }
+  .bt .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--bt-success);
+    animation: pulse 2s infinite; display: inline-block;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .bt .feed { padding: 20px 32px; }
+  .bt .feed-item {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); margin-bottom: 14px;
+    box-shadow: var(--bt-shadow-sm); overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .bt .feed-item:hover { box-shadow: var(--bt-shadow-md); }
+  .bt .feed-item.needs-human { border-left: 4px solid var(--bt-warning); }
+  .bt .feed-item.ai-complete { border-left: 4px solid var(--bt-success); }
+  .bt .feed-item.ai-working { border-left: 4px solid var(--bt-info); }
+  .bt .feed-item.ai-error { border-left: 4px solid var(--bt-error); }
+  .bt .fi-header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .fi-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .bt .fi-meta { flex: 1; }
+  .bt .fi-title { font-size: 14px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .fi-time { font-size: 11px; color: var(--bt-text-muted); margin-top: 1px; }
+  .bt .fi-status {
+    font-size: 10px; font-weight: 700; padding: 4px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .bt .fi-status.complete { background: #DFF0E3; color: var(--bt-success); }
+  .bt .fi-status.review { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .fi-status.working { background: #DBEAFE; color: var(--bt-info); }
+  .bt .fi-status.error { background: #FDE8E8; color: var(--bt-error); }
+  .bt .fi-body { padding: 16px 20px; }
+  .bt .fi-type {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bt .fi-type-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bt .fi-type-dot.doc { background: var(--bt-info); }
+  .bt .fi-type-dot.comm { background: var(--bt-accent); }
+  .bt .fi-type-dot.verify { background: var(--bt-success); }
+  .bt .fi-type-dot.cond { background: var(--bt-warning); }
+  .bt .fi-result {
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary);
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .bt .fi-result strong { color: var(--bt-text-primary); }
+  .bt .fi-confidence {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 12px; color: var(--bt-text-muted);
+  }
+  .bt .conf-bar { width: 60px; height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden; }
+  .bt .conf-fill { height: 100%; border-radius: 3px; }
+  .bt .conf-fill.high { background: var(--bt-success); }
+  .bt .conf-fill.med { background: var(--bt-accent); }
+  .bt .conf-fill.low { background: var(--bt-warning); }
+  .bt .fi-draft {
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary); position: relative;
+  }
+  .bt .fi-draft::before {
+    content: 'DRAFT'; position: absolute; top: 8px; right: 10px;
+    font-size: 9px; font-weight: 700; color: var(--bt-accent); letter-spacing: 0.06em;
+  }
+  .bt .fi-draft .draft-to { font-size: 12px; color: var(--bt-text-muted); margin-bottom: 6px; }
+  .bt .fi-draft .draft-subject { font-weight: 600; color: var(--bt-text-primary); margin-bottom: 8px; }
+  .bt .fi-actions { display: flex; gap: 8px; padding-top: 4px; }
+  .bt .fi-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer; font-family: inherit;
+    border: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+    color: var(--bt-text-primary); transition: all 0.15s;
+  }
+  .bt .fi-btn:hover { border-color: var(--bt-border-strong); }
+  .bt .fi-btn.approve { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .fi-btn.approve:hover { background: var(--bt-primary-hover); }
+  .bt .fi-btn.reject { color: var(--bt-error); border-color: #FDE8E8; }
+  .bt .fi-btn.reject:hover { background: #FDE8E8; }
+  .bt .file-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-accent-light); color: var(--bt-accent); display: inline-block; margin-right: 6px;
+  }
+  .bt .lo-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary); display: inline-block;
+  }
+  .bt .check-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .bt .check-icon {
+    width: 16px; height: 16px; border-radius: 4px; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;
+  }
+  .bt .check-icon.pass { background: #DFF0E3; color: var(--bt-success); }
+  .bt .check-icon.fail { background: #FDE8E8; color: var(--bt-error); }
+  .bt .check-icon.warn { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .feed-sep {
+    text-align: center; padding: 8px 0; font-size: 11px;
+    color: var(--bt-text-faint); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; position: relative;
+  }
+  .bt .feed-sep span { background: var(--bt-bg-page); padding: 0 12px; position: relative; }
+  .bt .feed-sep::before {
+    content: ''; position: absolute; left: 32px; right: 32px;
+    top: 50%; height: 1px; background: var(--bt-border);
+  }
+
 </style>
 </head>
 <body>
@@ -444,6 +585,7 @@
     <button class="tab" onclick="show(6)">6 — Funding Checklist</button>
     <button class="tab" onclick="show(7)">7 — TRID Timeline</button>
     <button class="tab" onclick="show(8)">8 — Morning Focus</button>
+    <button class="tab" onclick="show(9)">9 — AI Tasks</button>
   </div>
 </div>
 
@@ -1613,6 +1755,136 @@
 </div>
 </div>
 
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 9 — AI Tasks
+     Live AI activity feed — Aria completing tasks, human handoff
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v9" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">11</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">3</span></div>
+      <div class="sum-row"><span class="sum-label">TRID checks</span><span class="sum-val" style="color:var(--bt-success)">6</span></div>
+      <div class="sum-row"><span class="sum-label">CDs prepared</span><span class="sum-val">2</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">4.1 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 3</button>
+      <button class="chip">TRID</button>
+      <button class="chip">Docs</button>
+      <button class="chip">Fees</button>
+    </div>
+    <div class="s-section">Closing</div>
+    <div class="s-item"><span class="s-icon">◎</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Closing Queue <span class="s-badge primary">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> CD Prep <span class="s-badge amber">2</span></div>
+    <div class="s-item active"><span class="s-icon">◉</span> AI Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-section">Compliance</div>
+    <div class="s-item"><span class="s-icon">◎</span> TRID Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Fee Reconciliation</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span class="ch-sub">Closer — Sarah Chen</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">CD fee variance detected — Kim closing</div><div class="fi-time">6 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Fee Reconciliation</div>
+          <div class="fi-confidence">Confidence: 95% <div class="conf-bar"><div class="conf-fill high" style="width:95%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Kim</span> <span class="lo-ref">Conv $550K · Closing 5/20</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Zero-tolerance:</strong> Origination fee, transfer taxes — match LE</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>10% cumulative:</strong> Title insurance $1,850 vs LE $1,650 — <strong>$200 increase (12.1%)</strong></div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Recording fees, HOI, taxes — within tolerance</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Total 10% bucket variance: $200 of $165 allowed — <strong>Exceeds tolerance by $35</strong></div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Tolerance cure required.</strong> Lender must credit borrower $35 at closing. Aria has prepared the updated CD with the cure credit applied.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Apply Cure & Issue Revised CD</button>
+            <button class="fi-btn">Review Fee Details</button>
+            <button class="fi-btn">Escalate to Manager</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">TRID timeline verified — Patterson closing tomorrow</div><div class="fi-time">25 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance Check</div>
+          <div class="fi-result">
+            <span class="file-ref">Patterson</span> <span class="lo-ref">Conv $490K · Closing 5/15</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> LE issued: Apr 18 — within 3 business days of application</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> CD delivered: May 9 — 4 business days before closing</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 3-business-day waiting period: Met (May 9→May 14)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No changed circumstances requiring revised CD</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Closing scheduled: May 15, 2:00 PM — Heritage Title, 450 King St</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">All TRID timelines met. Clear to proceed with closing.</div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Drafted closing confirmation email — Patterson</div><div class="fi-time">30 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot comm"></span> Communication Draft</div>
+          <div class="fi-draft">
+            <div class="draft-to">To: Lisa Patterson · Email</div>
+            <div class="draft-subject">Your closing is confirmed — May 15 at 2:00 PM</div>
+            Hi Lisa,<br><br>
+            This is a reminder that your closing is confirmed for <strong>Thursday, May 15 at 2:00 PM</strong> at Heritage Title Company (450 King St, Suite 200).<br><br>
+            <strong>Please bring:</strong><br>
+            • Valid government-issued photo ID<br>
+            • Certified/cashier's check for $12,847.50 (payable to Heritage Title)<br>
+            • Your homeowners insurance binder<br><br>
+            The signing should take approximately 45-60 minutes. Congratulations — you're almost home!
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Send Email</button>
+            <button class="fi-btn">Edit</button>
+            <button class="fi-btn reject">Don't Send</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Wire instructions verified — Patterson</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Patterson</span> — Wire instruction verification:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Bank name matches ABA lookup: Heritage National Bank</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> ABA routing: ●●●●●6742 — Verified active</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Account matches prior closing instructions from Heritage Title</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No changes from last verified instructions (callback confirmed)</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Wire instructions verified. No fraud indicators.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 
 <script>
 function show(n) {

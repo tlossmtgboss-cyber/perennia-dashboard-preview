@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Assistant Dashboard — Perennia AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #1A1F1B; }
+
+  /* ── Tab Switcher ── */
+  .selector {
+    position: sticky; top: 0; z-index: 9999;
+    background: #1F3D2E; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .selector h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #F5EDD9; font-size: 15px; font-weight: 500; white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  .selector .role-tag {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: rgba(184,146,74,0.25); color: #F5EDD9; white-space: nowrap;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .selector .tabs { display: flex; gap: 5px; flex-shrink: 0; }
+  .selector .tab {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s;
+    white-space: nowrap; font-family: inherit;
+  }
+  .selector .tab:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+  .selector .tab.active { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .mockup { display: none; }
+  .mockup.active { display: block; }
+
+  /* ═══════════════════════════════════════════════════
+     SHARED — Borrower Theme Design System
+     ═══════════════════════════════════════════════════ */
+  :root {
+    --bt-font-display: 'Fraunces', Georgia, serif;
+    --bt-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --bt-bg-page: #FAF7F1;
+    --bt-bg-surface: #FFFFFF;
+    --bt-bg-sidebar: #F6F2EA;
+    --bt-bg-elevated: #F2EDE2;
+    --bt-bg-soft: #FBF8F2;
+    --bt-border: #ECE6D8;
+    --bt-border-strong: #D8D0BD;
+    --bt-text-primary: #1A1F1B;
+    --bt-text-secondary: #4F554E;
+    --bt-text-muted: #8B8A7E;
+    --bt-text-faint: #B5B2A4;
+    --bt-primary: #1F3D2E;
+    --bt-primary-hover: #2A4F3D;
+    --bt-primary-light: #E5EDE6;
+    --bt-primary-tint: #EFF3EE;
+    --bt-accent: #B8924A;
+    --bt-accent-light: #F5EDD9;
+    --bt-success: #2D7A52;
+    --bt-warning: #B25F18;
+    --bt-error: #9B2C2C;
+    --bt-info: #3182CE;
+    --bt-radius-sm: 6px;
+    --bt-radius-md: 10px;
+    --bt-radius-lg: 14px;
+    --bt-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --bt-shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --bt-shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .bt {
+    background: var(--bt-bg-page); color: var(--bt-text-primary);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+    letter-spacing: -0.005em;
+  }
+  .bt .layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .bt .sidebar {
+    width: 240px; background: var(--bt-bg-sidebar);
+    border-right: 1px solid var(--bt-border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    overflow-y: auto; max-height: 100vh; position: sticky; top: 44px;
+    height: calc(100vh - 44px);
+  }
+  .bt .sidebar::-webkit-scrollbar { width: 4px; }
+  .bt .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .bt .sidebar::-webkit-scrollbar-thumb { background: var(--bt-border-strong); border-radius: 2px; }
+
+  .bt .s-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--bt-border); position: sticky; top: 0;
+    background: var(--bt-bg-sidebar); z-index: 2;
+  }
+  .bt .s-logo {
+    font-family: var(--bt-font-display); font-weight: 500; font-size: 17px;
+    letter-spacing: -0.02em; color: var(--bt-primary);
+  }
+  .bt .s-version {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--bt-primary-tint);
+    color: var(--bt-primary); margin-left: auto;
+  }
+  .bt .s-section {
+    padding: 18px 20px 6px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--bt-text-muted); font-weight: 600;
+  }
+  .bt .s-item {
+    padding: 8px 12px 8px 20px; font-size: 13px; color: var(--bt-text-secondary);
+    cursor: pointer; display: flex; align-items: center; gap: 9px;
+    transition: all 0.12s; margin: 1px 8px; border-radius: 8px;
+    font-weight: 500;
+  }
+  .bt .s-item:hover { background: var(--bt-bg-elevated); color: var(--bt-text-primary); }
+  .bt .s-item.active {
+    background: var(--bt-bg-elevated); color: var(--bt-text-primary);
+    font-weight: 600;
+  }
+  .bt .s-icon { width: 16px; text-align: center; opacity: 0.5; font-size: 12px; }
+  .bt .s-badge {
+    margin-left: auto; font-size: 10px; padding: 2px 7px;
+    border-radius: 10px; font-weight: 700; min-width: 18px; text-align: center;
+  }
+  .bt .s-badge.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .s-badge.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .s-badge.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .s-badge.primary { background: var(--bt-primary); color: #fff; }
+  .bt .s-spacer { flex: 1; min-height: 12px; }
+  .bt .s-user {
+    padding: 14px 20px; border-top: 1px solid var(--bt-border);
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    position: sticky; bottom: 0; background: var(--bt-bg-sidebar);
+  }
+  .bt .s-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bt-accent); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff;
+  }
+
+  /* ── Main Content ── */
+  .bt .content { flex: 1; overflow-y: auto; }
+  .bt .c-head {
+    padding: 20px 32px; display: flex; align-items: center;
+    border-bottom: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+  }
+  .bt .c-head h2 {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--bt-text-primary);
+  }
+  .bt .c-head .ch-sub {
+    font-size: 13px; color: var(--bt-text-muted); margin-left: 12px;
+  }
+  .bt .c-head .ch-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .bt .search-bar {
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 8px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-soft); font-size: 13px; color: var(--bt-text-muted);
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .bt .search-bar:hover { border-color: var(--bt-border-strong); }
+  .bt .search-bar kbd {
+    font-size: 10px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-muted);
+    font-family: inherit;
+  }
+
+  .bt .btn {
+    font-size: 13px; font-weight: 600; padding: 8px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer;
+    font-family: inherit; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-primary);
+    transition: all 0.15s;
+  }
+  .bt .btn:hover { border-color: var(--bt-border-strong); }
+  .bt .btn.primary { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .btn.primary:hover { background: var(--bt-primary-hover); }
+  .bt .btn.accent { background: var(--bt-accent); color: #fff; border-color: var(--bt-accent); }
+
+  .bt .card {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); box-shadow: var(--bt-shadow-sm);
+  }
+  .bt .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .card-header h3 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted);
+  }
+  .bt .card-header .link {
+    font-size: 12px; font-weight: 500; color: var(--bt-primary);
+    cursor: pointer; text-decoration: none;
+  }
+  .bt .card-body { padding: 16px 20px; }
+
+  .bt .hero {
+    background: var(--bt-primary); border-radius: var(--bt-radius-lg);
+    padding: 24px 28px; color: #F5EDD9; position: relative; overflow: hidden;
+  }
+  .bt .hero::after {
+    content: ''; position: absolute; top: -60px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .bt .hero .greeting {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 500; letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .bt .hero .subtitle { font-size: 14px; color: rgba(245,237,217,0.7); }
+  .bt .hero-stats { display: flex; gap: 28px; margin-top: 16px; }
+  .bt .hero-stat .label { font-size: 11px; color: rgba(245,237,217,0.5); text-transform: uppercase; letter-spacing: 0.05em; }
+  .bt .hero-stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  .bt .metric { padding: 16px 20px; }
+  .bt .metric .m-label { font-size: 11px; font-weight: 500; color: var(--bt-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bt .metric .m-value { font-size: 26px; font-weight: 700; color: var(--bt-text-primary); margin-top: 4px; letter-spacing: -0.02em; }
+  .bt .metric .m-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .bt .metric .m-change.up { color: var(--bt-success); }
+  .bt .metric .m-change.down { color: var(--bt-error); }
+
+  .bt .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bt .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-3-1 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .bt .main-area { padding: 24px 32px; }
+
+  .bt .pipeline-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bt-bg-elevated); }
+  .bt .pipeline-bar .segment { height: 100%; transition: width 0.5s; }
+
+  .bt .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .list-item:last-child { border-bottom: none; }
+  .bt .list-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bt-primary-light); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--bt-primary); flex-shrink: 0;
+  }
+  .bt .list-info { flex: 1; min-width: 0; }
+  .bt .list-info .name { font-size: 13px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .list-info .detail { font-size: 12px; color: var(--bt-text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bt .tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; display: inline-block;
+  }
+  .bt .tag.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .tag.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .tag.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .tag.blue { background: #DBEAFE; color: var(--bt-info); }
+  .bt .tag.muted { background: var(--bt-bg-elevated); color: var(--bt-text-muted); }
+
+  .bt .task-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .task-item:last-child { border-bottom: none; }
+  .bt .task-check {
+    width: 16px; height: 16px; border: 2px solid var(--bt-border-strong);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .bt .task-item.urgent .task-check { border-color: var(--bt-warning); }
+
+  .bt .aria-bar {
+    padding: 14px 20px; background: var(--bt-bg-surface);
+    border: 1px solid var(--bt-border); border-radius: var(--bt-radius-lg);
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bt .aria-bar:hover { border-color: var(--bt-primary); box-shadow: 0 0 0 3px var(--bt-primary-tint); }
+  .bt .aria-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .bt .aria-bar .prompt { flex: 1; font-size: 14px; color: var(--bt-text-muted); }
+  .bt .aria-bar .aria-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary);
+  }
+
+  .bt .cal-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bt-border); }
+  .bt .cal-item:last-child { border-bottom: none; }
+  .bt .cal-date {
+    width: 42px; height: 42px; border-radius: var(--bt-radius-md);
+    background: var(--bt-primary-tint); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .bt .cal-date .month { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--bt-primary); letter-spacing: 0.04em; }
+  .bt .cal-date .day { font-size: 15px; font-weight: 700; color: var(--bt-primary); line-height: 1; }
+
+  .bt table { width: 100%; border-collapse: collapse; }
+  .bt table th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--bt-text-muted); padding: 10px 14px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table td {
+    padding: 10px 14px; font-size: 13px; color: var(--bt-text-primary);
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table tr:last-child td { border-bottom: none; }
+  .bt table tr:hover td { background: var(--bt-bg-soft); }
+
+  .bt .progress-ring { width: 56px; height: 56px; position: relative; }
+  .bt .progress-ring svg { transform: rotate(-90deg); width: 56px; height: 56px; }
+  .bt .progress-ring .bg { fill: none; stroke: var(--bt-bg-elevated); stroke-width: 5; }
+  .bt .progress-ring .fg { fill: none; stroke: var(--bt-accent); stroke-width: 5; stroke-linecap: round; }
+  .bt .progress-ring .pct {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--bt-text-primary);
+  }
+
+  /* Condition tracker */
+  .bt .cond-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--bt-border);
+    font-size: 13px;
+  }
+  .bt .cond-item:last-child { border-bottom: none; }
+  .bt .cond-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .bt .cond-dot.received { background: var(--bt-success); }
+  .bt .cond-dot.pending { background: var(--bt-warning); }
+  .bt .cond-dot.missing { background: var(--bt-error); }
+  .bt .cond-dot.waived { background: var(--bt-text-faint); }
+
+  /* Lo assignment tag */
+  .bt .lo-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: var(--bt-accent-light);
+    color: var(--bt-accent); white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TAB SWITCHER
+     ════════════════════════════════════════════════════════════════ -->
+<div class="selector">
+  <h1>Perennia Dashboard</h1>
+  <span class="role-tag">Production Assistant</span>
+  <div class="tabs">
+    <button class="tab active" onclick="show(1)">1 — Task Command</button>
+    <button class="tab" onclick="show(2)">2 — Condition Tracker</button>
+    <button class="tab" onclick="show(3)">3 — Pipeline Monitor</button>
+    <button class="tab" onclick="show(4)">4 — Ops Grid</button>
+    <button class="tab" onclick="show(5)">5 — Activity Stream</button>
+    <button class="tab" onclick="show(6)">6 — File Status Board</button>
+    <button class="tab" onclick="show(7)">7 — Efficiency View</button>
+    <button class="tab" onclick="show(8)">8 — Morning Focus</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     SIDEBAR TEMPLATE (reused across all variations)
+     ════════════════════════════════════════════════════════════════ -->
+
+<!-- VARIATION 1 — Task Command Center
+     Priority: what needs to be done right now
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v1" class="mockup active">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Dashboard</h2>
+      <span class="ch-sub">Monday, May 12</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>⌘</span> Search files... <kbd>⌘K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Hero -->
+      <div class="hero" style="margin-bottom:20px">
+        <div class="greeting">Good morning, Jessica</div>
+        <div class="subtitle">You're supporting 3 LOs across 14 active files today</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="label">Active Files</div><div class="value">14</div></div>
+          <div class="hero-stat"><div class="label">Tasks Due Today</div><div class="value">7</div></div>
+          <div class="hero-stat"><div class="label">Docs Pending</div><div class="value">5</div></div>
+          <div class="hero-stat"><div class="label">Conditions Out</div><div class="value">9</div></div>
+        </div>
+      </div>
+
+      <!-- Metrics row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Overdue Tasks</div><div class="m-value" style="color:var(--bt-error)">3</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">Due Today</div><div class="m-value">4</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">Awaiting Response</div><div class="m-value">6</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Completed Today</div><div class="m-value">2</div></div>
+        </div>
+      </div>
+
+      <div class="grid-3-1">
+        <div>
+          <!-- AI Prioritized Tasks -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header">
+              <h3>AI Prioritized Tasks</h3>
+              <div style="display:flex;gap:6px">
+                <span class="tag red" style="font-size:10px;cursor:pointer">Overdue 3</span>
+                <span class="tag amber" style="font-size:10px;cursor:pointer">Today 4</span>
+                <span class="tag muted" style="font-size:10px;cursor:pointer">All</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Chase pay stubs — Martinez (T. Loss)</div>
+                  <div style="font-size:12px;color:var(--bt-error);font-weight:500;margin-top:2px">Overdue 2 days · FHA Purchase · Blocking submission</div>
+                </div>
+                <span class="lo-tag">T. Loss</span>
+              </div>
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Order appraisal — Kim (T. Loss)</div>
+                  <div style="font-size:12px;color:var(--bt-warning);font-weight:500;margin-top:2px">Due today · Conv Purchase · $550K</div>
+                </div>
+                <span class="lo-tag">T. Loss</span>
+              </div>
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">VOE callback — Watson (M. Davis)</div>
+                  <div style="font-size:12px;color:var(--bt-warning);font-weight:500;margin-top:2px">Due today · FHA · Employer hasn't responded</div>
+                </div>
+                <span class="lo-tag">M. Davis</span>
+              </div>
+              <div class="task-item">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Upload title commitment — O'Brien (S. Park)</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">Due tomorrow · Conv Refi</div>
+                </div>
+                <span class="lo-tag">S. Park</span>
+              </div>
+              <div class="task-item">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Clear prior-to-doc conditions — Nguyen (T. Loss)</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">Due Wed · Conv Purchase</div>
+                </div>
+                <span class="lo-tag">T. Loss</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smart Docs alerts -->
+          <div class="card">
+            <div class="card-header"><h3>Doc Alerts</h3><span class="s-badge red">5</span></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error);font-size:14px">!</div>
+                <div class="list-info"><div class="name">Martinez — W-2 expired</div><div class="detail">2023 W-2 on file; need 2024 or 2025</div></div>
+                <button class="btn" style="font-size:11px;padding:4px 10px">Request</button>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FEF3C7;color:var(--bt-warning);font-size:14px">!</div>
+                <div class="list-info"><div class="name">Watson — bank statements</div><div class="detail">Only 1 month provided; need 2 months</div></div>
+                <button class="btn" style="font-size:11px;padding:4px 10px">Request</button>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error);font-size:14px">!</div>
+                <div class="list-info"><div class="name">Johnson — HOI missing</div><div class="detail">Homeowners insurance binder not received</div></div>
+                <button class="btn" style="font-size:11px;padding:4px 10px">Request</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px">
+            <div class="aria-avatar">A</div>
+            <div class="prompt">Ask Aria...</div>
+            <span class="aria-tag">AI</span>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Today's Schedule</h3></div>
+            <div class="card-body">
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+                <div><div style="font-size:13px;font-weight:600">Follow-up call — Martinez</div><div style="font-size:12px;color:var(--bt-text-muted)">9:30 AM · Doc collection</div></div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+                <div><div style="font-size:13px;font-weight:600">Processor check-in — Kim file</div><div style="font-size:12px;color:var(--bt-text-muted)">11:00 AM</div></div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+                <div><div style="font-size:13px;font-weight:600">Team standup</div><div style="font-size:12px;color:var(--bt-text-muted)">3:00 PM · 15 min</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Files by LO</h3></div>
+            <div class="card-body">
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bt-border)">
+                <span style="font-size:13px;font-weight:600">T. Loss</span>
+                <span style="font-size:13px;color:var(--bt-text-secondary)">6 files</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bt-border)">
+                <span style="font-size:13px;font-weight:600">M. Davis</span>
+                <span style="font-size:13px;color:var(--bt-text-secondary)">5 files</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:7px 0">
+                <span style="font-size:13px;font-weight:600">S. Park</span>
+                <span style="font-size:13px;color:var(--bt-text-secondary)">3 files</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 2 — Condition Tracker
+     Focused on outstanding conditions across all files
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v2" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Condition Tracker</h2>
+      <div class="ch-right">
+        <div class="search-bar"><span>⌘</span> Search conditions... <kbd>⌘K</kbd></div>
+        <button class="btn">Export</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Summary -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-error)"><div class="metric"><div class="m-label">Outstanding</div><div class="m-value" style="color:var(--bt-error)">9</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)"><div class="metric"><div class="m-label">Requested</div><div class="m-value">4</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-info)"><div class="metric"><div class="m-label">Under Review</div><div class="m-value">3</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-success)"><div class="metric"><div class="m-label">Cleared Today</div><div class="m-value">2</div></div></div>
+      </div>
+
+      <!-- Conditions by file -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Conditions by File</h3>
+          <div style="display:flex;gap:6px">
+            <span class="tag red" style="font-size:10px;cursor:pointer">Missing</span>
+            <span class="tag amber" style="font-size:10px;cursor:pointer">Pending</span>
+            <span class="tag green" style="font-size:10px;cursor:pointer">Received</span>
+            <span class="tag muted" style="font-size:10px;cursor:pointer">All</span>
+          </div>
+        </div>
+
+        <!-- File: Martinez -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--bt-border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="list-avatar">JM</div>
+              <div>
+                <div style="font-size:14px;font-weight:600">James Martinez</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">FHA Purchase · $425K · Processing</div>
+              </div>
+            </div>
+            <span class="lo-tag">T. Loss</span>
+          </div>
+          <div class="cond-item"><div class="cond-dot missing"></div><span style="flex:1">Pay stubs (most recent 30 days)</span><span class="tag red" style="font-size:10px">Overdue 2d</span></div>
+          <div class="cond-item"><div class="cond-dot missing"></div><span style="flex:1">2024 W-2</span><span class="tag red" style="font-size:10px">Missing</span></div>
+          <div class="cond-item"><div class="cond-dot pending"></div><span style="flex:1">VOE — employer callback</span><span class="tag amber" style="font-size:10px">Requested</span></div>
+          <div class="cond-item"><div class="cond-dot received"></div><span style="flex:1;color:var(--bt-text-muted)">Bank statements (2 months)</span><span class="tag green" style="font-size:10px">Received</span></div>
+        </div>
+
+        <!-- File: Johnson -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--bt-border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="list-avatar">AJ</div>
+              <div>
+                <div style="font-size:14px;font-weight:600">Amanda Johnson</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">Jumbo Purchase · $675K · UW Review</div>
+              </div>
+            </div>
+            <span class="lo-tag">T. Loss</span>
+          </div>
+          <div class="cond-item"><div class="cond-dot missing"></div><span style="flex:1">HOI binder</span><span class="tag red" style="font-size:10px">Missing</span></div>
+          <div class="cond-item"><div class="cond-dot pending"></div><span style="flex:1">Gift letter — sourced & seasoned</span><span class="tag amber" style="font-size:10px">Requested</span></div>
+          <div class="cond-item"><div class="cond-dot received"></div><span style="flex:1;color:var(--bt-text-muted)">Appraisal</span><span class="tag green" style="font-size:10px">Received</span></div>
+        </div>
+
+        <!-- File: Watson -->
+        <div style="padding:16px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="list-avatar">EW</div>
+              <div>
+                <div style="font-size:14px;font-weight:600">Emily Watson</div>
+                <div style="font-size:12px;color:var(--bt-text-muted)">FHA Purchase · $295K · Processing</div>
+              </div>
+            </div>
+            <span class="lo-tag">M. Davis</span>
+          </div>
+          <div class="cond-item"><div class="cond-dot pending"></div><span style="flex:1">VOE — employer hasn't responded</span><span class="tag amber" style="font-size:10px">3 days out</span></div>
+          <div class="cond-item"><div class="cond-dot missing"></div><span style="flex:1">Flood cert</span><span class="tag red" style="font-size:10px">Missing</span></div>
+          <div class="cond-item"><div class="cond-dot received"></div><span style="flex:1;color:var(--bt-text-muted)">Credit report</span><span class="tag green" style="font-size:10px">Received</span></div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">Ask Aria — "Which conditions are blocking submission?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 3 — Pipeline Monitor
+     Table view of all active loans with stage, status, days
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v3" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Pipeline Monitor</h2>
+      <div class="ch-right">
+        <div class="search-bar"><span>⌘</span> Search loans... <kbd>⌘K</kbd></div>
+        <button class="btn">Export</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card"><div class="metric"><div class="m-label">Application</div><div class="m-value">4</div></div></div>
+        <div class="card"><div class="metric"><div class="m-label">Processing</div><div class="m-value">5</div></div></div>
+        <div class="card"><div class="metric"><div class="m-label">Underwriting</div><div class="m-value">3</div></div></div>
+        <div class="card"><div class="metric"><div class="m-label">CTC / Closing</div><div class="m-value">2</div></div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>All Active Files</h3>
+          <div style="display:flex;gap:6px">
+            <span class="tag muted" style="cursor:pointer;font-size:10px">All LOs</span>
+            <span class="tag" style="cursor:pointer;font-size:10px;background:var(--bt-accent-light);color:var(--bt-accent)">T. Loss</span>
+            <span class="tag" style="cursor:pointer;font-size:10px;background:var(--bt-primary-tint);color:var(--bt-primary)">M. Davis</span>
+            <span class="tag" style="cursor:pointer;font-size:10px;background:#DBEAFE;color:var(--bt-info)">S. Park</span>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Borrower</th><th>LO</th><th>Amount</th><th>Type</th><th>Stage</th><th>Conditions</th><th>Days</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600">Martinez, James</td><td>T. Loss</td><td>$425K</td><td>FHA</td><td>Application</td><td><span style="color:var(--bt-error);font-weight:600">3 open</span></td><td>5</td><td><span class="tag red" style="font-size:10px">Blocked</span></td></tr>
+            <tr><td style="font-weight:600">Chen, Michael</td><td>T. Loss</td><td>$320K</td><td>VA</td><td>Application</td><td>0</td><td>1</td><td><span class="tag blue" style="font-size:10px">New</span></td></tr>
+            <tr><td style="font-weight:600">Richardson, Sarah</td><td>T. Loss</td><td>$380K</td><td>Conv</td><td>Processing</td><td>0</td><td>5</td><td><span class="tag green" style="font-size:10px">On track</span></td></tr>
+            <tr><td style="font-weight:600">Watson, Emily</td><td>M. Davis</td><td>$295K</td><td>FHA</td><td>Processing</td><td><span style="color:var(--bt-warning);font-weight:600">2 open</span></td><td>4</td><td><span class="tag amber" style="font-size:10px">At risk</span></td></tr>
+            <tr><td style="font-weight:600">O'Brien, Kevin</td><td>S. Park</td><td>$440K</td><td>Conv</td><td>Processing</td><td><span style="color:var(--bt-warning);font-weight:600">1 open</span></td><td>3</td><td><span class="tag amber" style="font-size:10px">Pending</span></td></tr>
+            <tr><td style="font-weight:600">Johnson, Amanda</td><td>T. Loss</td><td>$675K</td><td>Jumbo</td><td>UW Review</td><td><span style="color:var(--bt-warning);font-weight:600">2 open</span></td><td>4</td><td><span class="tag amber" style="font-size:10px">Conditions</span></td></tr>
+            <tr><td style="font-weight:600">Nguyen, Robert</td><td>T. Loss</td><td>$365K</td><td>Conv</td><td>UW Review</td><td>0</td><td>2</td><td><span class="tag green" style="font-size:10px">Cleared</span></td></tr>
+            <tr><td style="font-weight:600">Kim, David</td><td>T. Loss</td><td>$550K</td><td>Conv</td><td>CTC</td><td>0</td><td>2</td><td><span class="tag green" style="font-size:10px">Closing 5/20</span></td></tr>
+            <tr><td style="font-weight:600">Patterson, Lisa</td><td>T. Loss</td><td>$490K</td><td>Conv</td><td>Closing</td><td>0</td><td>1</td><td><span class="tag green" style="font-size:10px">Docs out</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which files have been in the same stage too long?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 4 — Ops Grid
+     Dense bento grid for operational overview
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v4" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head"><h2>Ops Grid</h2><span class="ch-sub">Monday, May 12</span><div class="ch-right"><div class="search-bar"><span>⌘</span> Search... <kbd>⌘K</kbd></div></div></div>
+
+    <div class="main-area">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <!-- Overdue tasks -->
+        <div class="card" style="border-top:3px solid var(--bt-error)">
+          <div class="card-header"><h3>Overdue</h3><span class="s-badge red">3</span></div>
+          <div class="card-body">
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">Martinez</span> — Pay stubs <span style="font-size:11px;color:var(--bt-error)">(2d)</span></div>
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">Martinez</span> — W-2 2024 <span style="font-size:11px;color:var(--bt-error)">(2d)</span></div>
+            <div style="padding:6px 0;font-size:13px"><span style="font-weight:600">Johnson</span> — HOI binder <span style="font-size:11px;color:var(--bt-error)">(1d)</span></div>
+          </div>
+        </div>
+
+        <!-- Due today -->
+        <div class="card" style="border-top:3px solid var(--bt-warning)">
+          <div class="card-header"><h3>Due Today</h3><span class="s-badge amber">4</span></div>
+          <div class="card-body">
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">Kim</span> — Order appraisal</div>
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">Watson</span> — VOE callback</div>
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">Richardson</span> — Rate lock review</div>
+            <div style="padding:6px 0;font-size:13px"><span style="font-weight:600">O'Brien</span> — Title commitment</div>
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="card" style="border-top:3px solid var(--bt-success)">
+          <div class="card-header"><h3>Done Today</h3><span class="s-badge green">2</span></div>
+          <div class="card-body">
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border);color:var(--bt-text-muted);text-decoration:line-through"><span style="font-weight:500">Kim</span> — Cleared conditions</div>
+            <div style="padding:6px 0;font-size:13px;color:var(--bt-text-muted);text-decoration:line-through"><span style="font-weight:500">Patterson</span> — Docs sent to title</div>
+          </div>
+        </div>
+
+        <!-- Pipeline by stage -->
+        <div class="card" style="grid-column:span 2">
+          <div class="card-header"><h3>Pipeline by Stage</h3></div>
+          <div class="card-body">
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;text-align:center;padding:16px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-md)">
+                <div style="font-size:24px;font-weight:700;color:var(--bt-info)">4</div>
+                <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">Application</div>
+              </div>
+              <div style="flex:1;text-align:center;padding:16px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-md)">
+                <div style="font-size:24px;font-weight:700;color:var(--bt-accent)">5</div>
+                <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">Processing</div>
+              </div>
+              <div style="flex:1;text-align:center;padding:16px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-md)">
+                <div style="font-size:24px;font-weight:700;color:var(--bt-warning)">3</div>
+                <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">Underwriting</div>
+              </div>
+              <div style="flex:1;text-align:center;padding:16px;background:var(--bt-bg-soft);border-radius:var(--bt-radius-md)">
+                <div style="font-size:24px;font-weight:700;color:var(--bt-success)">2</div>
+                <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">CTC</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="card">
+          <div class="card-header"><h3>Schedule</h3></div>
+          <div class="card-body">
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div><div style="font-size:12px;font-weight:600">Martinez call</div><div style="font-size:11px;color:var(--bt-text-muted)">9:30 AM</div></div>
+            </div>
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div><div style="font-size:12px;font-weight:600">Processor sync</div><div style="font-size:11px;color:var(--bt-text-muted)">11:00 AM</div></div>
+            </div>
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div><div style="font-size:12px;font-weight:600">Team standup</div><div style="font-size:11px;color:var(--bt-text-muted)">3:00 PM</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SMS alerts -->
+        <div class="card">
+          <div class="card-header"><h3>Unread SMS</h3><span class="s-badge amber">4</span></div>
+          <div class="card-body">
+            <div class="list-item"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">JM</div><div class="list-info"><div class="name" style="font-size:12px">Martinez</div><div class="detail" style="font-size:11px">"I'll have the stubs by..."</div></div></div>
+            <div class="list-item"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">EW</div><div class="list-info"><div class="name" style="font-size:12px">Watson</div><div class="detail" style="font-size:11px">"My employer said they'd..."</div></div></div>
+            <div class="list-item"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">AJ</div><div class="list-info"><div class="name" style="font-size:12px">Johnson</div><div class="detail" style="font-size:11px">"Where do I upload the..."</div></div></div>
+          </div>
+        </div>
+
+        <!-- Reconciliation -->
+        <div class="card">
+          <div class="card-header"><h3>Reconciliation</h3><span class="s-badge red">2</span></div>
+          <div class="card-body">
+            <div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--bt-border)"><span style="font-weight:600">CD vs LE variance</span><div style="font-size:12px;color:var(--bt-error);margin-top:2px">Johnson — $847 tolerance exceeded</div></div>
+            <div style="padding:6px 0;font-size:13px"><span style="font-weight:600">Fee audit flag</span><div style="font-size:12px;color:var(--bt-warning);margin-top:2px">O'Brien — title fee mismatch</div></div>
+          </div>
+        </div>
+
+        <!-- Aria -->
+        <div class="card" style="grid-column:span 3">
+          <div style="padding:16px 20px">
+            <div class="aria-bar" style="border:none;padding:0">
+              <div class="aria-avatar">A</div>
+              <div class="prompt">"Aria, run a doc check on all files in processing"</div>
+              <span class="aria-tag">AI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 5 — Activity Stream
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v5" class="mockup">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head"><h2>Activity</h2><span class="ch-sub">Live feed across all files</span><div class="ch-right"><div class="search-bar"><span>⌘</span> Search... <kbd>⌘K</kbd></div></div></div>
+    <div class="main-area">
+      <div class="grid-3-1">
+        <div class="card">
+          <div class="card-header"><h3>Today's Activity</h3></div>
+          <div class="card-body">
+            <div style="position:relative;padding-left:28px">
+              <div style="position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--bt-border)"></div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-error);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">!</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">8:15 AM · T. Loss</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Martinez pay stubs — still outstanding (day 2)</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-success);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✓</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">9:02 AM · T. Loss</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Kim — all UW conditions cleared, moved to CTC</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-info);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">↗</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">9:18 AM · M. Davis</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Watson — borrower SMS: "My employer said they'd fax it today"</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-warning);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">⚡</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">9:30 AM · AI Alert</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Richardson rate lock expires in 16 days — review recommended</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-success);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✓</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">9:45 AM · T. Loss</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Patterson — closing docs sent to title company</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-primary);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">◎</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">10:00 AM · S. Park</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">O'Brien — title commitment uploaded to Smart Docs</div>
+              </div>
+              <div style="position:relative">
+                <div style="position:absolute;left:-28px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--bt-accent);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">$</div>
+                <div style="font-size:11px;color:var(--bt-text-muted)">10:15 AM · System</div>
+                <div style="font-size:13px;font-weight:500;margin-top:2px">Johnson — CD vs LE variance flagged: $847 over tolerance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px"><div class="aria-avatar">A</div><div class="prompt">Ask Aria...</div><span class="aria-tag">AI</span></div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Needs Action</h3><span class="s-badge red">5</span></div>
+            <div class="card-body" style="padding:12px 16px">
+              <div style="font-size:13px;padding:5px 0;border-bottom:1px solid var(--bt-border);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--bt-error);flex-shrink:0"></span>Chase stubs — Martinez</div>
+              <div style="font-size:13px;padding:5px 0;border-bottom:1px solid var(--bt-border);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--bt-error);flex-shrink:0"></span>W-2 request — Martinez</div>
+              <div style="font-size:13px;padding:5px 0;border-bottom:1px solid var(--bt-border);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--bt-warning);flex-shrink:0"></span>Order appraisal — Kim</div>
+              <div style="font-size:13px;padding:5px 0;border-bottom:1px solid var(--bt-border);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--bt-warning);flex-shrink:0"></span>VOE follow-up — Watson</div>
+              <div style="font-size:13px;padding:5px 0;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--bt-warning);flex-shrink:0"></span>HOI request — Johnson</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Efficiency</h3></div>
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div class="progress-ring" style="width:70px;height:70px;margin:0 auto 10px">
+                <svg viewBox="0 0 56 56" style="width:70px;height:70px"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="27.6" style="stroke:var(--bt-success)"/></svg>
+                <div class="pct" style="font-size:15px">80%</div>
+              </div>
+              <div style="font-size:13px;font-weight:600">Files on track</div>
+              <div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">11 of 14 active files</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 6 — File Status Board
+     Card-per-file view showing health at a glance
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v6" class="mockup">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head"><h2>File Status Board</h2><div class="ch-right"><div class="search-bar"><span>⌘</span> Search... <kbd>⌘K</kbd></div></div></div>
+    <div class="main-area">
+      <div class="aria-bar" style="margin-bottom:20px"><div class="aria-avatar">A</div><div class="prompt">"Aria, give me a health check on all files"</div><span class="aria-tag">AI</span></div>
+
+      <div class="grid-3">
+        <!-- File cards -->
+        <div class="card" style="border-top:3px solid var(--bt-error)">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Martinez, James</div><div style="font-size:12px;color:var(--bt-text-muted)">FHA Purchase · $425K</div></div>
+              <span class="lo-tag">T. Loss</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">Application</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Days</span><span style="font-weight:600">5</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-error)">3 open</span></div>
+            <span class="tag red">Blocked</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--bt-amber, var(--bt-warning))">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Johnson, Amanda</div><div style="font-size:12px;color:var(--bt-text-muted)">Jumbo · $675K</div></div>
+              <span class="lo-tag">T. Loss</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">UW Review</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Days</span><span style="font-weight:600">4</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-warning)">2 open</span></div>
+            <span class="tag amber">Conditions</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--bt-warning)">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Watson, Emily</div><div style="font-size:12px;color:var(--bt-text-muted)">FHA · $295K</div></div>
+              <span class="lo-tag">M. Davis</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">Processing</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Days</span><span style="font-weight:600">4</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-warning)">2 open</span></div>
+            <span class="tag amber">At risk</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--bt-success)">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Kim, David</div><div style="font-size:12px;color:var(--bt-text-muted)">Conv · $550K</div></div>
+              <span class="lo-tag">T. Loss</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">CTC</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Closing</span><span style="font-weight:600">May 20</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-success)">All clear</span></div>
+            <span class="tag green">On track</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--bt-success)">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Patterson, Lisa</div><div style="font-size:12px;color:var(--bt-text-muted)">Conv · $490K</div></div>
+              <span class="lo-tag">T. Loss</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">Closing</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Closing</span><span style="font-weight:600">May 15</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-success)">All clear</span></div>
+            <span class="tag green">Docs out</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--bt-success)">
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+              <div><div style="font-size:14px;font-weight:700">Richardson, Sarah</div><div style="font-size:12px;color:var(--bt-text-muted)">Conv Refi · $380K</div></div>
+              <span class="lo-tag">T. Loss</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Stage</span><span style="font-weight:600">Processing</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Lock</span><span style="font-weight:600">May 28</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--bt-text-muted)">Conditions</span><span style="font-weight:600;color:var(--bt-success)">All clear</span></div>
+            <span class="tag green">On track</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 7 — Efficiency View
+     Pipeline efficiency metrics and SLA tracking
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v7" class="mockup">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head"><h2>Efficiency Dashboard</h2><span class="ch-sub">Pipeline health & SLA tracking</span><div class="ch-right"><div class="search-bar"><span>⌘</span> Search... <kbd>⌘K</kbd></div></div></div>
+    <div class="main-area">
+      <div class="grid-3" style="margin-bottom:24px">
+        <div class="card" style="text-align:center;padding:28px 20px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--bt-text-muted);margin-bottom:8px">Files On Track</div>
+          <div class="progress-ring" style="width:80px;height:80px;margin:0 auto 10px">
+            <svg viewBox="0 0 56 56" style="width:80px;height:80px"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="27.6" style="stroke:var(--bt-success)"/></svg>
+            <div class="pct" style="font-size:18px">80%</div>
+          </div>
+          <div style="font-size:13px;color:var(--bt-text-secondary)">11 of 14 files</div>
+        </div>
+        <div class="card" style="text-align:center;padding:28px 20px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--bt-text-muted);margin-bottom:8px">Avg Days in Stage</div>
+          <div style="font-family:var(--bt-font-display);font-size:36px;font-weight:600;color:var(--bt-primary)">3.2</div>
+          <div style="font-size:13px;color:var(--bt-success);font-weight:600;margin-top:4px">↓ 0.8 from last week</div>
+        </div>
+        <div class="card" style="text-align:center;padding:28px 20px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--bt-text-muted);margin-bottom:8px">Task Completion Rate</div>
+          <div style="font-family:var(--bt-font-display);font-size:36px;font-weight:600;color:var(--bt-primary)">91%</div>
+          <div style="font-size:13px;color:var(--bt-success);font-weight:600;margin-top:4px">↑ 4% this week</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header"><h3>SLA Tracking — Time in Stage</h3></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <div style="width:100px;font-size:13px;color:var(--bt-text-secondary)">Application</div>
+              <div style="flex:1"><div class="pipeline-bar"><div class="segment" style="width:50%;background:var(--bt-info)"></div></div></div>
+              <span style="font-size:13px;font-weight:600">2.5d <span style="color:var(--bt-success);font-size:11px">✓ &lt; 5d</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <div style="width:100px;font-size:13px;color:var(--bt-text-secondary)">Processing</div>
+              <div style="flex:1"><div class="pipeline-bar"><div class="segment" style="width:60%;background:var(--bt-accent)"></div></div></div>
+              <span style="font-size:13px;font-weight:600">4.0d <span style="color:var(--bt-success);font-size:11px">✓ &lt; 7d</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <div style="width:100px;font-size:13px;color:var(--bt-text-secondary)">Underwriting</div>
+              <div style="flex:1"><div class="pipeline-bar"><div class="segment" style="width:70%;background:var(--bt-warning)"></div></div></div>
+              <span style="font-size:13px;font-weight:600">3.3d <span style="color:var(--bt-success);font-size:11px">✓ &lt; 5d</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <div style="width:100px;font-size:13px;color:var(--bt-text-secondary)">CTC → Close</div>
+              <div style="flex:1"><div class="pipeline-bar"><div class="segment" style="width:30%;background:var(--bt-success)"></div></div></div>
+              <span style="font-size:13px;font-weight:600">1.5d <span style="color:var(--bt-success);font-size:11px">✓ &lt; 5d</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Task Velocity — This Week</h3></div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <span style="font-size:14px;font-weight:500">Tasks Created</span>
+              <span style="font-size:14px;font-weight:700">18</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <span style="font-size:14px;font-weight:500">Tasks Completed</span>
+              <span style="font-size:14px;font-weight:700;color:var(--bt-success)">16</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bt-border)">
+              <span style="font-size:14px;font-weight:500">Overdue</span>
+              <span style="font-size:14px;font-weight:700;color:var(--bt-error)">3</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0">
+              <span style="font-size:14px;font-weight:500">Avg Resolution</span>
+              <span style="font-size:14px;font-weight:700">1.2 days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- At-risk files -->
+      <div class="card">
+        <div class="card-header"><h3>Files Requiring Attention</h3></div>
+        <table>
+          <thead><tr><th>File</th><th>LO</th><th>Issue</th><th>Days Stalled</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600">Martinez</td><td>T. Loss</td><td><span class="tag red" style="font-size:10px">Missing docs (3)</span></td><td style="color:var(--bt-error);font-weight:600">5</td><td><button class="btn" style="font-size:11px;padding:4px 10px">Chase</button></td></tr>
+            <tr><td style="font-weight:600">Watson</td><td>M. Davis</td><td><span class="tag amber" style="font-size:10px">VOE pending</span></td><td>4</td><td><button class="btn" style="font-size:11px;padding:4px 10px">Follow up</button></td></tr>
+            <tr><td style="font-weight:600">Johnson</td><td>T. Loss</td><td><span class="tag amber" style="font-size:10px">HOI + gift letter</span></td><td>3</td><td><button class="btn" style="font-size:11px;padding:4px 10px">Request</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 8 — Morning Focus
+     Clean, action-first view — what to do right now
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v8" class="mockup">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Work Queue</div>
+    <div class="s-item active"><span class="s-icon">◉</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">◎</span> Leads <span class="s-badge primary">6</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Active Loans <span class="s-badge green">14</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Closed Clients</div>
+    <div class="s-item"><span class="s-icon">◎</span> Tasks <span class="s-badge red">7</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> SMS Tasks <span class="s-badge amber">4</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">◎</span> Smart Docs <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">◎</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">◎</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">◎</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">JR</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Jessica Reyes</div><div style="font-size:11px;color:var(--bt-text-muted)">Production Assistant</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head" style="border-bottom:none;background:var(--bt-bg-page)">
+      <div>
+        <h2 style="font-size:28px">Good morning, Jessica</h2>
+        <div style="font-size:14px;color:var(--bt-text-muted);margin-top:4px;font-family:var(--bt-font-display);font-weight:400">Monday, May 12 — 14 files across 3 LOs</div>
+      </div>
+      <div class="ch-right"><div class="search-bar"><span>⌘</span> Search... <kbd>⌘K</kbd></div></div>
+    </div>
+
+    <div class="main-area" style="padding-top:8px">
+      <!-- Priority banner -->
+      <div style="background:linear-gradient(135deg,#FFF8EE,#FFF3E0);border:1px solid #F0D9B5;border-radius:var(--bt-radius-lg);padding:24px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <span style="font-size:16px">⚡</span>
+          <span style="font-family:var(--bt-font-display);font-size:18px;font-weight:600;color:var(--bt-warning)">Start Here</span>
+          <span style="font-size:12px;font-weight:600;padding:2px 10px;border-radius:20px;background:var(--bt-warning);color:#fff">3 urgent</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;background:#fff;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--bt-accent-light);color:var(--bt-accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">1</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:600">Chase Martinez pay stubs & W-2</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">T. Loss · FHA Purchase · Overdue 2 days · Blocking submission</div></div>
+            <button class="btn primary" style="font-size:12px;padding:6px 14px">Call borrower</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;background:#fff;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--bt-accent-light);color:var(--bt-accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">2</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:600">Order appraisal for Kim purchase</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">T. Loss · Conv $550K · Due today</div></div>
+            <button class="btn" style="font-size:12px;padding:6px 14px">Open file</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;background:#fff;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--bt-accent-light);color:var(--bt-accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">3</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:600">Follow up on Watson VOE</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">M. Davis · FHA $295K · Employer hasn't responded in 3 days</div></div>
+            <button class="btn" style="font-size:12px;padding:6px 14px">Call employer</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- Schedule -->
+        <div class="card">
+          <div class="card-header"><h3>Today's Schedule</h3><span class="link">Calendar →</span></div>
+          <div class="card-body">
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:600">Follow-up call — Martinez</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">9:30 AM · Document collection</div></div>
+              <button class="btn primary" style="font-size:11px;padding:5px 12px">Call</button>
+            </div>
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:600">Processor check-in — Kim & Richardson</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">11:00 AM · Status update</div></div>
+            </div>
+            <div class="cal-item">
+              <div class="cal-date"><div class="month">May</div><div class="day">12</div></div>
+              <div style="flex:1"><div style="font-size:14px;font-weight:600">Team standup</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">3:00 PM · 15 min</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="grid-2">
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Active Files</div><div class="m-value" style="font-size:22px">14</div></div></div>
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Conditions Out</div><div class="m-value" style="font-size:22px;color:var(--bt-warning)">9</div></div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Docs Pending</div><div class="m-value" style="font-size:22px;color:var(--bt-error)">5</div></div></div>
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">SMS Unread</div><div class="m-value" style="font-size:22px">4</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-body" style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+              <div class="progress-ring" style="width:48px;height:48px">
+                <svg viewBox="0 0 56 56" style="width:48px;height:48px"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="27.6" style="stroke:var(--bt-success)"/></svg>
+                <div class="pct" style="font-size:12px">80%</div>
+              </div>
+              <div><div style="font-size:13px;font-weight:600">Pipeline health</div><div style="font-size:12px;color:var(--bt-text-muted)">11 of 14 on track</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, what's the fastest way to clear Martinez's file?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<script>
+function show(n) {
+  document.querySelectorAll('.mockup').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v' + n).classList.add('active');
+  document.querySelectorAll('.tab')[n - 1].classList.add('active');
+}
+</script>
+
+</body>
+</html>

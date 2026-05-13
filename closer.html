@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Closer Dashboard — Perennia AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #1A1F1B; }
+
+  /* ── Tab Switcher ── */
+  .selector {
+    position: sticky; top: 0; z-index: 9999;
+    background: #1F3D2E; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .selector h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #F5EDD9; font-size: 15px; font-weight: 500; white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  .selector .role-tag {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: rgba(184,146,74,0.25); color: #F5EDD9; white-space: nowrap;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .selector .tabs { display: flex; gap: 5px; flex-shrink: 0; }
+  .selector .tab {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s;
+    white-space: nowrap; font-family: inherit;
+  }
+  .selector .tab:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+  .selector .tab.active { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .mockup { display: none; }
+  .mockup.active { display: block; }
+
+  /* ═══════════════════════════════════════════════════
+     SHARED — Borrower Theme Design System
+     ═══════════════════════════════════════════════════ */
+  :root {
+    --bt-font-display: 'Fraunces', Georgia, serif;
+    --bt-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --bt-bg-page: #FAF7F1;
+    --bt-bg-surface: #FFFFFF;
+    --bt-bg-sidebar: #F6F2EA;
+    --bt-bg-elevated: #F2EDE2;
+    --bt-bg-soft: #FBF8F2;
+    --bt-border: #ECE6D8;
+    --bt-border-strong: #D8D0BD;
+    --bt-text-primary: #1A1F1B;
+    --bt-text-secondary: #4F554E;
+    --bt-text-muted: #8B8A7E;
+    --bt-text-faint: #B5B2A4;
+    --bt-primary: #1F3D2E;
+    --bt-primary-hover: #2A4F3D;
+    --bt-primary-light: #E5EDE6;
+    --bt-primary-tint: #EFF3EE;
+    --bt-accent: #B8924A;
+    --bt-accent-light: #F5EDD9;
+    --bt-success: #2D7A52;
+    --bt-warning: #B25F18;
+    --bt-error: #9B2C2C;
+    --bt-info: #3182CE;
+    --bt-radius-sm: 6px;
+    --bt-radius-md: 10px;
+    --bt-radius-lg: 14px;
+    --bt-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --bt-shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --bt-shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .bt {
+    background: var(--bt-bg-page); color: var(--bt-text-primary);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+    letter-spacing: -0.005em;
+  }
+  .bt .layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .bt .sidebar {
+    width: 240px; background: var(--bt-bg-sidebar);
+    border-right: 1px solid var(--bt-border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    overflow-y: auto; max-height: 100vh; position: sticky; top: 44px;
+    height: calc(100vh - 44px);
+  }
+  .bt .sidebar::-webkit-scrollbar { width: 4px; }
+  .bt .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .bt .sidebar::-webkit-scrollbar-thumb { background: var(--bt-border-strong); border-radius: 2px; }
+
+  .bt .s-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--bt-border); position: sticky; top: 0;
+    background: var(--bt-bg-sidebar); z-index: 2;
+  }
+  .bt .s-logo {
+    font-family: var(--bt-font-display); font-weight: 500; font-size: 17px;
+    letter-spacing: -0.02em; color: var(--bt-primary);
+  }
+  .bt .s-version {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--bt-primary-tint);
+    color: var(--bt-primary); margin-left: auto;
+  }
+  .bt .s-section {
+    padding: 18px 20px 6px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--bt-text-muted); font-weight: 600;
+  }
+  .bt .s-item {
+    padding: 8px 12px 8px 20px; font-size: 13px; color: var(--bt-text-secondary);
+    cursor: pointer; display: flex; align-items: center; gap: 9px;
+    transition: all 0.12s; margin: 1px 8px; border-radius: 8px;
+    font-weight: 500;
+  }
+  .bt .s-item:hover { background: var(--bt-bg-elevated); color: var(--bt-text-primary); }
+  .bt .s-item.active {
+    background: var(--bt-bg-elevated); color: var(--bt-text-primary);
+    font-weight: 600;
+  }
+  .bt .s-icon { width: 16px; text-align: center; opacity: 0.5; font-size: 12px; }
+  .bt .s-badge {
+    margin-left: auto; font-size: 10px; padding: 2px 7px;
+    border-radius: 10px; font-weight: 700; min-width: 18px; text-align: center;
+  }
+  .bt .s-badge.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .s-badge.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .s-badge.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .s-badge.primary { background: var(--bt-primary); color: #fff; }
+  .bt .s-spacer { flex: 1; min-height: 12px; }
+  .bt .s-user {
+    padding: 14px 20px; border-top: 1px solid var(--bt-border);
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    position: sticky; bottom: 0; background: var(--bt-bg-sidebar);
+  }
+  .bt .s-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bt-accent); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff;
+  }
+
+  /* ── Main Content ── */
+  .bt .content { flex: 1; overflow-y: auto; }
+  .bt .c-head {
+    padding: 20px 32px; display: flex; align-items: center;
+    border-bottom: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+  }
+  .bt .c-head h2 {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--bt-text-primary);
+  }
+  .bt .c-head .ch-sub {
+    font-size: 13px; color: var(--bt-text-muted); margin-left: 12px;
+  }
+  .bt .c-head .ch-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .bt .search-bar {
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 8px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-soft); font-size: 13px; color: var(--bt-text-muted);
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .bt .search-bar:hover { border-color: var(--bt-border-strong); }
+  .bt .search-bar kbd {
+    font-size: 10px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-muted);
+    font-family: inherit;
+  }
+
+  .bt .btn {
+    font-size: 13px; font-weight: 600; padding: 8px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer;
+    font-family: inherit; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-primary);
+    transition: all 0.15s;
+  }
+  .bt .btn:hover { border-color: var(--bt-border-strong); }
+  .bt .btn.primary { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .btn.primary:hover { background: var(--bt-primary-hover); }
+  .bt .btn.accent { background: var(--bt-accent); color: #fff; border-color: var(--bt-accent); }
+
+  .bt .card {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); box-shadow: var(--bt-shadow-sm);
+  }
+  .bt .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .card-header h3 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted);
+  }
+  .bt .card-header .link {
+    font-size: 12px; font-weight: 500; color: var(--bt-primary);
+    cursor: pointer; text-decoration: none;
+  }
+  .bt .card-body { padding: 16px 20px; }
+
+  .bt .hero {
+    background: var(--bt-primary); border-radius: var(--bt-radius-lg);
+    padding: 24px 28px; color: #F5EDD9; position: relative; overflow: hidden;
+  }
+  .bt .hero::after {
+    content: ''; position: absolute; top: -60px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .bt .hero .greeting {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 500; letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .bt .hero .subtitle { font-size: 14px; color: rgba(245,237,217,0.7); }
+  .bt .hero-stats { display: flex; gap: 28px; margin-top: 16px; }
+  .bt .hero-stat .label { font-size: 11px; color: rgba(245,237,217,0.5); text-transform: uppercase; letter-spacing: 0.05em; }
+  .bt .hero-stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  .bt .metric { padding: 16px 20px; }
+  .bt .metric .m-label { font-size: 11px; font-weight: 500; color: var(--bt-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bt .metric .m-value { font-size: 26px; font-weight: 700; color: var(--bt-text-primary); margin-top: 4px; letter-spacing: -0.02em; }
+  .bt .metric .m-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .bt .metric .m-change.up { color: var(--bt-success); }
+  .bt .metric .m-change.down { color: var(--bt-error); }
+
+  .bt .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bt .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-3-1 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .bt .main-area { padding: 24px 32px; }
+
+  .bt .pipeline-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bt-bg-elevated); }
+  .bt .pipeline-bar .segment { height: 100%; transition: width 0.5s; }
+
+  .bt .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .list-item:last-child { border-bottom: none; }
+  .bt .list-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bt-primary-light); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--bt-primary); flex-shrink: 0;
+  }
+  .bt .list-info { flex: 1; min-width: 0; }
+  .bt .list-info .name { font-size: 13px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .list-info .detail { font-size: 12px; color: var(--bt-text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bt .tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; display: inline-block;
+  }
+  .bt .tag.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .tag.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .tag.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .tag.blue { background: #DBEAFE; color: var(--bt-info); }
+  .bt .tag.muted { background: var(--bt-bg-elevated); color: var(--bt-text-muted); }
+
+  .bt .task-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .task-item:last-child { border-bottom: none; }
+  .bt .task-check {
+    width: 16px; height: 16px; border: 2px solid var(--bt-border-strong);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .bt .task-item.urgent .task-check { border-color: var(--bt-warning); }
+
+  .bt .aria-bar {
+    padding: 14px 20px; background: var(--bt-bg-surface);
+    border: 1px solid var(--bt-border); border-radius: var(--bt-radius-lg);
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bt .aria-bar:hover { border-color: var(--bt-primary); box-shadow: 0 0 0 3px var(--bt-primary-tint); }
+  .bt .aria-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .bt .aria-bar .prompt { flex: 1; font-size: 14px; color: var(--bt-text-muted); }
+  .bt .aria-bar .aria-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary);
+  }
+
+  .bt .cal-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bt-border); }
+  .bt .cal-item:last-child { border-bottom: none; }
+  .bt .cal-date {
+    width: 42px; height: 42px; border-radius: var(--bt-radius-md);
+    background: var(--bt-primary-tint); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .bt .cal-date .month { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--bt-primary); letter-spacing: 0.04em; }
+  .bt .cal-date .day { font-size: 15px; font-weight: 700; color: var(--bt-primary); line-height: 1; }
+
+  .bt table { width: 100%; border-collapse: collapse; }
+  .bt table th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--bt-text-muted); padding: 10px 14px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table td {
+    padding: 10px 14px; font-size: 13px; color: var(--bt-text-primary);
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table tr:last-child td { border-bottom: none; }
+  .bt table tr:hover td { background: var(--bt-bg-soft); }
+
+  .bt .progress-ring { width: 56px; height: 56px; position: relative; }
+  .bt .progress-ring svg { transform: rotate(-90deg); width: 56px; height: 56px; }
+  .bt .progress-ring .bg { fill: none; stroke: var(--bt-bg-elevated); stroke-width: 5; }
+  .bt .progress-ring .fg { fill: none; stroke: var(--bt-accent); stroke-width: 5; stroke-linecap: round; }
+  .bt .progress-ring .pct {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--bt-text-primary);
+  }
+
+  /* Condition tracker */
+  .bt .cond-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--bt-border);
+    font-size: 13px;
+  }
+  .bt .cond-item:last-child { border-bottom: none; }
+  .bt .cond-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .bt .cond-dot.received { background: var(--bt-success); }
+  .bt .cond-dot.pending { background: var(--bt-warning); }
+  .bt .cond-dot.missing { background: var(--bt-error); }
+  .bt .cond-dot.waived { background: var(--bt-text-faint); }
+
+  /* LO tag */
+  .bt .lo-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: var(--bt-accent-light);
+    color: var(--bt-accent); white-space: nowrap;
+  }
+
+  /* ── Closer-specific: Timeline bars ── */
+  .bt .timeline-row {
+    display: flex; align-items: center; gap: 0;
+    padding: 6px 0;
+  }
+  .bt .tl-step {
+    display: flex; align-items: center; gap: 0;
+  }
+  .bt .tl-node {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .bt .tl-node.done { background: var(--bt-success); }
+  .bt .tl-node.active { background: var(--bt-info); box-shadow: 0 0 0 3px rgba(49,130,206,0.2); }
+  .bt .tl-node.upcoming { background: var(--bt-border-strong); }
+  .bt .tl-node.warn { background: var(--bt-warning); }
+  .bt .tl-node.error { background: var(--bt-error); }
+  .bt .tl-line {
+    width: 28px; height: 2px; flex-shrink: 0;
+  }
+  .bt .tl-line.done { background: var(--bt-success); }
+  .bt .tl-line.pending { background: var(--bt-border); }
+
+  /* Fee tolerance row */
+  .bt .fee-row {
+    display: flex; align-items: center; padding: 8px 0;
+    border-bottom: 1px solid var(--bt-border); font-size: 13px;
+  }
+  .bt .fee-row:last-child { border-bottom: none; }
+  .bt .fee-name { flex: 1; font-weight: 500; }
+  .bt .fee-le { width: 90px; text-align: right; color: var(--bt-text-secondary); }
+  .bt .fee-cd { width: 90px; text-align: right; font-weight: 600; }
+  .bt .fee-var { width: 90px; text-align: right; font-weight: 600; }
+
+  /* Checklist dots */
+  .bt .check-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .bt .check-dot.done { background: var(--bt-success); }
+  .bt .check-dot.pending { background: var(--bt-warning); }
+  .bt .check-dot.not-started { background: var(--bt-border-strong); }
+  .bt .check-dot.blocked { background: var(--bt-error); }
+
+  /* TRID timeline visual */
+  .bt .trid-bar {
+    display: flex; align-items: stretch; border-radius: 6px; overflow: hidden;
+    height: 28px; font-size: 10px; font-weight: 600;
+  }
+  .bt .trid-seg {
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; padding: 0 8px; white-space: nowrap;
+  }
+
+  /* Start-here banner */
+  .bt .start-banner {
+    background: linear-gradient(135deg, var(--bt-primary), #2A5A3E);
+    border-radius: var(--bt-radius-lg); padding: 20px 24px;
+    color: #F5EDD9; position: relative; overflow: hidden;
+  }
+  .bt .start-banner::after {
+    content: ''; position: absolute; top: -40px; right: -20px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .bt .start-banner h3 {
+    font-family: var(--bt-font-display); font-size: 18px; font-weight: 500;
+    letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .bt .start-banner .start-item {
+    display: flex; align-items: center; gap: 8px; padding: 5px 0;
+    font-size: 13px; color: rgba(245,237,217,0.85);
+  }
+  .bt .start-banner .start-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TAB SWITCHER
+     ════════════════════════════════════════════════════════════════ -->
+<div class="selector">
+  <h1>Perennia Dashboard</h1>
+  <span class="role-tag">Closer</span>
+  <div class="tabs">
+    <button class="tab active" onclick="show(1)">1 — Closing Pipeline</button>
+    <button class="tab" onclick="show(2)">2 — CD Reconciliation</button>
+    <button class="tab" onclick="show(3)">3 — Doc Tracker</button>
+    <button class="tab" onclick="show(4)">4 — Title Coordination</button>
+    <button class="tab" onclick="show(5)">5 — Closing Calendar</button>
+    <button class="tab" onclick="show(6)">6 — Funding Checklist</button>
+    <button class="tab" onclick="show(7)">7 — TRID Timeline</button>
+    <button class="tab" onclick="show(8)">8 — Morning Focus</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 1 — Closing Pipeline
+     Files approaching closing with timeline view
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v1" class="mockup active">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Closing Pipeline</h2>
+      <span class="ch-sub">Tuesday, May 13</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search files... <kbd>&#8984;K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Hero -->
+      <div class="hero" style="margin-bottom:20px">
+        <div class="greeting">Good morning, Sarah</div>
+        <div class="subtitle">8 files in your closing pipeline — 3 closing this week</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="label">Closings This Week</div><div class="value">3</div></div>
+          <div class="hero-stat"><div class="label">Docs Ordered</div><div class="value">5</div></div>
+          <div class="hero-stat"><div class="label">Docs Out</div><div class="value">2</div></div>
+          <div class="hero-stat"><div class="label">Funded MTD</div><div class="value">4</div></div>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">CTC Cleared</div><div class="m-value" style="color:var(--bt-success)">2</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">CD Sent / Waiting</div><div class="m-value">3</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">Docs Pending</div><div class="m-value">2</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-accent)">
+          <div class="metric"><div class="m-label">Funded MTD</div><div class="m-value">$1.42M</div></div>
+        </div>
+      </div>
+
+      <!-- Pipeline Table -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Active Closing Files</h3><span class="link">View All</span></div>
+        <table>
+          <tr>
+            <th>Borrower</th>
+            <th>Loan Type</th>
+            <th>Close Date</th>
+            <th>Stage</th>
+            <th>Docs</th>
+            <th>Title</th>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Patterson, James</td>
+            <td>Conv Purchase</td>
+            <td style="font-weight:600">May 14</td>
+            <td><span class="tag green">CTC</span></td>
+            <td><span class="tag green">Docs Out</span></td>
+            <td><span class="tag green">Ready</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Kim, Michelle</td>
+            <td>FHA Purchase</td>
+            <td style="font-weight:600">May 15</td>
+            <td><span class="tag green">CTC</span></td>
+            <td><span class="tag blue">Ordered</span></td>
+            <td><span class="tag green">Ready</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Rivera, Carlos</td>
+            <td>Conv Refi</td>
+            <td style="font-weight:600">May 16</td>
+            <td><span class="tag blue">CD Sent</span></td>
+            <td><span class="tag amber">Pending</span></td>
+            <td><span class="tag amber">Review</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Okafor, Nneka</td>
+            <td>VA Purchase</td>
+            <td>May 19</td>
+            <td><span class="tag blue">CD Sent</span></td>
+            <td><span class="tag amber">Pending</span></td>
+            <td><span class="tag green">Ready</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Whitfield, Dana</td>
+            <td>Conv Purchase</td>
+            <td>May 20</td>
+            <td><span class="tag blue">CD Sent</span></td>
+            <td><span class="tag muted">Not Ordered</span></td>
+            <td><span class="tag amber">Pending</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Nakamura, Yuki</td>
+            <td>FHA Streamline</td>
+            <td>May 22</td>
+            <td><span class="tag amber">Cond. Approval</span></td>
+            <td><span class="tag muted">Not Ordered</span></td>
+            <td><span class="tag amber">Pending</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Torres, Maria</td>
+            <td>Conv Purchase</td>
+            <td>May 23</td>
+            <td><span class="tag amber">Cond. Approval</span></td>
+            <td><span class="tag muted">Not Ordered</span></td>
+            <td><span class="tag muted">Not Started</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Bennett, Marcus</td>
+            <td>USDA Purchase</td>
+            <td>May 28</td>
+            <td><span class="tag muted">Underwriting</span></td>
+            <td><span class="tag muted">Not Ordered</span></td>
+            <td><span class="tag muted">Not Started</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Aria Bar -->
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which closings need docs ordered today?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 2 — CD Reconciliation
+     Closing Disclosure vs Loan Estimate fee tolerance tracking
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v2" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>CD Reconciliation</h2>
+      <span class="ch-sub">Fee Tolerance Tracking</span>
+      <div class="ch-right">
+        <button class="btn primary" style="font-size:11px;padding:6px 14px">Export Report</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- File selector -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="card-header"><h3>Patterson — Conv Purchase</h3><span class="tag red">Tolerance Exceeded</span></div>
+          <div class="card-body" style="font-size:12px;color:var(--bt-text-secondary)">
+            Loan: $385,000 &middot; Close: May 14 &middot; CD issued May 10
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="card-header"><h3>Kim — FHA Purchase</h3><span class="tag green">Within Tolerance</span></div>
+          <div class="card-body" style="font-size:12px;color:var(--bt-text-secondary)">
+            Loan: $275,000 &middot; Close: May 15 &middot; CD issued May 11
+          </div>
+        </div>
+      </div>
+
+      <!-- Patterson Detail — Tolerance Issue -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Patterson File — Zero Tolerance Fees (cannot increase)</h3>
+          <span class="tag red">1 Violation</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;padding:6px 0;border-bottom:1px solid var(--bt-border);font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em">
+            <div class="fee-name">Fee Description</div>
+            <div class="fee-le">LE Amount</div>
+            <div class="fee-cd">CD Amount</div>
+            <div class="fee-var">Variance</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Origination Fee</div>
+            <div class="fee-le">$3,850.00</div>
+            <div class="fee-cd">$3,850.00</div>
+            <div class="fee-var" style="color:var(--bt-success)">$0.00</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Discount Points (0.5%)</div>
+            <div class="fee-le">$1,925.00</div>
+            <div class="fee-cd">$1,925.00</div>
+            <div class="fee-var" style="color:var(--bt-success)">$0.00</div>
+          </div>
+          <div class="fee-row" style="background:#FDE8E8;margin:0 -20px;padding:8px 20px;border-radius:6px">
+            <div class="fee-name" style="color:var(--bt-error);font-weight:700">Processing Fee</div>
+            <div class="fee-le" style="color:var(--bt-error)">$895.00</div>
+            <div class="fee-cd" style="color:var(--bt-error);font-weight:700">$995.00</div>
+            <div class="fee-var" style="color:var(--bt-error);font-weight:700">+$100.00</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Appraisal Fee</div>
+            <div class="fee-le">$550.00</div>
+            <div class="fee-cd">$550.00</div>
+            <div class="fee-var" style="color:var(--bt-success)">$0.00</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Credit Report</div>
+            <div class="fee-le">$65.00</div>
+            <div class="fee-cd">$65.00</div>
+            <div class="fee-var" style="color:var(--bt-success)">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10% Tolerance bucket -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Patterson File — 10% Cumulative Tolerance</h3>
+          <span class="tag green">Within Tolerance</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;padding:6px 0;border-bottom:1px solid var(--bt-border);font-size:11px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em">
+            <div class="fee-name">Fee Description</div>
+            <div class="fee-le">LE Amount</div>
+            <div class="fee-cd">CD Amount</div>
+            <div class="fee-var">Variance</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Title — Lender's Policy</div>
+            <div class="fee-le">$1,450.00</div>
+            <div class="fee-cd">$1,525.00</div>
+            <div class="fee-var" style="color:var(--bt-warning)">+$75.00</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Title — Settlement Fee</div>
+            <div class="fee-le">$625.00</div>
+            <div class="fee-cd">$650.00</div>
+            <div class="fee-var" style="color:var(--bt-warning)">+$25.00</div>
+          </div>
+          <div class="fee-row">
+            <div class="fee-name">Recording Fees</div>
+            <div class="fee-le">$125.00</div>
+            <div class="fee-cd">$130.00</div>
+            <div class="fee-var" style="color:var(--bt-warning)">+$5.00</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-top:6px;border-top:2px solid var(--bt-border-strong);font-size:13px;font-weight:700">
+            <span>Cumulative Increase</span>
+            <span style="color:var(--bt-warning)">+$105.00 of $220.00 allowed (4.8%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aria -->
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, flag all tolerance violations across open files"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 3 — Doc Tracker
+     Closing document status board with per-file checklist
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v3" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Doc Tracker</h2>
+      <span class="ch-sub">Closing Document Status</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search files... <kbd>&#8984;K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Patterson file -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Patterson, James — Conv Purchase &middot; Close May 14</h3>
+          <span class="tag green">5/7 Complete</span>
+        </div>
+        <div class="card-body">
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">CD prepared</span><span style="font-size:12px;color:var(--bt-text-muted)">May 9</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">CD sent to borrower</span><span style="font-size:12px;color:var(--bt-text-muted)">May 10</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1;display:flex;align-items:center;gap:8px">3-day waiting period <span class="tag green" style="font-size:10px;padding:2px 8px">Expired May 13</span></span><span style="font-size:12px;color:var(--bt-success);font-weight:600">Complete</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Closing docs ordered</span><span style="font-size:12px;color:var(--bt-text-muted)">May 11</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Docs received from title</span><span style="font-size:12px;color:var(--bt-text-muted)">May 12</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Docs reviewed</span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">In Review</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs sent out</span><span style="font-size:12px;color:var(--bt-text-muted)">Pending review</span></div>
+        </div>
+      </div>
+
+      <!-- Kim file -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Kim, Michelle — FHA Purchase &middot; Close May 15</h3>
+          <span class="tag amber">3/7 Complete</span>
+        </div>
+        <div class="card-body">
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">CD prepared</span><span style="font-size:12px;color:var(--bt-text-muted)">May 10</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">CD sent to borrower</span><span style="font-size:12px;color:var(--bt-text-muted)">May 11</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;display:flex;align-items:center;gap:8px">3-day waiting period <span class="tag amber" style="font-size:10px;padding:2px 8px">Expires May 14</span></span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">1 day left</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Closing docs ordered</span><span style="font-size:12px;color:var(--bt-text-muted)">May 12</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Docs received from title</span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">Expected today</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs reviewed</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs sent out</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+        </div>
+      </div>
+
+      <!-- Rivera file -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Rivera, Carlos — Conv Refi &middot; Close May 16</h3>
+          <span class="tag red">1/7 Complete</span>
+        </div>
+        <div class="card-body">
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">CD prepared</span><span style="font-size:12px;color:var(--bt-text-muted)">May 12</span></div>
+          <div class="cond-item"><div class="check-dot blocked"></div><span style="flex:1;font-weight:600;color:var(--bt-error)">CD sent to borrower — BLOCKED</span><span style="font-size:12px;color:var(--bt-error);font-weight:600">Fee variance</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">3-day waiting period</span><span style="font-size:12px;color:var(--bt-text-muted)">Not started</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Closing docs ordered</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs received from title</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs reviewed</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Docs sent out</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, what's blocking the Rivera CD?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 4 — Title Coordination
+     Tracking title company interactions per file
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v4" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Title Coordination</h2>
+      <span class="ch-sub">Title Company Tracking</span>
+      <div class="ch-right">
+        <button class="btn" style="font-size:11px;padding:6px 14px">Add Contact</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Patterson title -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Patterson — Heritage Title Group</h3>
+          <span class="tag green">All Clear</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:24px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bt-border)">
+            <div>
+              <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Title Rep</div>
+              <div style="font-size:13px;font-weight:600">Angela Torres</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary)">(843) 555-0142 &middot; atorres@heritagetitle.com</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Closing Agent</div>
+              <div style="font-size:13px;font-weight:600">Robert Walsh</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary)">(843) 555-0198</div>
+            </div>
+          </div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Title commitment received</span><span style="font-size:12px;color:var(--bt-success)">May 2</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Title commitment reviewed — no issues</span><span style="font-size:12px;color:var(--bt-success)">May 4</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Survey received</span><span style="font-size:12px;color:var(--bt-success)">May 6</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Payoff demand received</span><span style="font-size:12px;color:var(--bt-success)">N/A (Purchase)</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Wire instructions received</span><span style="font-size:12px;color:var(--bt-success)">May 12</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Wire instructions verified</span><span style="font-size:12px;color:var(--bt-success)">May 12</span></div>
+        </div>
+      </div>
+
+      <!-- Kim title -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Kim — Lowcountry Title &amp; Escrow</h3>
+          <span class="tag amber">2 Pending</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:24px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bt-border)">
+            <div>
+              <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Title Rep</div>
+              <div style="font-size:13px;font-weight:600">Jennifer Park</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary)">(843) 555-0267 &middot; jpark@lowcountrytitle.com</div>
+            </div>
+          </div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Title commitment received</span><span style="font-size:12px;color:var(--bt-success)">May 5</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Title commitment reviewed — liens cleared</span><span style="font-size:12px;color:var(--bt-success)">May 7</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Survey received</span><span style="font-size:12px;color:var(--bt-success)">May 9</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Payoff demand received</span><span style="font-size:12px;color:var(--bt-success)">N/A (Purchase)</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Wire instructions received</span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">Requested May 12</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Wire instructions verified</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+        </div>
+      </div>
+
+      <!-- Rivera title -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Rivera — Palmetto Closing Services</h3>
+          <span class="tag red">3 Pending</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:24px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bt-border)">
+            <div>
+              <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Title Rep</div>
+              <div style="font-size:13px;font-weight:600">Marcus Greene</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary)">(843) 555-0331 &middot; mgreene@palmettoclosing.com</div>
+            </div>
+          </div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Title commitment received</span><span style="font-size:12px;color:var(--bt-success)">May 8</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Title commitment reviewed — exception found</span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">Old mortgage lien</span></div>
+          <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Survey received</span><span style="font-size:12px;color:var(--bt-success)">N/A (Refi)</span></div>
+          <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Payoff demand received</span><span style="font-size:12px;color:var(--bt-warning);font-weight:600">Requested May 11 — follow up</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Wire instructions received</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+          <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Wire instructions verified</span><span style="font-size:12px;color:var(--bt-text-muted)">Waiting</span></div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, draft a follow-up email to Palmetto Closing for the Rivera payoff demand"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 5 — Closing Calendar
+     Weekly timeline with upcoming closings and prep checklists
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v5" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Closing Calendar</h2>
+      <span class="ch-sub">Week of May 12 — May 16</span>
+      <div class="ch-right">
+        <button class="btn" style="font-size:11px;padding:6px 14px">Month View</button>
+        <button class="btn primary" style="font-size:11px;padding:6px 14px">Add Closing</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Tomorrow -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-family:var(--bt-font-display);font-size:16px;font-weight:600;color:var(--bt-text-primary)">Wednesday, May 14</div>
+          <span class="tag red" style="font-size:10px">Tomorrow</span>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="display:flex;gap:20px;align-items:flex-start">
+            <div style="min-width:90px">
+              <div style="font-size:20px;font-weight:700;color:var(--bt-primary)">10:00 AM</div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:2px">1 hr 30 min</div>
+            </div>
+            <div style="flex:1;border-left:3px solid var(--bt-success);padding-left:16px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Patterson, James — Closing</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary);margin-bottom:8px">Conv Purchase &middot; $385,000 &middot; Heritage Title Group</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <span class="tag green">In-Person</span>
+                <span style="font-size:12px;color:var(--bt-text-secondary)">425 Meeting St, Suite 200, Charleston SC</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Prep Checklist</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot done" style="width:8px;height:8px"></div> Final CD reviewed</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot done" style="width:8px;height:8px"></div> Wire instructions confirmed</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot done" style="width:8px;height:8px"></div> Closing package received from title</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot pending" style="width:8px;height:8px"></div> <span style="font-weight:600">Confirm borrower attendance</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thursday -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-family:var(--bt-font-display);font-size:16px;font-weight:600;color:var(--bt-text-primary)">Thursday, May 15</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="display:flex;gap:20px;align-items:flex-start">
+            <div style="min-width:90px">
+              <div style="font-size:20px;font-weight:700;color:var(--bt-primary)">2:00 PM</div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:2px">1 hr</div>
+            </div>
+            <div style="flex:1;border-left:3px solid var(--bt-info);padding-left:16px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Kim, Michelle — Closing</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary);margin-bottom:8px">FHA Purchase &middot; $275,000 &middot; Lowcountry Title</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <span class="tag blue">Hybrid</span>
+                <span style="font-size:12px;color:var(--bt-text-secondary)">Borrower remote / Agent at title office</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Prep Checklist</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot done" style="width:8px;height:8px"></div> Final CD reviewed</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot pending" style="width:8px;height:8px"></div> <span style="font-weight:600">Wire instructions — awaiting title</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot pending" style="width:8px;height:8px"></div> <span style="font-weight:600">Closing docs from title</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot not-started" style="width:8px;height:8px"></div> Set up RON session link</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Friday -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-family:var(--bt-font-display);font-size:16px;font-weight:600;color:var(--bt-text-primary)">Friday, May 16</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="display:flex;gap:20px;align-items:flex-start">
+            <div style="min-width:90px">
+              <div style="font-size:20px;font-weight:700;color:var(--bt-primary)">11:00 AM</div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:2px">1 hr</div>
+            </div>
+            <div style="flex:1;border-left:3px solid var(--bt-warning);padding-left:16px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Rivera, Carlos — Closing</div>
+              <div style="font-size:12px;color:var(--bt-text-secondary);margin-bottom:8px">Conv Refi &middot; $310,000 &middot; Palmetto Closing Services</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <span class="tag amber">Remote (RON)</span>
+                <span style="font-size:12px;color:var(--bt-text-secondary)">Remote Online Notarization</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Prep Checklist</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot blocked" style="width:8px;height:8px"></div> <span style="font-weight:600;color:var(--bt-error)">CD blocked — fee variance issue</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot not-started" style="width:8px;height:8px"></div> Wire instructions</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot not-started" style="width:8px;height:8px"></div> Closing docs from title</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="check-dot not-started" style="width:8px;height:8px"></div> RON session setup</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, send confirmation to Patterson for tomorrow's 10 AM closing"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 6 — Funding Checklist
+     Pre-funding verification per file
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v6" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Funding Checklist</h2>
+      <span class="ch-sub">Pre-Funding Verification</span>
+      <div class="ch-right">
+        <button class="btn primary" style="font-size:11px;padding:6px 14px">Generate Report</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Summary cards -->
+      <div class="grid-3" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Ready to Fund</div><div class="m-value" style="color:var(--bt-success)">1</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">Pending Items</div><div class="m-value">2</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Blocked</div><div class="m-value" style="color:var(--bt-error)">1</div></div>
+        </div>
+      </div>
+
+      <!-- Patterson — Ready -->
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--bt-success)">
+        <div class="card-header">
+          <h3>Patterson, James — Conv Purchase &middot; $385,000</h3>
+          <span class="tag green">Ready to Fund</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:12px">
+            <div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Final conditions cleared</span></div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Closing docs executed</span></div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Note reviewed &amp; correct</span></div>
+            </div>
+            <div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Wire instructions verified</span></div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Recording confirmed</span></div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Disbursement authorized</span></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bt-border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;color:var(--bt-success);font-weight:600">All 6 items verified — file ready for funding</span>
+            <button class="btn primary" style="font-size:11px;padding:6px 14px">Authorize Wire</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kim — Pending -->
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--bt-warning)">
+        <div class="card-header">
+          <h3>Kim, Michelle — FHA Purchase &middot; $275,000</h3>
+          <span class="tag amber">2 Items Pending</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:12px">
+            <div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Final conditions cleared</span></div>
+              <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Closing docs executed</span><span style="font-size:11px;color:var(--bt-warning)">Closing May 15</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Note reviewed</span></div>
+            </div>
+            <div>
+              <div class="cond-item"><div class="check-dot pending"></div><span style="flex:1;font-weight:600">Wire instructions verified</span><span style="font-size:11px;color:var(--bt-warning)">Awaiting title</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Recording confirmed</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Disbursement authorized</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Okafor — Pending -->
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--bt-warning)">
+        <div class="card-header">
+          <h3>Okafor, Nneka — VA Purchase &middot; $340,000</h3>
+          <span class="tag amber">3 Items Pending</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:12px">
+            <div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Final conditions cleared</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Closing docs executed</span><span style="font-size:11px;color:var(--bt-text-muted)">Close May 19</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Note reviewed</span></div>
+            </div>
+            <div>
+              <div class="cond-item"><div class="check-dot done"></div><span style="flex:1">Wire instructions verified</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Recording confirmed</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Disbursement authorized</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rivera — Blocked -->
+      <div class="card" style="margin-bottom:20px;border-left:3px solid var(--bt-error)">
+        <div class="card-header">
+          <h3>Rivera, Carlos — Conv Refi &middot; $310,000</h3>
+          <span class="tag red">Blocked</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:12px">
+            <div>
+              <div class="cond-item"><div class="check-dot blocked"></div><span style="flex:1;font-weight:600;color:var(--bt-error)">Final conditions — 1 outstanding</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Closing docs executed</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Note reviewed</span></div>
+            </div>
+            <div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Wire instructions verified</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Recording confirmed</span></div>
+              <div class="cond-item"><div class="check-dot not-started"></div><span style="flex:1">Disbursement authorized</span></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:#FDE8E8;border-radius:8px;font-size:12px;color:var(--bt-error);font-weight:500">
+            Blocking: Payoff demand not received from current servicer. Title exception on old mortgage lien unresolved.
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, what's the remaining condition on the Rivera file?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 7 — TRID Timeline
+     LE → CD → 3-day period → closing compliance tracker
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v7" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>TRID Timeline</h2>
+      <span class="ch-sub">Compliance Tracking</span>
+      <div class="ch-right">
+        <span class="tag red" style="cursor:pointer;font-size:10px">Violations 0</span>
+        <span class="tag amber" style="cursor:pointer;font-size:10px">Tight 2</span>
+        <span class="tag green" style="cursor:pointer;font-size:10px">Clear 3</span>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Explanation banner -->
+      <div class="card" style="margin-bottom:20px;background:var(--bt-bg-soft)">
+        <div class="card-body" style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--bt-text-secondary)">
+          <div style="font-size:16px">&#9432;</div>
+          <div>TRID requires the Closing Disclosure be delivered to the borrower at least 3 business days before closing. A revised CD may restart the waiting period if certain fees change beyond tolerance.</div>
+        </div>
+      </div>
+
+      <!-- Patterson — Clear -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3>Patterson, James — Conv Purchase</h3>
+          <span class="tag green">TRID Clear</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div class="trid-bar" style="flex:1">
+              <div class="trid-seg" style="background:var(--bt-primary);flex:2">LE Apr 15</div>
+              <div class="trid-seg" style="background:var(--bt-info);flex:1">CD May 10</div>
+              <div class="trid-seg" style="background:var(--bt-success);flex:1">3-Day OK</div>
+              <div class="trid-seg" style="background:var(--bt-accent);flex:0.5">Close May 14</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:12px;color:var(--bt-text-secondary)">
+            <div><strong>LE Issued:</strong> Apr 15</div>
+            <div><strong>CD Delivered:</strong> May 10</div>
+            <div><strong>3-Day Expiry:</strong> May 13 (today)</div>
+            <div><strong>Closing:</strong> May 14</div>
+            <div style="color:var(--bt-success);font-weight:600">1 day buffer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kim — Tight -->
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--bt-warning)">
+        <div class="card-header">
+          <h3>Kim, Michelle — FHA Purchase</h3>
+          <span class="tag amber">Tight Timeline</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div class="trid-bar" style="flex:1">
+              <div class="trid-seg" style="background:var(--bt-primary);flex:2">LE Apr 18</div>
+              <div class="trid-seg" style="background:var(--bt-info);flex:1">CD May 11</div>
+              <div class="trid-seg" style="background:var(--bt-warning);flex:1">3-Day May 14</div>
+              <div class="trid-seg" style="background:var(--bt-accent);flex:0.5">Close May 15</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:12px;color:var(--bt-text-secondary)">
+            <div><strong>LE Issued:</strong> Apr 18</div>
+            <div><strong>CD Delivered:</strong> May 11</div>
+            <div><strong>3-Day Expiry:</strong> May 14</div>
+            <div><strong>Closing:</strong> May 15</div>
+            <div style="color:var(--bt-warning);font-weight:600">0 day buffer — no room for revised CD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rivera — Tight / At Risk -->
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--bt-warning)">
+        <div class="card-header">
+          <h3>Rivera, Carlos — Conv Refi</h3>
+          <span class="tag amber">At Risk</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div class="trid-bar" style="flex:1">
+              <div class="trid-seg" style="background:var(--bt-primary);flex:2">LE Apr 22</div>
+              <div class="trid-seg" style="background:var(--bt-warning);flex:1">CD May 12</div>
+              <div class="trid-seg" style="background:var(--bt-error);flex:1;font-size:9px">3-Day May 15</div>
+              <div class="trid-seg" style="background:var(--bt-accent);flex:0.5;font-size:9px">Close May 16</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:12px;color:var(--bt-text-secondary)">
+            <div><strong>LE Issued:</strong> Apr 22</div>
+            <div><strong>CD Delivered:</strong> May 12</div>
+            <div><strong>3-Day Expiry:</strong> May 15</div>
+            <div><strong>Closing:</strong> May 16</div>
+            <div style="color:var(--bt-warning);font-weight:600">0 buffer — fee variance may require revised CD</div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:#FEF3C7;border-radius:6px;font-size:12px;color:var(--bt-warning);font-weight:500">
+            Warning: Processing fee increase ($100) on zero-tolerance item. If a revised CD is required, closing must be postponed to May 19 minimum.
+          </div>
+        </div>
+      </div>
+
+      <!-- Okafor — Clear -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3>Okafor, Nneka — VA Purchase</h3>
+          <span class="tag green">TRID Clear</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div class="trid-bar" style="flex:1">
+              <div class="trid-seg" style="background:var(--bt-primary);flex:2">LE Apr 25</div>
+              <div class="trid-seg" style="background:var(--bt-info);flex:1">CD May 9</div>
+              <div class="trid-seg" style="background:var(--bt-success);flex:1">3-Day May 12</div>
+              <div class="trid-seg" style="background:var(--bt-accent);flex:1">Close May 19</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:12px;color:var(--bt-text-secondary)">
+            <div><strong>LE Issued:</strong> Apr 25</div>
+            <div><strong>CD Delivered:</strong> May 9</div>
+            <div><strong>3-Day Expiry:</strong> May 12</div>
+            <div><strong>Closing:</strong> May 19</div>
+            <div style="color:var(--bt-success);font-weight:600">4 day buffer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Whitfield — Clear -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>Whitfield, Dana — Conv Purchase</h3>
+          <span class="tag green">TRID Clear</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div class="trid-bar" style="flex:1">
+              <div class="trid-seg" style="background:var(--bt-primary);flex:2">LE Apr 28</div>
+              <div class="trid-seg" style="background:var(--bt-info);flex:1">CD May 10</div>
+              <div class="trid-seg" style="background:var(--bt-success);flex:1">3-Day May 13</div>
+              <div class="trid-seg" style="background:var(--bt-accent);flex:1">Close May 20</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:12px;color:var(--bt-text-secondary)">
+            <div><strong>LE Issued:</strong> Apr 28</div>
+            <div><strong>CD Delivered:</strong> May 10</div>
+            <div><strong>3-Day Expiry:</strong> May 13</div>
+            <div><strong>Closing:</strong> May 20</div>
+            <div style="color:var(--bt-success);font-weight:600">5 day buffer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, check TRID compliance on the Kim file"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VARIATION 8 — Morning Focus
+     Clean priority view with "Start Here" banner
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v8" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Active Loans <span class="s-badge green">8</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Closed Loans</div>
+    <div class="s-section">Work</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Tasks <span class="s-badge red">5</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> SMS Tasks <span class="s-badge amber">3</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Reconciliation <span class="s-badge red">2</span></div>
+    <div class="s-section">Tools</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Smart Docs <span class="s-badge red">4</span></div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> Calendar</div>
+    <div class="s-item active"><span class="s-icon">&#9679;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9675;</span> AI Underwriter</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">SC</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Sarah Chen</div><div style="font-size:11px;color:var(--bt-text-muted)">Closer</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Morning Briefing</h2>
+      <span class="ch-sub">Tuesday, May 13</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search files... <kbd>&#8984;K</kbd></div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Start Here Banner -->
+      <div class="start-banner" style="margin-bottom:20px">
+        <h3>Start Here</h3>
+        <div class="start-item"><div class="start-dot" style="background:#F87171"></div> <strong>Patterson closing tomorrow</strong> — review final docs and confirm borrower attendance</div>
+        <div class="start-item"><div class="start-dot" style="background:#FBBF24"></div> <strong>Kim 3-day period expires today</strong> — wire instructions still needed from Lowcountry Title</div>
+        <div class="start-item"><div class="start-dot" style="background:#FBBF24"></div> <strong>Rivera CD has fee variance</strong> — processing fee +$100 on zero-tolerance item, resolve before sending</div>
+        <div class="start-item"><div class="start-dot" style="background:#60A5FA"></div> <strong>Okafor wire instructions</strong> — verify received amount matches CD</div>
+      </div>
+
+      <div class="grid-3-1">
+        <div>
+          <!-- Today's Closing Tasks -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>Priority Tasks</h3><span class="s-badge red">5</span></div>
+            <div class="card-body">
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Review Patterson closing package</div>
+                  <div style="font-size:12px;color:var(--bt-error);font-weight:500;margin-top:2px">Closing tomorrow 10 AM &middot; Heritage Title</div>
+                </div>
+                <span class="tag red" style="font-size:10px">Urgent</span>
+              </div>
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Follow up on Kim wire instructions</div>
+                  <div style="font-size:12px;color:var(--bt-warning);font-weight:500;margin-top:2px">Lowcountry Title &middot; jpark@lowcountrytitle.com</div>
+                </div>
+                <span class="tag amber" style="font-size:10px">Today</span>
+              </div>
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Resolve Rivera fee variance</div>
+                  <div style="font-size:12px;color:var(--bt-warning);font-weight:500;margin-top:2px">Processing fee $895 &rarr; $995 &middot; Zero tolerance bucket</div>
+                </div>
+                <span class="tag amber" style="font-size:10px">Today</span>
+              </div>
+              <div class="task-item">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Verify Okafor wire amount</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">Wire received &middot; Match against CD page 3</div>
+                </div>
+                <span class="tag blue" style="font-size:10px">Due Today</span>
+              </div>
+              <div class="task-item">
+                <div class="task-check"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Chase Rivera payoff demand</div>
+                  <div style="font-size:12px;color:var(--bt-text-muted);margin-top:2px">Palmetto Closing Services &middot; Requested May 11</div>
+                </div>
+                <span class="tag muted" style="font-size:10px">Follow Up</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid-4" style="margin-bottom:20px">
+            <div class="card">
+              <div class="metric"><div class="m-label">Active Files</div><div class="m-value">8</div></div>
+            </div>
+            <div class="card">
+              <div class="metric"><div class="m-label">Close This Week</div><div class="m-value">3</div></div>
+            </div>
+            <div class="card">
+              <div class="metric"><div class="m-label">Funded MTD</div><div class="m-value">4</div></div>
+            </div>
+            <div class="card">
+              <div class="metric"><div class="m-label">MTD Volume</div><div class="m-value">$1.42M</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px">
+            <div class="aria-avatar">A</div>
+            <div class="prompt">"Aria, generate CD for the Patterson closing"</div>
+            <span class="aria-tag">AI</span>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Today's Schedule</h3></div>
+            <div class="card-body">
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div><div style="font-size:13px;font-weight:600">Review Patterson docs</div><div style="font-size:12px;color:var(--bt-text-muted)">9:00 AM &middot; Final review</div></div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div><div style="font-size:13px;font-weight:600">Call Lowcountry Title — Kim wire</div><div style="font-size:12px;color:var(--bt-text-muted)">10:30 AM</div></div>
+              </div>
+              <div class="cal-item">
+                <div class="cal-date"><div class="month">May</div><div class="day">13</div></div>
+                <div><div style="font-size:13px;font-weight:600">Team closing review</div><div style="font-size:12px;color:var(--bt-text-muted)">2:00 PM &middot; Week preview</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>This Week's Closings</h3></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-avatar">JP</div>
+                <div class="list-info"><div class="name">Patterson</div><div class="detail">Wed May 14 &middot; 10:00 AM</div></div>
+                <span class="tag green" style="font-size:10px">Ready</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar">MK</div>
+                <div class="list-info"><div class="name">Kim</div><div class="detail">Thu May 15 &middot; 2:00 PM</div></div>
+                <span class="tag amber" style="font-size:10px">Pending</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar">CR</div>
+                <div class="list-info"><div class="name">Rivera</div><div class="detail">Fri May 16 &middot; 11:00 AM</div></div>
+                <span class="tag red" style="font-size:10px">Blocked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<script>
+function show(n) {
+  document.querySelectorAll('.mockup').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v' + n).classList.add('active');
+  document.querySelectorAll('.tab')[n - 1].classList.add('active');
+}
+</script>
+
+</body>
+</html>

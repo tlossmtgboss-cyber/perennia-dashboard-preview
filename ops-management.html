@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ops Management Dashboard — Perennia AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #1A1F1B; }
+
+  /* ── Tab Switcher ── */
+  .selector {
+    position: sticky; top: 0; z-index: 9999;
+    background: #1F3D2E; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .selector h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #F5EDD9; font-size: 15px; font-weight: 500; white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  .selector .role-tag {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    background: rgba(184,146,74,0.25); color: #F5EDD9; white-space: nowrap;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .selector .tabs { display: flex; gap: 5px; flex-shrink: 0; }
+  .selector .tab {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,0.5); transition: all 0.2s;
+    white-space: nowrap; font-family: inherit;
+  }
+  .selector .tab:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+  .selector .tab.active { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .mockup { display: none; }
+  .mockup.active { display: block; }
+
+  /* ═══════════════════════════════════════════════════
+     SHARED — Borrower Theme Design System
+     ═══════════════════════════════════════════════════ */
+  :root {
+    --bt-font-display: 'Fraunces', Georgia, serif;
+    --bt-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --bt-bg-page: #FAF7F1;
+    --bt-bg-surface: #FFFFFF;
+    --bt-bg-sidebar: #F6F2EA;
+    --bt-bg-elevated: #F2EDE2;
+    --bt-bg-soft: #FBF8F2;
+    --bt-border: #ECE6D8;
+    --bt-border-strong: #D8D0BD;
+    --bt-text-primary: #1A1F1B;
+    --bt-text-secondary: #4F554E;
+    --bt-text-muted: #8B8A7E;
+    --bt-text-faint: #B5B2A4;
+    --bt-primary: #1F3D2E;
+    --bt-primary-hover: #2A4F3D;
+    --bt-primary-light: #E5EDE6;
+    --bt-primary-tint: #EFF3EE;
+    --bt-accent: #B8924A;
+    --bt-accent-light: #F5EDD9;
+    --bt-success: #2D7A52;
+    --bt-warning: #B25F18;
+    --bt-error: #9B2C2C;
+    --bt-info: #3182CE;
+    --bt-radius-sm: 6px;
+    --bt-radius-md: 10px;
+    --bt-radius-lg: 14px;
+    --bt-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --bt-shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --bt-shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .bt {
+    background: var(--bt-bg-page); color: var(--bt-text-primary);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+    letter-spacing: -0.005em;
+  }
+  .bt .layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .bt .sidebar {
+    width: 260px; background: var(--bt-bg-sidebar);
+    border-right: 1px solid var(--bt-border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    overflow-y: auto; max-height: 100vh; position: sticky; top: 44px;
+    height: calc(100vh - 44px);
+  }
+  .bt .sidebar::-webkit-scrollbar { width: 4px; }
+  .bt .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .bt .sidebar::-webkit-scrollbar-thumb { background: var(--bt-border-strong); border-radius: 2px; }
+
+  .bt .s-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--bt-border); position: sticky; top: 0;
+    background: var(--bt-bg-sidebar); z-index: 2;
+  }
+  .bt .s-logo {
+    font-family: var(--bt-font-display); font-weight: 500; font-size: 17px;
+    letter-spacing: -0.02em; color: var(--bt-primary);
+  }
+  .bt .s-version {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--bt-primary-tint);
+    color: var(--bt-primary); margin-left: auto;
+  }
+  .bt .s-section {
+    padding: 18px 20px 6px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--bt-text-muted); font-weight: 600;
+  }
+  .bt .s-item {
+    padding: 8px 12px 8px 20px; font-size: 13px; color: var(--bt-text-secondary);
+    cursor: pointer; display: flex; align-items: center; gap: 9px;
+    transition: all 0.12s; margin: 1px 8px; border-radius: 8px;
+    font-weight: 500;
+  }
+  .bt .s-item:hover { background: var(--bt-bg-elevated); color: var(--bt-text-primary); }
+  .bt .s-item.active {
+    background: var(--bt-bg-elevated); color: var(--bt-text-primary);
+    font-weight: 600;
+  }
+  .bt .s-icon { width: 16px; text-align: center; opacity: 0.5; font-size: 12px; }
+  .bt .s-badge {
+    margin-left: auto; font-size: 10px; padding: 2px 7px;
+    border-radius: 10px; font-weight: 700; min-width: 18px; text-align: center;
+  }
+  .bt .s-badge.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .s-badge.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .s-badge.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .s-badge.primary { background: var(--bt-primary); color: #fff; }
+  .bt .s-spacer { flex: 1; min-height: 12px; }
+  .bt .s-user {
+    padding: 14px 20px; border-top: 1px solid var(--bt-border);
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    position: sticky; bottom: 0; background: var(--bt-bg-sidebar);
+  }
+  .bt .s-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bt-accent); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff;
+  }
+
+  /* ── Main Content ── */
+  .bt .content { flex: 1; overflow-y: auto; }
+  .bt .c-head {
+    padding: 20px 32px; display: flex; align-items: center;
+    border-bottom: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+  }
+  .bt .c-head h2 {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--bt-text-primary);
+  }
+  .bt .c-head .ch-sub {
+    font-size: 13px; color: var(--bt-text-muted); margin-left: 12px;
+  }
+  .bt .c-head .ch-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .bt .search-bar {
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 8px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-soft); font-size: 13px; color: var(--bt-text-muted);
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .bt .search-bar:hover { border-color: var(--bt-border-strong); }
+  .bt .search-bar kbd {
+    font-size: 10px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-muted);
+    font-family: inherit;
+  }
+
+  .bt .btn {
+    font-size: 13px; font-weight: 600; padding: 8px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer;
+    font-family: inherit; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-primary);
+    transition: all 0.15s;
+  }
+  .bt .btn:hover { border-color: var(--bt-border-strong); }
+  .bt .btn.primary { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .btn.primary:hover { background: var(--bt-primary-hover); }
+  .bt .btn.accent { background: var(--bt-accent); color: #fff; border-color: var(--bt-accent); }
+
+  .bt .card {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); box-shadow: var(--bt-shadow-sm);
+  }
+  .bt .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .card-header h3 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted);
+  }
+  .bt .card-header .link {
+    font-size: 12px; font-weight: 500; color: var(--bt-primary);
+    cursor: pointer; text-decoration: none;
+  }
+  .bt .card-body { padding: 16px 20px; }
+
+  .bt .hero {
+    background: var(--bt-primary); border-radius: var(--bt-radius-lg);
+    padding: 24px 28px; color: #F5EDD9; position: relative; overflow: hidden;
+  }
+  .bt .hero::after {
+    content: ''; position: absolute; top: -60px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .bt .hero .greeting {
+    font-family: var(--bt-font-display); font-size: 22px;
+    font-weight: 500; letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .bt .hero .subtitle { font-size: 14px; color: rgba(245,237,217,0.7); }
+  .bt .hero-stats { display: flex; gap: 28px; margin-top: 16px; }
+  .bt .hero-stat .label { font-size: 11px; color: rgba(245,237,217,0.5); text-transform: uppercase; letter-spacing: 0.05em; }
+  .bt .hero-stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  .bt .metric { padding: 16px 20px; }
+  .bt .metric .m-label { font-size: 11px; font-weight: 500; color: var(--bt-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bt .metric .m-value { font-size: 26px; font-weight: 700; color: var(--bt-text-primary); margin-top: 4px; letter-spacing: -0.02em; }
+  .bt .metric .m-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .bt .metric .m-change.up { color: var(--bt-success); }
+  .bt .metric .m-change.down { color: var(--bt-error); }
+
+  .bt .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bt .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .bt .grid-3-1 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .bt .main-area { padding: 24px 32px; }
+
+  .bt .pipeline-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bt-bg-elevated); }
+  .bt .pipeline-bar .segment { height: 100%; transition: width 0.5s; }
+
+  .bt .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .list-item:last-child { border-bottom: none; }
+  .bt .list-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bt-primary-light); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--bt-primary); flex-shrink: 0;
+  }
+  .bt .list-info { flex: 1; min-width: 0; }
+  .bt .list-info .name { font-size: 13px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .list-info .detail { font-size: 12px; color: var(--bt-text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bt .tag {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; display: inline-block;
+  }
+  .bt .tag.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .tag.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .tag.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .tag.blue { background: #DBEAFE; color: var(--bt-info); }
+  .bt .tag.muted { background: var(--bt-bg-elevated); color: var(--bt-text-muted); }
+
+  .bt .task-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .task-item:last-child { border-bottom: none; }
+  .bt .task-check {
+    width: 16px; height: 16px; border: 2px solid var(--bt-border-strong);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .bt .task-item.urgent .task-check { border-color: var(--bt-warning); }
+
+  .bt .aria-bar {
+    padding: 14px 20px; background: var(--bt-bg-surface);
+    border: 1px solid var(--bt-border); border-radius: var(--bt-radius-lg);
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bt .aria-bar:hover { border-color: var(--bt-primary); box-shadow: 0 0 0 3px var(--bt-primary-tint); }
+  .bt .aria-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .bt .aria-bar .prompt { flex: 1; font-size: 14px; color: var(--bt-text-muted); }
+  .bt .aria-bar .aria-tag {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+    background: var(--bt-primary-tint); color: var(--bt-primary);
+  }
+
+  .bt .cal-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bt-border); }
+  .bt .cal-item:last-child { border-bottom: none; }
+  .bt .cal-date {
+    width: 42px; height: 42px; border-radius: var(--bt-radius-md);
+    background: var(--bt-primary-tint); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .bt .cal-date .month { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--bt-primary); letter-spacing: 0.04em; }
+  .bt .cal-date .day { font-size: 15px; font-weight: 700; color: var(--bt-primary); line-height: 1; }
+
+  .bt table { width: 100%; border-collapse: collapse; }
+  .bt table th {
+    text-align: left; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--bt-text-muted); padding: 10px 14px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table td {
+    padding: 10px 14px; font-size: 13px; color: var(--bt-text-primary);
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt table tr:last-child td { border-bottom: none; }
+  .bt table tr:hover td { background: var(--bt-bg-soft); }
+
+  .bt .progress-ring { width: 56px; height: 56px; position: relative; }
+  .bt .progress-ring svg { transform: rotate(-90deg); width: 56px; height: 56px; }
+  .bt .progress-ring .bg { fill: none; stroke: var(--bt-bg-elevated); stroke-width: 5; }
+  .bt .progress-ring .fg { fill: none; stroke: var(--bt-accent); stroke-width: 5; stroke-linecap: round; }
+  .bt .progress-ring .pct {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--bt-text-primary);
+  }
+
+  .bt .lo-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; background: var(--bt-accent-light);
+    color: var(--bt-accent); white-space: nowrap;
+  }
+
+  /* ── Ops-specific styles ── */
+  .bt .stage-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .stage-row:last-child { border-bottom: none; }
+  .bt .stage-label { width: 120px; font-size: 12px; font-weight: 600; color: var(--bt-text-secondary); flex-shrink: 0; }
+  .bt .stage-bar-wrap { flex: 1; height: 22px; background: var(--bt-bg-elevated); border-radius: 4px; overflow: hidden; position: relative; }
+  .bt .stage-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
+  .bt .stage-bar-fill span { font-size: 10px; font-weight: 700; color: #fff; }
+  .bt .stage-count { width: 36px; text-align: right; font-size: 13px; font-weight: 700; color: var(--bt-text-primary); }
+  .bt .stage-sla { width: 60px; text-align: right; font-size: 11px; font-weight: 600; }
+
+  .bt .capacity-bar { height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden; }
+  .bt .capacity-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+  .bt .flow-stage { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+  .bt .flow-arrow { color: var(--bt-text-faint); font-size: 14px; }
+
+  .bt .compliance-score {
+    width: 48px; height: 48px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .bt .trend-indicator { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; }
+  .bt .trend-indicator.up { color: var(--bt-success); }
+  .bt .trend-indicator.down { color: var(--bt-error); }
+  .bt .trend-indicator.flat { color: var(--bt-text-muted); }
+
+  .bt .alert-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .alert-item:last-child { border-bottom: none; }
+  .bt .alert-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TAB SWITCHER
+     ════════════════════════════════════════════════════════════════ -->
+<div class="selector">
+  <h1>Perennia Dashboard</h1>
+  <span class="role-tag">Ops Management</span>
+  <div class="tabs">
+    <button class="tab active" onclick="show(1)">1 — Command Center</button>
+    <button class="tab" onclick="show(2)">2 — Team Performance</button>
+    <button class="tab" onclick="show(3)">3 — Pipeline Health</button>
+    <button class="tab" onclick="show(4)">4 — Production Tracker</button>
+    <button class="tab" onclick="show(5)">5 — Bottleneck Analysis</button>
+    <button class="tab" onclick="show(6)">6 — Compliance Overview</button>
+    <button class="tab" onclick="show(7)">7 — Profitability View</button>
+    <button class="tab" onclick="show(8)">8 — Morning Briefing</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SIDEBAR HELPER (macro — repeated per variation)
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- VARIATION 1 — Command Center
+     Executive overview with big numbers and team summary
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v1" class="mockup active">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Command Center</h2>
+      <span class="ch-sub">Tuesday, May 13</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search pipeline... <kbd>&#8984;K</kbd></div>
+        <button class="btn primary">Export Report</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Hero -->
+      <div class="hero" style="margin-bottom:20px">
+        <div class="greeting">Good morning, Karen</div>
+        <div class="subtitle">Operations overview across 4 teams, 10 team members</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="label">Total Pipeline</div><div class="value">$18.2M</div></div>
+          <div class="hero-stat"><div class="label">Active Files</div><div class="value">42</div></div>
+          <div class="hero-stat"><div class="label">Avg Days to Close</div><div class="value">34</div></div>
+          <div class="hero-stat"><div class="label">Pull-Through Rate</div><div class="value">71%</div></div>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Funded MTD</div><div class="m-value" style="color:var(--bt-success)">$4.8M</div><div class="m-change up">+12% vs last month</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-info)">
+          <div class="metric"><div class="m-label">Files in UW</div><div class="m-value">11</div><div class="m-change flat" style="color:var(--bt-text-muted)">Avg 4.2 days</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)">
+          <div class="metric"><div class="m-label">SLA Breaches</div><div class="m-value" style="color:var(--bt-warning)">6</div><div class="m-change down">3 in processing</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-accent)">
+          <div class="metric"><div class="m-label">Closing This Week</div><div class="m-value">7</div><div class="m-change up">$2.1M volume</div></div>
+        </div>
+      </div>
+
+      <div class="grid-3-1">
+        <div>
+          <!-- Pipeline Stage Distribution -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>Pipeline Stage Distribution</h3><span class="link">View all files</span></div>
+            <div class="card-body">
+              <div class="stage-row">
+                <div class="stage-label">Application</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:19%;background:var(--bt-info)"><span>8</span></div></div>
+                <div class="stage-count">8</div>
+              </div>
+              <div class="stage-row">
+                <div class="stage-label">Processing</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:26%;background:var(--bt-primary)"><span>11</span></div></div>
+                <div class="stage-count">11</div>
+              </div>
+              <div class="stage-row">
+                <div class="stage-label">Underwriting</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:17%;background:var(--bt-accent)"><span>7</span></div></div>
+                <div class="stage-count">7</div>
+              </div>
+              <div class="stage-row">
+                <div class="stage-label">Cond. Approval</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:14%;background:var(--bt-warning)"><span>6</span></div></div>
+                <div class="stage-count">6</div>
+              </div>
+              <div class="stage-row">
+                <div class="stage-label">Clear to Close</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:12%;background:var(--bt-success)"><span>5</span></div></div>
+                <div class="stage-count">5</div>
+              </div>
+              <div class="stage-row">
+                <div class="stage-label">Closing/Docs</div>
+                <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:12%;background:#6B7280"><span>5</span></div></div>
+                <div class="stage-count">5</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Performance Summary -->
+          <div class="card">
+            <div class="card-header"><h3>Team Performance Summary</h3><span class="link">Full report</span></div>
+            <div class="card-body">
+              <table>
+                <tr><th>Team</th><th>Members</th><th>Files</th><th>Avg Turn Time</th><th>SLA %</th></tr>
+                <tr><td style="font-weight:600">Processing</td><td>3</td><td>18</td><td>3.2 days</td><td><span class="tag green">94%</span></td></tr>
+                <tr><td style="font-weight:600">Underwriting</td><td>2</td><td>11</td><td>4.2 days</td><td><span class="tag amber">82%</span></td></tr>
+                <tr><td style="font-weight:600">Closing</td><td>3</td><td>8</td><td>2.1 days</td><td><span class="tag green">97%</span></td></tr>
+                <tr><td style="font-weight:600">Funding</td><td>2</td><td>5</td><td>1.4 days</td><td><span class="tag green">100%</span></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px">
+            <div class="aria-avatar">A</div>
+            <div class="prompt">"Aria, which team needs the most support today?"</div>
+            <span class="aria-tag">AI</span>
+          </div>
+
+          <!-- Production Tracker -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Production Tracker</h3></div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+                <div class="progress-ring">
+                  <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="40" style="stroke:var(--bt-success)"/></svg>
+                  <div class="pct">71%</div>
+                </div>
+                <div><div style="font-size:13px;font-weight:600">Monthly Goal</div><div style="font-size:12px;color:var(--bt-text-muted)">$4.8M of $6.8M target</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--bt-text-muted);margin-bottom:6px">Pace: On track (+$200K ahead)</div>
+              <div class="capacity-bar"><div class="capacity-fill" style="width:71%;background:var(--bt-success)"></div></div>
+            </div>
+          </div>
+
+          <!-- AI Tasks -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>AI Task Queue</h3><span class="s-badge red">18</span></div>
+            <div class="card-body">
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Reassign Chen files (J. Torres OOO)</div><div style="font-size:12px;color:var(--bt-error);margin-top:1px">Overdue &middot; 3 files need coverage</div></div>
+              </div>
+              <div class="task-item urgent">
+                <div class="task-check"></div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Review SLA exceptions &mdash; Processing</div><div style="font-size:12px;color:var(--bt-warning);margin-top:1px">3 files over 5-day target</div></div>
+              </div>
+              <div class="task-item">
+                <div class="task-check"></div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:500">Approve overtime request &mdash; M. Grant</div><div style="font-size:12px;color:var(--bt-text-muted);margin-top:1px">Closing backlog, 4 files due Fri</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="grid-2">
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Team Capacity</div><div class="m-value" style="font-size:22px">86%</div></div></div>
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Avg Quality Score</div><div class="m-value" style="font-size:22px;color:var(--bt-success)">94</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar" style="margin-top:20px">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, give me the executive summary for this week's pipeline performance."</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 2 — Team Performance
+     Per-member metrics, leaderboard, targets
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v2" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Team Performance</h2>
+      <span class="ch-sub">May 2026</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search team... <kbd>&#8984;K</kbd></div>
+        <button class="btn">This Month</button>
+        <button class="btn primary">Export</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Performance summary row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-success)"><div class="metric"><div class="m-label">Team Files Closed</div><div class="m-value">18</div><div class="m-change up">+4 vs target</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-info)"><div class="metric"><div class="m-label">Avg Turn Time</div><div class="m-value">3.1d</div><div class="m-change up">-0.4d vs last month</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-accent)"><div class="metric"><div class="m-label">Completion Rate</div><div class="m-value">92%</div><div class="m-change up">+3%</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-primary)"><div class="metric"><div class="m-label">SLA Compliance</div><div class="m-value">89%</div><div class="m-change down">-2%</div></div></div>
+      </div>
+
+      <!-- Processors -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Processors</h3><span class="tag green">3 Active</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Name</th><th>Active Files</th><th>Completed MTD</th><th>Avg Turn Time</th><th>SLA %</th><th>Capacity</th><th>Status</th></tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">RP</div><span style="font-weight:600">Rachel Park</span></div></td>
+              <td>7</td><td>6</td><td>2.8 days</td><td><span class="tag green">96%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:88%;background:var(--bt-warning)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">88%</span></td>
+              <td><span class="tag green">On Track</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">MG</div><span style="font-weight:600">Marcus Grant</span></div></td>
+              <td>6</td><td>5</td><td>3.4 days</td><td><span class="tag green">91%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:75%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">75%</span></td>
+              <td><span class="tag green">On Track</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">LL</div><span style="font-weight:600">Lisa Lopez</span></div></td>
+              <td>5</td><td>4</td><td>3.6 days</td><td><span class="tag amber">84%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:62%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">62%</span></td>
+              <td><span class="tag amber">Needs Coaching</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Underwriters -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Underwriters</h3><span class="tag blue">2 Active</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Name</th><th>Active Files</th><th>Completed MTD</th><th>Avg Turn Time</th><th>SLA %</th><th>Capacity</th><th>Status</th></tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">DW</div><span style="font-weight:600">David Wang</span></div></td>
+              <td>6</td><td>4</td><td>3.8 days</td><td><span class="tag amber">80%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:92%;background:var(--bt-error)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">92%</span></td>
+              <td><span class="tag red">Over Capacity</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">AN</div><span style="font-weight:600">Anita Nguyen</span></div></td>
+              <td>5</td><td>3</td><td>4.5 days</td><td><span class="tag amber">83%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:78%;background:var(--bt-warning)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">78%</span></td>
+              <td><span class="tag amber">Heavy Load</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Closers -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Closers</h3><span class="tag green">3 Active</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Name</th><th>Active Files</th><th>Completed MTD</th><th>Avg Turn Time</th><th>SLA %</th><th>Capacity</th><th>Status</th></tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">JT</div><span style="font-weight:600">James Torres</span></div></td>
+              <td>3</td><td>4</td><td>1.8 days</td><td><span class="tag green">100%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:60%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">60%</span></td>
+              <td><span class="tag green">On Track</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">SK</div><span style="font-weight:600">Sarah Kim</span></div></td>
+              <td>3</td><td>3</td><td>2.2 days</td><td><span class="tag green">95%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:55%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">55%</span></td>
+              <td><span class="tag green">On Track</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">BJ</div><span style="font-weight:600">Brian Johnson</span></div></td>
+              <td>2</td><td>2</td><td>2.4 days</td><td><span class="tag green">92%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:40%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">40%</span></td>
+              <td><span class="tag green">Available</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Funders -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Funders</h3><span class="tag green">2 Active</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Name</th><th>Active Files</th><th>Completed MTD</th><th>Avg Turn Time</th><th>SLA %</th><th>Capacity</th><th>Status</th></tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">CM</div><span style="font-weight:600">Carlos Martinez</span></div></td>
+              <td>3</td><td>5</td><td>1.2 days</td><td><span class="tag green">100%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:50%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">50%</span></td>
+              <td><span class="tag green">On Track</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="list-avatar" style="width:28px;height:28px;font-size:10px">PP</div><span style="font-weight:600">Priya Patel</span></div></td>
+              <td>2</td><td>4</td><td>1.5 days</td><td><span class="tag green">98%</span></td>
+              <td><div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:35%;background:var(--bt-success)"></div></div><span style="font-size:11px;color:var(--bt-text-muted);margin-left:4px">35%</span></td>
+              <td><span class="tag green">Available</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which team members are over capacity this week?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 3 — Pipeline Health
+     Files by stage, SLA compliance, bottleneck detection
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v3" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Pipeline Health</h2>
+      <span class="ch-sub">Real-time monitor</span>
+      <div class="ch-right">
+        <div class="search-bar"><span>&#8984;</span> Search files... <kbd>&#8984;K</kbd></div>
+        <button class="btn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Health summary -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-body" style="display:flex;align-items:center;gap:14px;padding:14px 16px">
+            <div class="progress-ring" style="width:48px;height:48px">
+              <svg viewBox="0 0 56 56" style="width:48px;height:48px"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="15.2" style="stroke:var(--bt-success)"/></svg>
+              <div class="pct" style="font-size:12px">89%</div>
+            </div>
+            <div><div style="font-size:12px;font-weight:600">Overall Health</div><div style="font-size:11px;color:var(--bt-text-muted)">37 of 42 on track</div></div>
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">On Schedule</div><div class="m-value" style="font-size:22px;color:var(--bt-success)">31</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">At Risk</div><div class="m-value" style="font-size:22px;color:var(--bt-warning)">6</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-error)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">SLA Breached</div><div class="m-value" style="font-size:22px;color:var(--bt-error)">5</div></div></div>
+      </div>
+
+      <!-- Pipeline efficiency table -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Pipeline Efficiency Monitor</h3><span class="link">Export data</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Stage</th><th>Files</th><th>Avg Days in Stage</th><th>SLA Target</th><th>SLA Compliance</th><th>Health</th></tr>
+            <tr>
+              <td style="font-weight:600">Application</td><td>8</td><td>2.1 days</td><td>3 days</td>
+              <td><span class="tag green">100%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-success)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Disclosed</td><td>3</td><td>1.4 days</td><td>3 days</td>
+              <td><span class="tag green">100%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-success)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Processing</td><td>11</td><td>4.8 days</td><td>5 days</td>
+              <td><span class="tag amber">82%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-warning)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Underwriting</td><td>7</td><td>5.2 days</td><td>4 days</td>
+              <td><span class="tag red">71%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-error)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Cond. Approval</td><td>6</td><td>3.6 days</td><td>5 days</td>
+              <td><span class="tag green">92%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-success)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Clear to Close</td><td>5</td><td>1.8 days</td><td>3 days</td>
+              <td><span class="tag green">100%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-success)">&#9679;</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Closing / Docs</td><td>2</td><td>2.1 days</td><td>3 days</td>
+              <td><span class="tag green">100%</span></td>
+              <td><span style="font-size:16px;color:var(--bt-success)">&#9679;</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Files at risk -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Files at Risk of Missing Closing Date</h3><span class="s-badge red">6</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Borrower</th><th>LO</th><th>Stage</th><th>Days in Stage</th><th>Closing Date</th><th>Risk</th></tr>
+            <tr>
+              <td style="font-weight:600">Thompson, Robert</td><td>T. Loss</td><td>Underwriting</td><td style="color:var(--bt-error);font-weight:600">8 days</td><td>May 20</td>
+              <td><span class="tag red">High</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Vasquez, Maria</td><td>S. Park</td><td>Processing</td><td style="color:var(--bt-error);font-weight:600">7 days</td><td>May 22</td>
+              <td><span class="tag red">High</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Chen, William</td><td>M. Davis</td><td>Underwriting</td><td style="color:var(--bt-warning);font-weight:600">6 days</td><td>May 28</td>
+              <td><span class="tag amber">Medium</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">O'Brien, Patrick</td><td>T. Loss</td><td>Processing</td><td style="color:var(--bt-warning);font-weight:600">5 days</td><td>May 30</td>
+              <td><span class="tag amber">Medium</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Anderson, Lisa</td><td>S. Park</td><td>Cond. Approval</td><td style="font-weight:600">4 days</td><td>Jun 2</td>
+              <td><span class="tag amber">Medium</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Kim, Daniel</td><td>M. Davis</td><td>Processing</td><td style="font-weight:600">5 days</td><td>Jun 5</td>
+              <td><span class="tag amber">Medium</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, show me pipeline bottlenecks this week."</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 4 — Production Tracker
+     Monthly/quarterly production, goal progress, trends
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v4" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Production Tracker</h2>
+      <span class="ch-sub">May 2026</span>
+      <div class="ch-right">
+        <button class="btn">Monthly</button>
+        <button class="btn primary">Quarterly</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Goal Progress Rings -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:20px">
+            <div class="progress-ring" style="margin:0 auto 10px">
+              <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="40" style="stroke:var(--bt-success)"/></svg>
+              <div class="pct">71%</div>
+            </div>
+            <div style="font-size:13px;font-weight:600">Volume Funded</div>
+            <div style="font-size:18px;font-weight:700;color:var(--bt-text-primary);margin-top:2px">$4.8M</div>
+            <div style="font-size:11px;color:var(--bt-text-muted)">of $6.8M goal</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:20px">
+            <div class="progress-ring" style="margin:0 auto 10px">
+              <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="41.5" style="stroke:var(--bt-accent)"/></svg>
+              <div class="pct">70%</div>
+            </div>
+            <div style="font-size:13px;font-weight:600">Units Closed</div>
+            <div style="font-size:18px;font-weight:700;color:var(--bt-text-primary);margin-top:2px">18</div>
+            <div style="font-size:11px;color:var(--bt-text-muted)">of 26 goal</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:20px">
+            <div class="progress-ring" style="margin:0 auto 10px">
+              <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="27.6" style="stroke:var(--bt-info)"/></svg>
+              <div class="pct">80%</div>
+            </div>
+            <div style="font-size:13px;font-weight:600">Conversion Rate</div>
+            <div style="font-size:18px;font-weight:700;color:var(--bt-text-primary);margin-top:2px">71%</div>
+            <div style="font-size:11px;color:var(--bt-text-muted)">Target: 68%</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:20px">
+            <div class="progress-ring" style="margin:0 auto 10px">
+              <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="22"/><circle class="fg" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="13.8" style="stroke:var(--bt-primary)"/></svg>
+              <div class="pct">90%</div>
+            </div>
+            <div style="font-size:13px;font-weight:600">Pipeline Velocity</div>
+            <div style="font-size:18px;font-weight:700;color:var(--bt-text-primary);margin-top:2px">34 days</div>
+            <div style="font-size:11px;color:var(--bt-text-muted)">Target: 38 days</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- Monthly trend -->
+        <div class="card">
+          <div class="card-header"><h3>Monthly Volume Trend</h3></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:6px">
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:45px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Jan</div>
+                <div style="font-size:10px;font-weight:600">$3.2M</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:58px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Feb</div>
+                <div style="font-size:10px;font-weight:600">$4.1M</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:72px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Mar</div>
+                <div style="font-size:10px;font-weight:600">$5.2M</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-primary-light);height:82px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Apr</div>
+                <div style="font-size:10px;font-weight:600">$5.9M</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-primary);height:67px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">May</div>
+                <div style="font-size:10px;font-weight:600">$4.8M*</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--bt-text-muted);margin-top:8px">* Month to date. Pace: $6.9M projected</div>
+          </div>
+        </div>
+
+        <!-- Units closed trend -->
+        <div class="card">
+          <div class="card-header"><h3>Units Closed Trend</h3></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:6px">
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:40px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Jan</div>
+                <div style="font-size:10px;font-weight:600">12</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:55px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Feb</div>
+                <div style="font-size:10px;font-weight:600">16</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-bg-elevated);height:78px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Mar</div>
+                <div style="font-size:10px;font-weight:600">22</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-primary-light);height:90px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">Apr</div>
+                <div style="font-size:10px;font-weight:600">25</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="background:var(--bt-primary);height:62px;border-radius:4px 4px 0 0;margin-bottom:4px"></div>
+                <div style="font-size:10px;color:var(--bt-text-muted)">May</div>
+                <div style="font-size:10px;font-weight:600">18*</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--bt-text-muted);margin-top:8px">* Month to date. Pace: 26 units projected</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period comparison -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Period Comparison</h3><span class="link">Customize</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Metric</th><th>This Month</th><th>Last Month</th><th>Change</th><th>Q2 Pace</th></tr>
+            <tr><td style="font-weight:600">Volume Funded</td><td>$4.8M</td><td>$5.9M</td><td><span class="trend-indicator up">+12% pace</span></td><td>$18.6M</td></tr>
+            <tr><td style="font-weight:600">Units Closed</td><td>18</td><td>25</td><td><span class="trend-indicator up">+4% pace</span></td><td>69</td></tr>
+            <tr><td style="font-weight:600">Avg Loan Size</td><td>$267K</td><td>$236K</td><td><span class="trend-indicator up">+13%</span></td><td>$270K</td></tr>
+            <tr><td style="font-weight:600">Avg Days to Close</td><td>34</td><td>37</td><td><span class="trend-indicator up">-3 days</span></td><td>35</td></tr>
+            <tr><td style="font-weight:600">Pull-Through Rate</td><td>71%</td><td>68%</td><td><span class="trend-indicator up">+3%</span></td><td>70%</td></tr>
+            <tr><td style="font-weight:600">Fallout Rate</td><td>12%</td><td>15%</td><td><span class="trend-indicator up">-3%</span></td><td>13%</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, are we on track to hit Q2 production goals?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 5 — Bottleneck Analysis
+     Stage flow, chokepoints, capacity utilization
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v5" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Bottleneck Analysis</h2>
+      <span class="ch-sub">Week of May 12</span>
+      <div class="ch-right">
+        <button class="btn">This Week</button>
+        <button class="btn primary">Run Analysis</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Flow visualization -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Stage-by-Stage Flow Analysis</h3><span class="tag red">2 Chokepoints Detected</span></div>
+        <div class="card-body">
+          <!-- Flow bars -->
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:20px">
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-info);color:#fff;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600">Application<div style="font-size:16px;margin-top:2px">8</div></div>
+              <div style="font-size:10px;color:var(--bt-text-muted);margin-top:4px">2.1d avg</div>
+            </div>
+            <div style="color:var(--bt-text-faint);font-size:18px">&#8594;</div>
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-error);color:#fff;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 0 0 3px rgba(155,44,44,0.2)">Processing<div style="font-size:16px;margin-top:2px">11</div></div>
+              <div style="font-size:10px;color:var(--bt-error);font-weight:600;margin-top:4px">4.8d avg &#9888;</div>
+            </div>
+            <div style="color:var(--bt-text-faint);font-size:18px">&#8594;</div>
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-error);color:#fff;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 0 0 3px rgba(155,44,44,0.2)">Underwriting<div style="font-size:16px;margin-top:2px">7</div></div>
+              <div style="font-size:10px;color:var(--bt-error);font-weight:600;margin-top:4px">5.2d avg &#9888;</div>
+            </div>
+            <div style="color:var(--bt-text-faint);font-size:18px">&#8594;</div>
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-warning);color:#fff;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600">Cond. Appr.<div style="font-size:16px;margin-top:2px">6</div></div>
+              <div style="font-size:10px;color:var(--bt-text-muted);margin-top:4px">3.6d avg</div>
+            </div>
+            <div style="color:var(--bt-text-faint);font-size:18px">&#8594;</div>
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-success);color:#fff;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600">CTC<div style="font-size:16px;margin-top:2px">5</div></div>
+              <div style="font-size:10px;color:var(--bt-text-muted);margin-top:4px">1.8d avg</div>
+            </div>
+            <div style="color:var(--bt-text-faint);font-size:18px">&#8594;</div>
+            <div style="text-align:center;flex:1;min-width:80px">
+              <div style="background:var(--bt-primary);color:#F5EDD9;padding:10px 8px;border-radius:8px;font-size:12px;font-weight:600">Funded<div style="font-size:16px;margin-top:2px">5</div></div>
+              <div style="font-size:10px;color:var(--bt-text-muted);margin-top:4px">1.4d avg</div>
+            </div>
+          </div>
+
+          <!-- Bottleneck explanations -->
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:8px;padding:14px 16px;margin-bottom:10px">
+            <div style="font-size:13px;font-weight:600;color:var(--bt-error);margin-bottom:4px">Chokepoint: Processing (11 files, 4.8d avg)</div>
+            <div style="font-size:12px;color:var(--bt-text-secondary)">3 files over SLA. Root cause: Lisa Lopez has 5 files and is behind on conditions. Rachel Park at 88% capacity. Recommend redistributing 2 files to Marcus Grant (75% capacity).</div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:8px;padding:14px 16px">
+            <div style="font-size:13px;font-weight:600;color:var(--bt-error);margin-bottom:4px">Chokepoint: Underwriting (7 files, 5.2d avg)</div>
+            <div style="font-size:12px;color:var(--bt-text-secondary)">David Wang at 92% capacity with 6 active files. 2 files waiting 6+ days for initial review. Recommend: escalate to Sr. UW or approve OT for Anita Nguyen.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Capacity utilization -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Capacity Utilization by Role</h3><span class="link">Adjust targets</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Team Member</th><th>Role</th><th>Active Files</th><th>Max Capacity</th><th>Utilization</th><th>Status</th></tr>
+            <tr>
+              <td style="font-weight:600">David Wang</td><td>Underwriter</td><td>6</td><td>6</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:92%;background:var(--bt-error)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-error)">92%</span>
+                </div>
+              </td>
+              <td><span class="tag red">Overloaded</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Rachel Park</td><td>Processor</td><td>7</td><td>8</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:88%;background:var(--bt-warning)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-warning)">88%</span>
+                </div>
+              </td>
+              <td><span class="tag amber">Near Max</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Anita Nguyen</td><td>Underwriter</td><td>5</td><td>6</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:78%;background:var(--bt-warning)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-warning)">78%</span>
+                </div>
+              </td>
+              <td><span class="tag amber">Heavy</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Marcus Grant</td><td>Processor</td><td>6</td><td>8</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:75%;background:var(--bt-success)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-success)">75%</span>
+                </div>
+              </td>
+              <td><span class="tag green">Available</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Lisa Lopez</td><td>Processor</td><td>5</td><td>8</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:62%;background:var(--bt-success)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-success)">62%</span>
+                </div>
+              </td>
+              <td><span class="tag amber">Slow Turn</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">James Torres</td><td>Closer</td><td>3</td><td>6</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:50%;background:var(--bt-success)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-success)">50%</span>
+                </div>
+              </td>
+              <td><span class="tag green">Available</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Brian Johnson</td><td>Closer</td><td>2</td><td>6</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="capacity-bar" style="width:80px"><div class="capacity-fill" style="width:33%;background:var(--bt-success)"></div></div>
+                  <span style="font-size:11px;font-weight:600;color:var(--bt-success)">33%</span>
+                </div>
+              </td>
+              <td><span class="tag green">Available</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI Recommendations -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>AI Rebalancing Recommendations</h3><span class="tag blue">3 Suggestions</span></div>
+        <div class="card-body">
+          <div class="list-item">
+            <div class="list-avatar" style="background:var(--bt-primary-tint);color:var(--bt-primary);font-size:14px">1</div>
+            <div class="list-info">
+              <div class="name">Move 2 files from Rachel Park to Marcus Grant</div>
+              <div class="detail">Would equalize processor load to ~6 files each. Est. improvement: -0.6d avg turn time</div>
+            </div>
+            <button class="btn primary" style="font-size:11px;padding:5px 12px">Apply</button>
+          </div>
+          <div class="list-item">
+            <div class="list-avatar" style="background:var(--bt-primary-tint);color:var(--bt-primary);font-size:14px">2</div>
+            <div class="list-info">
+              <div class="name">Approve OT for David Wang (UW backlog)</div>
+              <div class="detail">6 active files, 2 waiting 6+ days. 4 hrs overtime clears 2 initial reviews</div>
+            </div>
+            <button class="btn" style="font-size:11px;padding:5px 12px">Review</button>
+          </div>
+          <div class="list-item">
+            <div class="list-avatar" style="background:var(--bt-primary-tint);color:var(--bt-primary);font-size:14px">3</div>
+            <div class="list-info">
+              <div class="name">Coach Lisa Lopez on condition tracking</div>
+              <div class="detail">84% SLA vs 91% team avg. Conditions chase taking 2x longer than peers</div>
+            </div>
+            <button class="btn" style="font-size:11px;padding:5px 12px">Schedule</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, what happens to pipeline velocity if we add one more processor?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 6 — Compliance Overview
+     Org-wide compliance health, TRID, QC, audit
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v6" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Compliance Overview</h2>
+      <span class="ch-sub">Organization-wide</span>
+      <div class="ch-right">
+        <button class="btn">Last 90 Days</button>
+        <button class="btn primary">Audit Report</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Compliance health cards -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-body" style="display:flex;align-items:center;gap:14px;padding:14px 16px">
+            <div class="compliance-score" style="background:#DFF0E3;color:var(--bt-success)">94</div>
+            <div><div style="font-size:13px;font-weight:600">Overall Score</div><div style="font-size:11px;color:var(--bt-text-muted)">Excellent</div></div>
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-success)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">TRID Compliant</div><div class="m-value" style="font-size:22px;color:var(--bt-success)">97%</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-warning)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Tolerance Cures</div><div class="m-value" style="font-size:22px;color:var(--bt-warning)">3</div></div></div>
+        <div class="card" style="border-left:3px solid var(--bt-error)"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Open QC Findings</div><div class="m-value" style="font-size:22px;color:var(--bt-error)">5</div></div></div>
+      </div>
+
+      <div class="grid-3-1">
+        <div>
+          <!-- TRID Violations -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>TRID Monitoring</h3><span class="tag amber">2 Violations</span></div>
+            <div class="card-body">
+              <table>
+                <tr><th>File</th><th>Violation</th><th>Severity</th><th>Status</th><th>Assigned</th></tr>
+                <tr>
+                  <td style="font-weight:600">Thompson #2847</td>
+                  <td>LE issued 4 days after application</td>
+                  <td><span class="tag red">High</span></td>
+                  <td><span class="tag amber">In Review</span></td>
+                  <td>R. Park</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Vasquez #2831</td>
+                  <td>CD tolerance exceeded (appraisal)</td>
+                  <td><span class="tag amber">Medium</span></td>
+                  <td><span class="tag blue">Curing</span></td>
+                  <td>M. Grant</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- QC Findings -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>QC Findings — Open</h3><span class="s-badge red">5</span></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FDE8E8;color:var(--bt-error);font-size:11px;font-weight:700">QC</div>
+                <div class="list-info">
+                  <div class="name">Missing VOE on Anderson file (#2819)</div>
+                  <div class="detail">Pre-fund QC &middot; Found May 10 &middot; Assigned to L. Lopez</div>
+                </div>
+                <span class="tag red">Critical</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FEF3C7;color:var(--bt-warning);font-size:11px;font-weight:700">QC</div>
+                <div class="list-info">
+                  <div class="name">Income calculation discrepancy — Chen (#2805)</div>
+                  <div class="detail">Post-close audit &middot; Found May 8 &middot; Assigned to D. Wang</div>
+                </div>
+                <span class="tag amber">Medium</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:#FEF3C7;color:var(--bt-warning);font-size:11px;font-weight:700">QC</div>
+                <div class="list-info">
+                  <div class="name">Stale credit report — O'Brien (#2812)</div>
+                  <div class="detail">Pre-fund QC &middot; Found May 9 &middot; Assigned to R. Park</div>
+                </div>
+                <span class="tag amber">Medium</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:var(--bt-bg-elevated);color:var(--bt-text-muted);font-size:11px;font-weight:700">QC</div>
+                <div class="list-info">
+                  <div class="name">Appraisal review missing signature — Kim (#2798)</div>
+                  <div class="detail">Post-close audit &middot; Found May 6 &middot; Assigned to A. Nguyen</div>
+                </div>
+                <span class="tag muted">Low</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="background:var(--bt-bg-elevated);color:var(--bt-text-muted);font-size:11px;font-weight:700">QC</div>
+                <div class="list-info">
+                  <div class="name">Flood zone cert date mismatch — Johnson (#2790)</div>
+                  <div class="detail">Post-close audit &middot; Found May 5 &middot; Assigned to S. Kim</div>
+                </div>
+                <span class="tag muted">Low</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audit trail -->
+          <div class="card">
+            <div class="card-header"><h3>Recent Audit Trail</h3><span class="link">View all</span></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div style="font-size:11px;color:var(--bt-text-muted);width:60px;flex-shrink:0">May 12</div>
+                <div class="list-info"><div class="name">Tolerance cure completed — Vasquez #2831</div><div class="detail">Refund of $142 issued to borrower</div></div>
+              </div>
+              <div class="list-item">
+                <div style="font-size:11px;color:var(--bt-text-muted);width:60px;flex-shrink:0">May 11</div>
+                <div class="list-info"><div class="name">QC finding resolved — Martinez #2825</div><div class="detail">Missing HOI binder obtained and filed</div></div>
+              </div>
+              <div class="list-item">
+                <div style="font-size:11px;color:var(--bt-text-muted);width:60px;flex-shrink:0">May 10</div>
+                <div class="list-info"><div class="name">TRID exception logged — Thompson #2847</div><div class="detail">Late LE documented; borrower notification sent</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px">
+            <div class="aria-avatar">A</div>
+            <div class="prompt">"Aria, show me all open compliance items by severity."</div>
+            <span class="aria-tag">AI</span>
+          </div>
+
+          <!-- Per-member compliance -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Compliance Score by Member</h3></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">JT</div>
+                <div class="list-info"><div class="name">James Torres</div><div class="detail">Closer</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#DFF0E3;color:var(--bt-success)">98</div>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">CM</div>
+                <div class="list-info"><div class="name">Carlos Martinez</div><div class="detail">Funder</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#DFF0E3;color:var(--bt-success)">97</div>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">MG</div>
+                <div class="list-info"><div class="name">Marcus Grant</div><div class="detail">Processor</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#DFF0E3;color:var(--bt-success)">95</div>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">RP</div>
+                <div class="list-info"><div class="name">Rachel Park</div><div class="detail">Processor</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#DFF0E3;color:var(--bt-success)">93</div>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">DW</div>
+                <div class="list-info"><div class="name">David Wang</div><div class="detail">Underwriter</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#FEF3C7;color:var(--bt-warning)">88</div>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px">LL</div>
+                <div class="list-info"><div class="name">Lisa Lopez</div><div class="detail">Processor</div></div>
+                <div class="compliance-score" style="width:32px;height:32px;font-size:13px;background:#FEF3C7;color:var(--bt-warning)">85</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Findings Resolved (90d)</div><div class="m-value" style="font-size:22px;color:var(--bt-success)">23</div></div></div>
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Avg Resolution Time</div><div class="m-value" style="font-size:22px">3.2d</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 7 — Profitability View
+     Revenue, cost, margin analysis
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v7" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Profitability View</h2>
+      <span class="ch-sub">Q2 2026</span>
+      <div class="ch-right">
+        <button class="btn">Monthly</button>
+        <button class="btn primary">Quarterly</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Top-level financials -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card" style="border-left:3px solid var(--bt-success)">
+          <div class="metric"><div class="m-label">Revenue MTD</div><div class="m-value" style="color:var(--bt-success)">$142K</div><div class="m-change up">+8% vs Apr</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-error)">
+          <div class="metric"><div class="m-label">Ops Cost MTD</div><div class="m-value" style="color:var(--bt-error)">$86K</div><div class="m-change down">+3% vs Apr</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-accent)">
+          <div class="metric"><div class="m-label">Net Margin</div><div class="m-value">39.4%</div><div class="m-change up">+2.1% vs Apr</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--bt-primary)">
+          <div class="metric"><div class="m-label">Revenue / Loan</div><div class="m-value">$7,889</div><div class="m-change up">+$420 vs target</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- Revenue per loan by type -->
+        <div class="card">
+          <div class="card-header"><h3>Revenue by Loan Type</h3></div>
+          <div class="card-body">
+            <table>
+              <tr><th>Loan Type</th><th>Closed</th><th>Avg Revenue</th><th>Total Revenue</th><th>Margin</th></tr>
+              <tr><td style="font-weight:600">Conv. Purchase</td><td>8</td><td>$8,240</td><td>$65,920</td><td><span class="tag green">42%</span></td></tr>
+              <tr><td style="font-weight:600">FHA Purchase</td><td>4</td><td>$6,180</td><td>$24,720</td><td><span class="tag green">38%</span></td></tr>
+              <tr><td style="font-weight:600">Conv. Refi</td><td>3</td><td>$7,900</td><td>$23,700</td><td><span class="tag green">44%</span></td></tr>
+              <tr><td style="font-weight:600">VA Purchase</td><td>2</td><td>$7,100</td><td>$14,200</td><td><span class="tag green">36%</span></td></tr>
+              <tr><td style="font-weight:600">Jumbo</td><td>1</td><td>$13,500</td><td>$13,500</td><td><span class="tag green">48%</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cost per file -->
+        <div class="card">
+          <div class="card-header"><h3>Cost per File Breakdown</h3></div>
+          <div class="card-body">
+            <div class="list-item">
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Processing Labor</div></div>
+              <div style="font-size:13px;font-weight:700">$1,850</div>
+              <div style="width:100px"><div class="capacity-bar"><div class="capacity-fill" style="width:38%;background:var(--bt-primary)"></div></div></div>
+            </div>
+            <div class="list-item">
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Underwriting Labor</div></div>
+              <div style="font-size:13px;font-weight:700">$1,420</div>
+              <div style="width:100px"><div class="capacity-bar"><div class="capacity-fill" style="width:29%;background:var(--bt-primary)"></div></div></div>
+            </div>
+            <div class="list-item">
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Closing / Funding</div></div>
+              <div style="font-size:13px;font-weight:700">$680</div>
+              <div style="width:100px"><div class="capacity-bar"><div class="capacity-fill" style="width:14%;background:var(--bt-accent)"></div></div></div>
+            </div>
+            <div class="list-item">
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Technology / AI</div></div>
+              <div style="font-size:13px;font-weight:700">$320</div>
+              <div style="width:100px"><div class="capacity-bar"><div class="capacity-fill" style="width:7%;background:var(--bt-info)"></div></div></div>
+            </div>
+            <div class="list-item">
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Compliance / QC</div></div>
+              <div style="font-size:13px;font-weight:700">$510</div>
+              <div style="width:100px"><div class="capacity-bar"><div class="capacity-fill" style="width:11%;background:var(--bt-warning)"></div></div></div>
+            </div>
+            <div style="padding:10px 0;border-top:2px solid var(--bt-border);display:flex;justify-content:space-between;font-weight:700;font-size:14px">
+              <span>Total Cost / File</span><span>$4,780</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LO Profitability -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Profitability by Loan Officer</h3><span class="link">Full P&L</span></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Loan Officer</th><th>Files Closed</th><th>Volume</th><th>Revenue</th><th>Ops Cost</th><th>Net Margin</th><th>Trend</th></tr>
+            <tr>
+              <td style="font-weight:600">T. Loss</td><td>7</td><td>$2.1M</td><td>$56K</td><td>$32K</td>
+              <td><span class="tag green">43%</span></td>
+              <td><span class="trend-indicator up">+5%</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">S. Park</td><td>6</td><td>$1.6M</td><td>$48K</td><td>$30K</td>
+              <td><span class="tag green">38%</span></td>
+              <td><span class="trend-indicator up">+2%</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">M. Davis</td><td>5</td><td>$1.1M</td><td>$38K</td><td>$24K</td>
+              <td><span class="tag green">37%</span></td>
+              <td><span class="trend-indicator flat">0%</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Margin trend -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Margin Trend (Q2)</h3></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:flex-end;gap:16px;height:100px">
+            <div style="flex:1;text-align:center">
+              <div style="background:var(--bt-primary-light);height:68px;border-radius:4px 4px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px"><span style="font-size:10px;font-weight:700;color:var(--bt-primary)">37.3%</span></div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">April</div>
+            </div>
+            <div style="flex:1;text-align:center">
+              <div style="background:var(--bt-primary);height:76px;border-radius:4px 4px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px"><span style="font-size:10px;font-weight:700;color:#F5EDD9">39.4%</span></div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">May*</div>
+            </div>
+            <div style="flex:1;text-align:center">
+              <div style="background:var(--bt-bg-elevated);border:2px dashed var(--bt-border-strong);height:82px;border-radius:4px 4px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px"><span style="font-size:10px;font-weight:600;color:var(--bt-text-muted)">41.0%</span></div>
+              <div style="font-size:11px;color:var(--bt-text-muted);margin-top:4px">Jun (proj)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, which loan programs are most profitable this quarter?"</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- VARIATION 8 — Morning Briefing
+     Executive morning view with alerts, closings, pace
+     ════════════════════════════════════════════════════════════════ -->
+<div id="v8" class="mockup">
+<div class="bt">
+<div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-version">AI</span></div>
+    <div class="s-section">Pipeline</div>
+    <div class="s-item active"><span class="s-icon">&#9673;</span> Dashboard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Leads <span class="s-badge primary">12</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Active Loans <span class="s-badge green">42</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Closed Loans</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Tasks <span class="s-badge red">18</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> SMS Tasks <span class="s-badge amber">9</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Reconciliation <span class="s-badge red">4</span></div>
+    <div class="s-section">Intelligence</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Smart Docs <span class="s-badge red">11</span></div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> AI Underwriter</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Market</div>
+    <div class="s-section">Marketing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Marketing</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Calendar</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Morning Briefing</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Scorecard</div>
+    <div class="s-item"><span class="s-icon">&#9678;</span> Goal Tracker</div>
+    <div class="s-spacer"></div>
+    <div class="s-user"><div class="s-av">KM</div><div><div style="font-weight:600;color:var(--bt-text-primary)">Karen Mitchell</div><div style="font-size:11px;color:var(--bt-text-muted)">Ops Manager</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <h2>Morning Briefing</h2>
+      <span class="ch-sub">Tuesday, May 13 &middot; 7:45 AM</span>
+      <div class="ch-right">
+        <button class="btn primary">Send to Team</button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <!-- Hero briefing -->
+      <div class="hero" style="margin-bottom:20px">
+        <div class="greeting">Good morning, Karen</div>
+        <div class="subtitle">3 critical alerts need your attention. 4 closings scheduled today across teams.</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="label">Critical Alerts</div><div class="value" style="color:#FF9B9B">3</div></div>
+          <div class="hero-stat"><div class="label">Today's Closings</div><div class="value">4</div></div>
+          <div class="hero-stat"><div class="label">Team Available</div><div class="value">9/10</div></div>
+          <div class="hero-stat"><div class="label">Production Pace</div><div class="value">+12%</div></div>
+        </div>
+      </div>
+
+      <div class="grid-3-1">
+        <div>
+          <!-- Critical Alerts -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>Critical Alerts</h3><span class="s-badge red">3</span></div>
+            <div class="card-body">
+              <div class="alert-item">
+                <div class="alert-dot" style="background:var(--bt-error)"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600;color:var(--bt-error)">SLA Breach: Thompson file in UW 8 days</div>
+                  <div style="font-size:12px;color:var(--bt-text-secondary);margin-top:2px">Closing date May 20. David Wang assigned. Needs immediate escalation or Sr. UW review.</div>
+                  <div style="margin-top:6px;display:flex;gap:6px">
+                    <button class="btn" style="font-size:11px;padding:4px 10px">Escalate</button>
+                    <button class="btn" style="font-size:11px;padding:4px 10px">Reassign</button>
+                  </div>
+                </div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot" style="background:var(--bt-error)"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600;color:var(--bt-error)">Staffing Gap: J. Torres OOO, 3 files unassigned</div>
+                  <div style="font-size:12px;color:var(--bt-text-secondary);margin-top:2px">James Torres called out sick. 3 closing files need coverage. Brian Johnson has capacity (40%).</div>
+                  <div style="margin-top:6px;display:flex;gap:6px">
+                    <button class="btn primary" style="font-size:11px;padding:4px 10px">Reassign to B. Johnson</button>
+                  </div>
+                </div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot" style="background:var(--bt-warning)"></div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600;color:var(--bt-warning)">TRID Alert: Vasquez tolerance cure due by May 16</div>
+                  <div style="font-size:12px;color:var(--bt-text-secondary);margin-top:2px">CD tolerance exceeded on appraisal fee. $142 refund needs approval. Marcus Grant tracking.</div>
+                  <div style="margin-top:6px;display:flex;gap:6px">
+                    <button class="btn" style="font-size:11px;padding:4px 10px">Approve Refund</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Closings -->
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><h3>Today's Closings</h3><span class="tag green">4 Files</span></div>
+            <div class="card-body">
+              <table>
+                <tr><th>Borrower</th><th>LO</th><th>Type</th><th>Amount</th><th>Time</th><th>Status</th></tr>
+                <tr>
+                  <td style="font-weight:600">Williams, James</td><td>T. Loss</td><td>Conv. Purchase</td><td>$385K</td><td>10:00 AM</td>
+                  <td><span class="tag green">Docs Ready</span></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Garcia, Sofia</td><td>S. Park</td><td>FHA Purchase</td><td>$275K</td><td>11:30 AM</td>
+                  <td><span class="tag green">Docs Ready</span></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Lee, Michael</td><td>T. Loss</td><td>Conv. Refi</td><td>$420K</td><td>2:00 PM</td>
+                  <td><span class="tag green">Docs Ready</span></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Brown, Tamara</td><td>M. Davis</td><td>VA Purchase</td><td>$310K</td><td>3:30 PM</td>
+                  <td><span class="tag amber">Awaiting Wire</span></td>
+                </tr>
+              </table>
+              <div style="margin-top:12px;padding:10px 14px;background:var(--bt-bg-soft);border-radius:8px;font-size:12px;color:var(--bt-text-secondary)">
+                Total closing volume today: <strong>$1.39M</strong> &middot; Funding team standing by
+              </div>
+            </div>
+          </div>
+
+          <!-- Production pace -->
+          <div class="card">
+            <div class="card-header"><h3>Production Pace vs Goal</h3></div>
+            <div class="card-body">
+              <div class="grid-2" style="margin-bottom:12px">
+                <div>
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">Volume Pace</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:4px">$6.9M</div>
+                  <div style="font-size:12px;color:var(--bt-success);font-weight:600">projected (+$100K over goal)</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--bt-text-muted);text-transform:uppercase;letter-spacing:0.04em">Unit Pace</div>
+                  <div style="font-size:22px;font-weight:700;margin-top:4px">26 units</div>
+                  <div style="font-size:12px;color:var(--bt-success);font-weight:600">on target</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:var(--bt-text-muted)">
+                13 business days remaining in May. Need 8 more closings to hit goal. Current pipeline supports 12 potential closings.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="aria-bar" style="margin-bottom:14px">
+            <div class="aria-avatar">A</div>
+            <div class="prompt">"Aria, what's the biggest risk to hitting our May goal?"</div>
+            <span class="aria-tag">AI</span>
+          </div>
+
+          <!-- Team availability -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><h3>Team Availability</h3></div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">RP</div>
+                <div class="list-info"><div class="name">Rachel Park</div><div class="detail">Processor &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">MG</div>
+                <div class="list-info"><div class="name">Marcus Grant</div><div class="detail">Processor &middot; Remote</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">LL</div>
+                <div class="list-info"><div class="name">Lisa Lopez</div><div class="detail">Processor &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">DW</div>
+                <div class="list-info"><div class="name">David Wang</div><div class="detail">Underwriter &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">AN</div>
+                <div class="list-info"><div class="name">Anita Nguyen</div><div class="detail">Underwriter &middot; Remote</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#FDE8E8;color:var(--bt-error)">JT</div>
+                <div class="list-info"><div class="name">James Torres</div><div class="detail">Closer &middot; Called out</div></div>
+                <span class="tag red" style="font-size:10px">OOO</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">SK</div>
+                <div class="list-info"><div class="name">Sarah Kim</div><div class="detail">Closer &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">BJ</div>
+                <div class="list-info"><div class="name">Brian Johnson</div><div class="detail">Closer &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">CM</div>
+                <div class="list-info"><div class="name">Carlos Martinez</div><div class="detail">Funder &middot; In office</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+              <div class="list-item">
+                <div class="list-avatar" style="width:28px;height:28px;font-size:10px;background:#DFF0E3;color:var(--bt-success)">PP</div>
+                <div class="list-info"><div class="name">Priya Patel</div><div class="detail">Funder &middot; Remote</div></div>
+                <span class="tag green" style="font-size:10px">Available</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="grid-2">
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Tasks Overdue</div><div class="m-value" style="font-size:22px;color:var(--bt-error)">6</div></div></div>
+            <div class="card"><div class="metric" style="padding:14px 16px"><div class="m-label" style="font-size:10px">Docs Pending</div><div class="m-value" style="font-size:22px;color:var(--bt-warning)">11</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aria-bar" style="margin-top:20px">
+        <div class="aria-avatar">A</div>
+        <div class="prompt">"Aria, draft a morning standup summary for the team Slack channel."</div>
+        <span class="aria-tag">AI</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<script>
+function show(n) {
+  document.querySelectorAll('.mockup').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v' + n).classList.add('active');
+  document.querySelectorAll('.tab')[n - 1].classList.add('active');
+}
+</script>
+
+</body>
+</html>

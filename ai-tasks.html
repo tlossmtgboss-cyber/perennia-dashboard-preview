@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Task Center — Perennia AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #1A1F1B; }
+
+  :root {
+    --bt-font-display: 'Fraunces', Georgia, serif;
+    --bt-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --bt-bg-page: #FAF7F1;
+    --bt-bg-surface: #FFFFFF;
+    --bt-bg-sidebar: #F6F2EA;
+    --bt-bg-elevated: #F2EDE2;
+    --bt-bg-soft: #FBF8F2;
+    --bt-border: #ECE6D8;
+    --bt-border-strong: #D8D0BD;
+    --bt-text-primary: #1A1F1B;
+    --bt-text-secondary: #4F554E;
+    --bt-text-muted: #8B8A7E;
+    --bt-text-faint: #B5B2A4;
+    --bt-primary: #1F3D2E;
+    --bt-primary-hover: #2A4F3D;
+    --bt-primary-light: #E5EDE6;
+    --bt-primary-tint: #EFF3EE;
+    --bt-accent: #B8924A;
+    --bt-accent-light: #F5EDD9;
+    --bt-success: #2D7A52;
+    --bt-warning: #B25F18;
+    --bt-error: #9B2C2C;
+    --bt-info: #3182CE;
+    --bt-radius-sm: 6px;
+    --bt-radius-md: 10px;
+    --bt-radius-lg: 14px;
+    --bt-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --bt-shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 9999;
+    background: #1F3D2E; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .topbar h1 {
+    font-family: var(--bt-font-display);
+    color: #F5EDD9; font-size: 15px; font-weight: 500; white-space: nowrap;
+  }
+  .topbar .ai-pill {
+    font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 4px;
+    background: rgba(184,146,74,0.3); color: #F5EDD9;
+    letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  }
+  .topbar .role-tabs { display: flex; gap: 4px; flex-shrink: 0; margin-left: 12px; }
+  .topbar .rtab {
+    padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,0.45); transition: all 0.2s;
+    white-space: nowrap; font-family: inherit;
+  }
+  .topbar .rtab:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.75); }
+  .topbar .rtab.active { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .role-view { display: none; }
+  .role-view.active { display: block; }
+
+  /* ── Layout ── */
+  .bt { background: var(--bt-bg-page); color: var(--bt-text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  .bt .layout { display: flex; min-height: calc(100vh - 44px); }
+
+  /* ── Sidebar ── */
+  .bt .sidebar {
+    width: 280px; background: var(--bt-bg-sidebar);
+    border-right: 1px solid var(--bt-border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+    position: sticky; top: 44px; height: calc(100vh - 44px); overflow-y: auto;
+  }
+  .bt .sidebar::-webkit-scrollbar { width: 4px; }
+  .bt .sidebar::-webkit-scrollbar-thumb { background: var(--bt-border-strong); border-radius: 2px; }
+
+  .bt .s-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .s-logo { font-family: var(--bt-font-display); font-weight: 500; font-size: 17px; color: var(--bt-primary); }
+  .bt .s-ai-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--bt-primary-tint); color: var(--bt-primary); margin-left: auto; }
+
+  /* Summary panel */
+  .bt .ai-summary {
+    padding: 20px; border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .ai-summary h3 {
+    font-family: var(--bt-font-display); font-size: 14px; font-weight: 600;
+    color: var(--bt-text-primary); margin-bottom: 14px;
+  }
+  .bt .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; font-size: 13px;
+  }
+  .bt .sum-row + .sum-row { border-top: 1px solid var(--bt-border); }
+  .bt .sum-label { color: var(--bt-text-secondary); }
+  .bt .sum-val { font-weight: 700; }
+
+  /* Filter chips */
+  .bt .filters {
+    padding: 14px 20px; border-bottom: 1px solid var(--bt-border);
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .bt .chip {
+    font-size: 11px; font-weight: 600; padding: 5px 12px;
+    border-radius: 20px; cursor: pointer; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-secondary);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .bt .chip:hover { border-color: var(--bt-border-strong); }
+  .bt .chip.active { background: var(--bt-primary); color: #fff; border-color: var(--bt-primary); }
+  .bt .chip.needs-review { background: #FEF3C7; color: var(--bt-warning); border-color: #F0D9B5; }
+
+  .bt .s-spacer { flex: 1; }
+
+  /* ── Main content ── */
+  .bt .content { flex: 1; overflow-y: auto; }
+  .bt .c-head {
+    padding: 18px 32px; display: flex; align-items: center;
+    border-bottom: 1px solid var(--bt-border); background: var(--bt-bg-surface);
+  }
+  .bt .c-head h2 {
+    font-family: var(--bt-font-display); font-size: 20px;
+    font-weight: 600; letter-spacing: -0.02em;
+  }
+  .bt .c-head .ch-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .bt .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--bt-success);
+    animation: pulse 2s infinite; display: inline-block;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .bt .feed { padding: 20px 32px; }
+
+  /* ── Feed item ── */
+  .bt .feed-item {
+    background: var(--bt-bg-surface); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-lg); margin-bottom: 14px;
+    box-shadow: var(--bt-shadow-sm); overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .bt .feed-item:hover { box-shadow: var(--bt-shadow-md); }
+  .bt .feed-item.needs-human { border-left: 4px solid var(--bt-warning); }
+  .bt .feed-item.ai-complete { border-left: 4px solid var(--bt-success); }
+  .bt .feed-item.ai-working { border-left: 4px solid var(--bt-info); }
+  .bt .feed-item.ai-error { border-left: 4px solid var(--bt-error); }
+
+  .bt .fi-header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--bt-border);
+  }
+  .bt .fi-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--bt-primary), #3a6b50);
+    display: flex; align-items: center; justify-content: center;
+    color: #F5EDD9; font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .bt .fi-avatar.human {
+    background: var(--bt-accent);
+  }
+  .bt .fi-meta { flex: 1; }
+  .bt .fi-title { font-size: 14px; font-weight: 600; color: var(--bt-text-primary); }
+  .bt .fi-time { font-size: 11px; color: var(--bt-text-muted); margin-top: 1px; }
+  .bt .fi-status {
+    font-size: 10px; font-weight: 700; padding: 4px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .bt .fi-status.complete { background: #DFF0E3; color: var(--bt-success); }
+  .bt .fi-status.review { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .fi-status.working { background: #DBEAFE; color: var(--bt-info); }
+  .bt .fi-status.error { background: #FDE8E8; color: var(--bt-error); }
+  .bt .fi-status.approved { background: var(--bt-primary-tint); color: var(--bt-primary); }
+
+  .bt .fi-body { padding: 16px 20px; }
+  .bt .fi-type {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--bt-text-muted); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bt .fi-type-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bt .fi-type-dot.doc { background: var(--bt-info); }
+  .bt .fi-type-dot.comm { background: var(--bt-accent); }
+  .bt .fi-type-dot.verify { background: var(--bt-success); }
+  .bt .fi-type-dot.cond { background: var(--bt-warning); }
+
+  .bt .fi-result {
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary);
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .bt .fi-result strong { color: var(--bt-text-primary); }
+  .bt .fi-finding {
+    display: flex; align-items: flex-start; gap: 8px; padding: 5px 0;
+    font-size: 13px;
+  }
+  .bt .fi-finding-icon { flex-shrink: 0; margin-top: 2px; }
+
+  .bt .fi-confidence {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 12px; color: var(--bt-text-muted);
+  }
+  .bt .conf-bar { width: 60px; height: 6px; border-radius: 3px; background: var(--bt-bg-elevated); overflow: hidden; }
+  .bt .conf-fill { height: 100%; border-radius: 3px; }
+  .bt .conf-fill.high { background: var(--bt-success); }
+  .bt .conf-fill.med { background: var(--bt-accent); }
+  .bt .conf-fill.low { background: var(--bt-warning); }
+
+  /* Draft preview */
+  .bt .fi-draft {
+    background: var(--bt-bg-soft); border: 1px solid var(--bt-border);
+    border-radius: var(--bt-radius-md); padding: 14px 16px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.6; color: var(--bt-text-secondary);
+    position: relative;
+  }
+  .bt .fi-draft::before {
+    content: 'DRAFT'; position: absolute; top: 8px; right: 10px;
+    font-size: 9px; font-weight: 700; color: var(--bt-accent);
+    letter-spacing: 0.06em;
+  }
+  .bt .fi-draft .draft-to { font-size: 12px; color: var(--bt-text-muted); margin-bottom: 6px; }
+  .bt .fi-draft .draft-subject { font-weight: 600; color: var(--bt-text-primary); margin-bottom: 8px; }
+
+  /* Action buttons */
+  .bt .fi-actions {
+    display: flex; gap: 8px; padding-top: 4px;
+  }
+  .bt .fi-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 16px;
+    border-radius: var(--bt-radius-sm); cursor: pointer;
+    font-family: inherit; border: 1px solid var(--bt-border);
+    background: var(--bt-bg-surface); color: var(--bt-text-primary);
+    transition: all 0.15s;
+  }
+  .bt .fi-btn:hover { border-color: var(--bt-border-strong); }
+  .bt .fi-btn.approve { background: var(--bt-primary); color: #F5EDD9; border-color: var(--bt-primary); }
+  .bt .fi-btn.approve:hover { background: var(--bt-primary-hover); }
+  .bt .fi-btn.reject { color: var(--bt-error); border-color: #FDE8E8; }
+  .bt .fi-btn.reject:hover { background: #FDE8E8; }
+
+  /* File reference tag */
+  .bt .file-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    border-radius: 4px; background: var(--bt-accent-light); color: var(--bt-accent);
+    display: inline-block; margin-right: 6px;
+  }
+  .bt .lo-ref {
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    border-radius: 4px; background: var(--bt-primary-tint); color: var(--bt-primary);
+    display: inline-block;
+  }
+
+  /* Checklist in results */
+  .bt .check-row {
+    display: flex; align-items: center; gap: 8px; padding: 4px 0;
+    font-size: 13px;
+  }
+  .bt .check-icon { width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+  .bt .check-icon.pass { background: #DFF0E3; color: var(--bt-success); }
+  .bt .check-icon.fail { background: #FDE8E8; color: var(--bt-error); }
+  .bt .check-icon.warn { background: #FEF3C7; color: var(--bt-warning); }
+
+  /* Separator */
+  .bt .feed-sep {
+    text-align: center; padding: 8px 0; font-size: 11px;
+    color: var(--bt-text-faint); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .bt .feed-sep span {
+    background: var(--bt-bg-page); padding: 0 12px;
+    position: relative;
+  }
+  .bt .feed-sep::before {
+    content: ''; position: absolute; left: 32px; right: 32px;
+    top: 50%; height: 1px; background: var(--bt-border);
+  }
+  .bt .feed-sep { position: relative; }
+
+  /* Tag row */
+  .bt .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+  .bt .tag.green { background: #DFF0E3; color: var(--bt-success); }
+  .bt .tag.amber { background: #FEF3C7; color: var(--bt-warning); }
+  .bt .tag.red { background: #FDE8E8; color: var(--bt-error); }
+  .bt .tag.blue { background: #DBEAFE; color: var(--bt-info); }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <h1>Perennia AI Tasks</h1>
+  <span class="ai-pill">Aria AI Engine</span>
+  <div class="role-tabs">
+    <button class="rtab active" onclick="showRole('lo')">Loan Officer</button>
+    <button class="rtab" onclick="showRole('pa')">Prod Assistant</button>
+    <button class="rtab" onclick="showRole('proc')">Processor</button>
+    <button class="rtab" onclick="showRole('uw')">Underwriter</button>
+    <button class="rtab" onclick="showRole('closer')">Closer</button>
+    <button class="rtab" onclick="showRole('funder')">Funder</button>
+    <button class="rtab" onclick="showRole('ops')">Ops Management</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     LOAN OFFICER — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="lo" class="role-view active">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">14</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">4</span></div>
+      <div class="sum-row"><span class="sum-label">Currently working</span><span class="sum-val" style="color:var(--bt-info)">2</span></div>
+      <div class="sum-row"><span class="sum-label">Errors / escalated</span><span class="sum-val" style="color:var(--bt-error)">1</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">3.2 hrs</span></div>
+    </div>
+
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 4</button>
+      <button class="chip">Docs</button>
+      <button class="chip">Comms</button>
+      <button class="chip">Verification</button>
+      <button class="chip">Conditions</button>
+    </div>
+
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="live-dot"></span>
+        <h2>Live AI Activity</h2>
+      </div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Loan Officer — Timothy Loss</span>
+      <div class="ch-right">
+        <span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span>
+      </div>
+    </div>
+
+    <div class="feed">
+
+      <!-- NEEDS REVIEW: Communication draft -->
+      <div class="feed-item needs-human">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Drafted rate alert email — 4 refinance prospects</div>
+            <div class="fi-time">2 minutes ago</div>
+          </div>
+          <span class="fi-status review">Needs Review</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot comm"></span> Communication Draft</div>
+          <div class="fi-confidence">
+            Confidence: 94%
+            <div class="conf-bar"><div class="conf-fill high" style="width:94%"></div></div>
+          </div>
+          <div class="fi-draft">
+            <div class="draft-to">To: S. Richardson, K. O'Brien, W. Brooks, M. Taylor</div>
+            <div class="draft-subject">Great news — rates dropped to 6.875%</div>
+            Hi [First Name],<br><br>
+            I wanted to reach out with some exciting news — mortgage rates dropped again today. The 30-year fixed is now at <strong>6.875%</strong>, down 12.5 basis points from last week.<br><br>
+            Based on your current loan at [current_rate], a refinance could save you approximately <strong>$[monthly_savings]/month</strong>. I'd love to run the numbers for your specific situation.<br><br>
+            Would you have 15 minutes this week for a quick call?<br><br>
+            Best,<br>Timothy Loss
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Approve & Send</button>
+            <button class="fi-btn">Edit Draft</button>
+            <button class="fi-btn reject">Discard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI WORKING -->
+      <div class="feed-item ai-working">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Running income calculation — Watson file</div>
+            <div class="fi-time">Just now · In progress</div>
+          </div>
+          <span class="fi-status working">Working</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Watson</span> <span class="lo-ref">FHA $295K</span><br><br>
+            Analyzing uploaded pay stubs and W-2s... Calculating qualifying income for self-employed borrower with commission income. Cross-referencing tax returns against 1003 stated income.
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+              <div style="width:120px;height:4px;border-radius:2px;background:var(--bt-bg-elevated);overflow:hidden">
+                <div style="width:60%;height:100%;background:var(--bt-info);border-radius:2px;animation:pulse 1.5s infinite"></div>
+              </div>
+              <span style="font-size:11px;color:var(--bt-text-muted)">Processing...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEEDS REVIEW: Document classification -->
+      <div class="feed-item needs-human">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Document review — Martinez uploaded 3 files</div>
+            <div class="fi-time">8 minutes ago</div>
+          </div>
+          <span class="fi-status review">Needs Review</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot doc"></span> Document Processing</div>
+          <div class="fi-confidence">
+            Confidence: 78%
+            <div class="conf-bar"><div class="conf-fill med" style="width:78%"></div></div>
+            <span style="color:var(--bt-warning);font-weight:600">Issue found</span>
+          </div>
+          <div class="fi-result">
+            <span class="file-ref">Martinez</span> <span class="lo-ref">FHA $425K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Pay stub (Apr 2026)</strong> — Verified. YTD gross: $47,350. Matches stated income.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Pay stub (Mar 2026)</strong> — Verified. Consistent earnings pattern.</div>
+              <div class="check-row"><div class="check-icon fail">✗</div> <strong>W-2 uploaded is 2023</strong> — Need 2024 or 2025. This doc is expired and cannot be used for income verification.</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Aria recommendation:</strong> Accept the 2 pay stubs and auto-request the correct W-2 from borrower. I've prepared the request email below.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Accept & Send W-2 Request</button>
+            <button class="fi-btn">Review Docs Manually</button>
+            <button class="fi-btn reject">Reject All</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI COMPLETE: Condition auto-cleared -->
+      <div class="feed-item ai-complete">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Auto-cleared condition — Kim bank statements</div>
+            <div class="fi-time">22 minutes ago</div>
+          </div>
+          <span class="fi-status complete">Complete</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot cond"></span> Condition Clearing</div>
+          <div class="fi-confidence">
+            Confidence: 98%
+            <div class="conf-bar"><div class="conf-fill high" style="width:98%"></div></div>
+          </div>
+          <div class="fi-result">
+            <span class="file-ref">Kim</span> <span class="lo-ref">Conv $550K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Condition:</strong> "Provide 2 months bank statements for all liquid accounts"</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Chase checking — Apr & Mar 2026 statements received, all pages present</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Fidelity 401K — Apr & Mar 2026 statements received</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No large deposits (>$1,000) requiring sourcing</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Total verified assets: $124,500 — exceeds required $82,000</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600;margin-top:4px">Condition marked as cleared. No action needed.</div>
+        </div>
+      </div>
+
+      <div class="feed-sep"><span>Earlier today</span></div>
+
+      <!-- AI COMPLETE: Verification -->
+      <div class="feed-item ai-complete">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">AUS comparison complete — Chen pre-approval</div>
+            <div class="fi-time">1 hour ago</div>
+          </div>
+          <span class="fi-status complete">Complete</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Chen</span> <span class="lo-ref">VA $320K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>DU:</strong> Approve/Eligible — DTI 38.2%, LTV 100% (VA)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>LP:</strong> Accept — consistent findings</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> VA COE verified — eligible veteran, no prior VA loans</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Funding fee: 2.15% ($6,880) — can be financed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEEDS REVIEW: Follow-up SMS -->
+      <div class="feed-item needs-human">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Drafted follow-up SMS — Johnson HOI binder</div>
+            <div class="fi-time">1.5 hours ago</div>
+          </div>
+          <span class="fi-status review">Needs Review</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot comm"></span> Communication Draft</div>
+          <div class="fi-confidence">
+            Confidence: 96%
+            <div class="conf-bar"><div class="conf-fill high" style="width:96%"></div></div>
+          </div>
+          <div class="fi-draft">
+            <div class="draft-to">To: Amanda Johnson · SMS</div>
+            <div class="draft-subject">Document request</div>
+            Hi Amanda, this is Timothy from Perennia. Quick reminder — we still need your homeowners insurance binder to keep your closing on track for Jun 2. Your insurance agent can email it directly to us at docs@perenniaai.com. Let me know if you need help!
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Send SMS</button>
+            <button class="fi-btn">Edit</button>
+            <button class="fi-btn reject">Don't Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI COMPLETE: CD reconciliation -->
+      <div class="feed-item ai-complete">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">CD vs LE fee check — Patterson closing</div>
+            <div class="fi-time">2 hours ago</div>
+          </div>
+          <span class="fi-status complete">Complete</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Patterson</span> <span class="lo-ref">Conv $490K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Zero-tolerance fees: All within tolerance</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 10% cumulative fees: $4,210 vs $4,180 LE — variance $30 (0.7%)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No tolerance fees: Within expected range</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> TRID 3-day period: Met (CD delivered May 9, closing May 15)</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">All fees within tolerance. Clear to close confirmed.</div>
+        </div>
+      </div>
+
+      <!-- ERROR: Escalation -->
+      <div class="feed-item ai-error">
+        <div class="fi-header">
+          <div class="fi-avatar">A</div>
+          <div class="fi-meta">
+            <div class="fi-title">Income discrepancy detected — Richardson</div>
+            <div class="fi-time">3 hours ago</div>
+          </div>
+          <span class="fi-status error">Escalated</span>
+        </div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-confidence">
+            Confidence: 42%
+            <div class="conf-bar"><div class="conf-fill low" style="width:42%"></div></div>
+            <span style="color:var(--bt-error);font-weight:600">Manual review required</span>
+          </div>
+          <div class="fi-result">
+            <span class="file-ref">Richardson</span> <span class="lo-ref">Conv Refi $380K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>1003 stated income:</strong> $8,200/mo</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>Pay stub calculation:</strong> $7,450/mo (9.1% variance)</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Borrower may have overtime/bonus income not reflected in base pay stub. Need additional documentation or LOE.</div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Aria cannot resolve this automatically.</strong> The income variance exceeds the 5% threshold. You'll need to verify overtime/bonus eligibility or update the 1003.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Open File</button>
+            <button class="fi-btn">Request LOE from Borrower</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PRODUCTION ASSISTANT — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="pa" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">22</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">6</span></div>
+      <div class="sum-row"><span class="sum-label">Currently working</span><span class="sum-val" style="color:var(--bt-info)">3</span></div>
+      <div class="sum-row"><span class="sum-label">Across LOs</span><span class="sum-val">3</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">4.8 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 6</button>
+      <button class="chip">Docs</button>
+      <button class="chip">Comms</button>
+      <button class="chip">Conditions</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Production Assistant — Jessica Reyes</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Classified 5 uploaded docs — Martinez file (T. Loss)</div><div class="fi-time">3 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot doc"></span> Document Processing</div>
+          <div class="fi-confidence">Confidence: 82% <div class="conf-bar"><div class="conf-fill med" style="width:82%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Martinez</span> <span class="lo-ref">T. Loss</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Pay stub Apr 2026</strong> — Auto-classified, data extracted. Matches condition #4.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Pay stub Mar 2026</strong> — Auto-classified, data extracted.</div>
+              <div class="check-row"><div class="check-icon fail">✗</div> <strong>W-2 2023</strong> — Wrong year. Need 2024/2025. Cannot satisfy condition #2.</div>
+              <div class="check-row"><div class="check-icon warn">?</div> <strong>Blurry scan</strong> — Cannot determine document type. Needs manual review.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Drivers license</strong> — Auto-classified. Matches borrower name, not expired.</div>
+            </div>
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Accept 3 Valid Docs</button>
+            <button class="fi-btn">Review Blurry Scan</button>
+            <button class="fi-btn">Request Correct W-2</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Auto-matched conditions — Kim file (T. Loss)</div><div class="fi-time">15 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot cond"></span> Condition Clearing</div>
+          <div class="fi-result">
+            <span class="file-ref">Kim</span> <span class="lo-ref">T. Loss</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Condition "2 months bank statements" — <strong>Auto-cleared.</strong> Apr + Mar Chase & Fidelity received.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Condition "VOE for current employer" — <strong>Auto-cleared.</strong> Written VOE received from Acme Corp.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Condition "Flood certification" — <strong>Auto-cleared.</strong> Zone X, no flood insurance required.</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">3 conditions auto-cleared. Kim file now has 0 outstanding conditions.</div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Drafted doc request emails — 3 borrowers (multi-LO)</div><div class="fi-time">30 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot comm"></span> Communication Draft</div>
+          <div class="fi-result">
+            Aria identified 3 borrowers with outstanding documents past SLA and drafted personalized request emails:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon warn">1</div> <span class="file-ref">Martinez</span> <span class="lo-ref">T. Loss</span> — W-2 (2024/2025) request. <strong>5 days overdue.</strong></div>
+              <div class="check-row"><div class="check-icon warn">2</div> <span class="file-ref">Watson</span> <span class="lo-ref">M. Davis</span> — Business bank statements (2 months). <strong>4 days overdue.</strong></div>
+              <div class="check-row"><div class="check-icon warn">3</div> <span class="file-ref">Johnson</span> <span class="lo-ref">T. Loss</span> — HOI binder. <strong>3 days overdue.</strong></div>
+            </div>
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Send All 3 Emails</button>
+            <button class="fi-btn">Review Each Draft</button>
+            <button class="fi-btn reject">Skip</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-working">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Running doc completeness scan — all 14 active files</div><div class="fi-time">Just now · In progress</div></div><span class="fi-status working">Working</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot doc"></span> Document Processing</div>
+          <div class="fi-result">
+            Scanning all active files for missing, expired, or incomplete documents. Checking against loan program requirements (FHA, VA, Conv, Jumbo)...
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+              <div style="width:140px;height:4px;border-radius:2px;background:var(--bt-bg-elevated);overflow:hidden">
+                <div style="width:35%;height:100%;background:var(--bt-info);border-radius:2px;animation:pulse 1.5s infinite"></div>
+              </div>
+              <span style="font-size:11px;color:var(--bt-text-muted)">5 of 14 files scanned...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-sep"><span>Earlier today</span></div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Reconciliation check — O'Brien CD vs LE (S. Park)</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">O'Brien</span> <span class="lo-ref">S. Park</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Zero-tolerance: All fees match</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 10% cumulative: Variance $45 of $380 allowed (1.2%)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Title fees: Match commitment</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">No tolerance issues. File is clean.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PROCESSOR — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="proc" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">18</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">5</span></div>
+      <div class="sum-row"><span class="sum-label">Currently working</span><span class="sum-val" style="color:var(--bt-info)">1</span></div>
+      <div class="sum-row"><span class="sum-label">Conditions auto-cleared</span><span class="sum-val" style="color:var(--bt-success)">7</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">5.1 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 5</button>
+      <button class="chip">Docs</button>
+      <button class="chip">Verification</button>
+      <button class="chip">Conditions</button>
+      <button class="chip">Service Orders</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Processor — Maria Santos</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Income calculation complete — Watson self-employed</div><div class="fi-time">5 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-confidence">Confidence: 85% <div class="conf-bar"><div class="conf-fill med" style="width:85%"></div></div><span style="color:var(--bt-warning);font-weight:600">Complex income</span></div>
+          <div class="fi-result">
+            <span class="file-ref">Watson</span> <span class="lo-ref">FHA $295K</span>
+            <div style="margin-top:10px">
+              <strong>Self-employed income analysis (2-year average):</strong>
+              <div class="check-row" style="margin-top:6px"><div class="check-icon pass">✓</div> 2025 Schedule C net: $92,400</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 2024 Schedule C net: $84,200</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 2-year average: $88,300/yr → <strong>$7,358/mo qualifying</strong></div>
+              <div class="check-row"><div class="check-icon warn">?</div> Depreciation add-back: $4,200 (2025), $3,800 (2024) — <strong>included in calculation</strong></div>
+              <div class="check-row"><div class="check-icon warn">?</div> Business showed 9.7% year-over-year growth — stable/increasing trend</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Resulting DTI: 41.2% (front) / 48.8% (back) — within FHA limits</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Processor review needed:</strong> Self-employed income with depreciation add-back requires processor sign-off per company policy. Calculation methodology and supporting docs attached.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Approve Calculation</button>
+            <button class="fi-btn">Adjust & Recalculate</button>
+            <button class="fi-btn">View Tax Returns</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Service order status updated — 4 files checked</div><div class="fi-time">18 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            Aria checked status of all pending service orders across your pipeline:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <span class="file-ref">Kim</span> Appraisal received — $545K value, meets LTV</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> <span class="file-ref">Richardson</span> Title commitment received — clean title, no liens</div>
+              <div class="check-row"><div class="check-icon warn">!</div> <span class="file-ref">Martinez</span> VOE still pending — Acme Corp, sent 5 days ago. <strong>Follow up recommended.</strong></div>
+              <div class="check-row"><div class="check-icon fail">✗</div> <span class="file-ref">O'Brien</span> Appraisal came in low — $420K vs $440K contract. <strong>Escalate to LO.</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">File packaging readiness — O'Brien ready for UW</div><div class="fi-time">35 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot doc"></span> Document Processing</div>
+          <div class="fi-confidence">Confidence: 92% <div class="conf-bar"><div class="conf-fill high" style="width:92%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">O'Brien</span> — UW submission package review:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> 1003 — Complete, all fields populated, signatures present</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Credit — Pulled May 8, FICO 742/738/745, no new inquiries</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Income — W-2 + pay stubs verified, $6,200/mo qualifying</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Assets — Bank statements (2 mo), $89K verified</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Property — Contract, appraisal, title commitment, flood cert</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> AUS — GUS Accept (USDA), DTI 38.4%</div>
+              <div class="check-row"><div class="check-icon warn">?</div> File notes — <strong>Auto-generated by Aria.</strong> Review before submission.</div>
+            </div>
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Submit to Underwriting</button>
+            <button class="fi-btn">Review File Notes</button>
+            <button class="fi-btn">Hold — Not Ready</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-working">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Cross-checking employer info — Chen VOE vs 1003</div><div class="fi-time">Just now</div></div><span class="fi-status working">Working</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            Comparing VOE responses with 1003-stated employment history. Checking dates, titles, income figures, and likelihood of continued employment...
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+              <div style="width:120px;height:4px;border-radius:2px;background:var(--bt-bg-elevated);overflow:hidden">
+                <div style="width:45%;height:100%;background:var(--bt-info);border-radius:2px;animation:pulse 1.5s infinite"></div>
+              </div>
+              <span style="font-size:11px;color:var(--bt-text-muted)">Analyzing...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     UNDERWRITER — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="uw" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Pre-screens completed</span><span class="sum-val" style="color:var(--bt-success)">8</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your decision</span><span class="sum-val" style="color:var(--bt-warning)">3</span></div>
+      <div class="sum-row"><span class="sum-label">Risk flags raised</span><span class="sum-val" style="color:var(--bt-error)">2</span></div>
+      <div class="sum-row"><span class="sum-label">Compliance checks</span><span class="sum-val" style="color:var(--bt-success)">12</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">6.3 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Decision 3</button>
+      <button class="chip">Risk Analysis</button>
+      <button class="chip">Compliance</button>
+      <button class="chip">Conditions</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Underwriter — Mark Thompson</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Pre-screen complete — Johnson Jumbo needs exception</div><div class="fi-time">4 minutes ago</div></div><span class="fi-status review">Needs Decision</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Analysis</div>
+          <div class="fi-confidence">Confidence: 88% <div class="conf-bar"><div class="conf-fill med" style="width:88%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Johnson</span> <span class="lo-ref">Jumbo $675K</span>
+            <div style="margin-top:10px">
+              <strong>Automated risk assessment:</strong>
+              <div class="check-row" style="margin-top:6px"><div class="check-icon pass">✓</div> FICO: 762 — Exceeds jumbo minimum (720)</div>
+              <div class="check-row"><div class="check-icon warn">!</div> DTI: 44.8% — <strong>Exceeds jumbo guideline of 43%.</strong> Exception required.</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> LTV: 78.5% — Within limits</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Reserves: 14 months PITIA — Exceeds 6-month requirement</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Employment: 8 years current employer, stable income trend</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Property: Primary residence, SFR, appraised value supports</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Aria recommendation:</strong> Strong compensating factors (high FICO, 14 months reserves, low LTV, stable employment). DTI exception is supportable. Recommend approval with PTD condition for reserves verification at closing.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Approve with Exception</button>
+            <button class="fi-btn">Suspend — Need More Info</button>
+            <button class="fi-btn reject">Deny</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">QM/ATR compliance verified — Richardson refi</div><div class="fi-time">20 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance Check</div>
+          <div class="fi-result">
+            <span class="file-ref">Richardson</span> <span class="lo-ref">Conv Refi $380K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> QM Safe Harbor: Qualified — DTI 36.2%, fixed rate, fully amortizing</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> ATR 8 factors: All documented and verified</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Points & fees: 1.8% — Below 3% threshold</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Net tangible benefit: Rate reduction 1.25%, savings $312/mo — Meets standard</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> HMDA data: Complete and validated</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Full QM compliance confirmed. No issues.</div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-error">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Fraud signal detected — Garcia new submission</div><div class="fi-time">45 minutes ago</div></div><span class="fi-status error">Escalated</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Analysis</div>
+          <div class="fi-confidence">Confidence: 72% <div class="conf-bar"><div class="conf-fill low" style="width:72%"></div></div><span style="color:var(--bt-error);font-weight:600">Fraud indicators</span></div>
+          <div class="fi-result">
+            <span class="file-ref">Garcia</span> <span class="lo-ref">Conv $485K</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>SSN alert:</strong> SSN associated with different name in credit bureau records</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>Employment:</strong> Employer phone number routes to residential line</div>
+              <div class="check-row"><div class="check-icon warn">?</div> <strong>Pay stub format:</strong> Font inconsistencies detected in earnings section</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Address history and property details appear legitimate</div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Manual investigation required.</strong> Multiple fraud indicators present. Aria recommends suspending the file and requesting additional verification: direct employer contact via independent lookup, copy of Social Security card, and original pay stubs (not scanned).
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn reject">Suspend File</button>
+            <button class="fi-btn">Request Additional Docs</button>
+            <button class="fi-btn">Flag for SAR Review</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Auto-generated conditions list — Nguyen approval</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot cond"></span> Condition Generation</div>
+          <div class="fi-result">
+            <span class="file-ref">Nguyen</span> <span class="lo-ref">Conv $365K</span> — Approved with conditions
+            <div style="margin-top:10px">
+              <strong>PTD Conditions (auto-generated):</strong>
+              <div class="check-row" style="margin-top:4px"><div class="check-icon warn">1</div> Updated pay stub within 30 days of closing</div>
+              <div class="check-row"><div class="check-icon warn">2</div> Evidence of clear pest inspection</div>
+              <div class="check-row"><div class="check-icon warn">3</div> Final title commitment with no exceptions</div>
+              <strong style="display:block;margin-top:10px">PTF Conditions:</strong>
+              <div class="check-row" style="margin-top:4px"><div class="check-icon warn">4</div> Executed closing docs</div>
+              <div class="check-row"><div class="check-icon warn">5</div> Final CD matching approved terms</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Conditions sent to processor automatically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     CLOSER — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="closer" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">11</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">3</span></div>
+      <div class="sum-row"><span class="sum-label">TRID checks</span><span class="sum-val" style="color:var(--bt-success)">6</span></div>
+      <div class="sum-row"><span class="sum-label">CDs prepared</span><span class="sum-val">2</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">4.1 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 3</button>
+      <button class="chip">TRID</button>
+      <button class="chip">Docs</button>
+      <button class="chip">Fees</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Closer — Sarah Chen</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">CD fee variance detected — Kim closing</div><div class="fi-time">6 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Fee Reconciliation</div>
+          <div class="fi-confidence">Confidence: 95% <div class="conf-bar"><div class="conf-fill high" style="width:95%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Kim</span> <span class="lo-ref">Conv $550K · Closing 5/20</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> <strong>Zero-tolerance:</strong> Origination fee, transfer taxes — match LE</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>10% cumulative:</strong> Title insurance $1,850 vs LE $1,650 — <strong>$200 increase (12.1%)</strong></div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Recording fees, HOI, taxes — within tolerance</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Total 10% bucket variance: $200 of $165 allowed — <strong>Exceeds tolerance by $35</strong></div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Tolerance cure required.</strong> Lender must credit borrower $35 at closing. Aria has prepared the updated CD with the cure credit applied.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Apply Cure & Issue Revised CD</button>
+            <button class="fi-btn">Review Fee Details</button>
+            <button class="fi-btn">Escalate to Manager</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">TRID timeline verified — Patterson closing tomorrow</div><div class="fi-time">25 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance Check</div>
+          <div class="fi-result">
+            <span class="file-ref">Patterson</span> <span class="lo-ref">Conv $490K · Closing 5/15</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> LE issued: Apr 18 — within 3 business days of application</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> CD delivered: May 9 — 4 business days before closing</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> 3-business-day waiting period: Met (May 9→May 14)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No changed circumstances requiring revised CD</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Closing scheduled: May 15, 2:00 PM — Heritage Title, 450 King St</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">All TRID timelines met. Clear to proceed with closing.</div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Drafted closing confirmation email — Patterson</div><div class="fi-time">30 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot comm"></span> Communication Draft</div>
+          <div class="fi-draft">
+            <div class="draft-to">To: Lisa Patterson · Email</div>
+            <div class="draft-subject">Your closing is confirmed — May 15 at 2:00 PM</div>
+            Hi Lisa,<br><br>
+            This is a reminder that your closing is confirmed for <strong>Thursday, May 15 at 2:00 PM</strong> at Heritage Title Company (450 King St, Suite 200).<br><br>
+            <strong>Please bring:</strong><br>
+            • Valid government-issued photo ID<br>
+            • Certified/cashier's check for $12,847.50 (payable to Heritage Title)<br>
+            • Your homeowners insurance binder<br><br>
+            The signing should take approximately 45-60 minutes. Congratulations — you're almost home!
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Send Email</button>
+            <button class="fi-btn">Edit</button>
+            <button class="fi-btn reject">Don't Send</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Wire instructions verified — Patterson</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Patterson</span> — Wire instruction verification:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Bank name matches ABA lookup: Heritage National Bank</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> ABA routing: ●●●●●6742 — Verified active</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Account matches prior closing instructions from Heritage Title</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No changes from last verified instructions (callback confirmed)</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Wire instructions verified. No fraud indicators.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     FUNDER — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="funder" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Today</h3>
+      <div class="sum-row"><span class="sum-label">Tasks completed</span><span class="sum-val" style="color:var(--bt-success)">9</span></div>
+      <div class="sum-row"><span class="sum-label">Needs your review</span><span class="sum-val" style="color:var(--bt-warning)">2</span></div>
+      <div class="sum-row"><span class="sum-label">QC checks run</span><span class="sum-val" style="color:var(--bt-success)">5</span></div>
+      <div class="sum-row"><span class="sum-label">Wires verified</span><span class="sum-val">3</span></div>
+      <div class="sum-row"><span class="sum-label">Time saved</span><span class="sum-val">3.5 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip needs-review">Needs Review 2</button>
+      <button class="chip">Wire/Funding</button>
+      <button class="chip">QC</button>
+      <button class="chip">Investor</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>Live AI Activity</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Funder — David Park</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Post-close QC finding — Davis file</div><div class="fi-time">8 minutes ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Post-Close QC</div>
+          <div class="fi-confidence">Confidence: 90% <div class="conf-bar"><div class="conf-fill high" style="width:90%"></div></div></div>
+          <div class="fi-result">
+            <span class="file-ref">Davis</span> <span class="lo-ref">FHA $310K · Funded May 8</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Data integrity: All 1003 fields match closing docs</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Compliance: QM/ATR verified, TRID timelines met</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Stacking order: Complete and correct</div>
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>Trailing doc:</strong> Final title policy not received (12 days post-closing)</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Investor delivery deadline: May 22 (9 days) — need title policy before delivery</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Action needed:</strong> Contact Heritage Title for final title policy. Aria has drafted a follow-up email. Investor delivery to Fannie Mae is at risk if not received by May 20.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Send Title Follow-up</button>
+            <button class="fi-btn">Contact Title Rep</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Wire verification complete — Nguyen funding</div><div class="fi-time">30 minutes ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Wire Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Nguyen</span> <span class="lo-ref">Conv $365K · Closing today</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Wire amount: $365,842.17 — Matches final CD</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Receiving bank: Palmetto Title · ABA ●●●●●3891 — Verified</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> No changes from prior instructions — Callback confirmed</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Fraud check: No wire redirection indicators detected</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> All PTF conditions: Cleared</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Ready to fund. Wire can be released.</div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Investor package prepared — Richardson (Freddie Mac)</div><div class="fi-time">1 hour ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot doc"></span> Document Processing</div>
+          <div class="fi-result">
+            <span class="file-ref">Richardson</span> <span class="lo-ref">Conv Refi $380K → Freddie Mac</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> Final signed note — scanned and verified</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Deed of trust — recorded, recording # 2026-045892</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Final title policy — received and reviewed</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> MI certificate — not required (LTV 74%)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Freddie Mac delivery data: LPA key validated</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Package complete. Ready for investor delivery. Deadline: May 18.</div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Disbursement discrepancy — Walker file</div><div class="fi-time">2 hours ago</div></div><span class="fi-status review">Needs Review</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Data Verification</div>
+          <div class="fi-result">
+            <span class="file-ref">Walker</span> <span class="lo-ref">Conv $425K · Funded May 10</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <strong>Payoff discrepancy:</strong> Prior lender payoff $287,432 vs wired $286,890 — <strong>$542 short</strong></div>
+              <div class="check-row"><div class="check-icon warn">?</div> Per-diem interest may account for difference (1 day @ $52.14/day = $52.14, not $542)</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Possible late fee or escrow shortage on prior loan</div>
+            </div>
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Contact Prior Lender</button>
+            <button class="fi-btn">Review Payoff Statement</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     OPS MANAGEMENT — AI Tasks Feed
+     ════════════════════════════════════════════════════════════════ -->
+<div id="ops" class="role-view">
+<div class="bt"><div class="layout">
+  <div class="sidebar">
+    <div class="s-head"><div class="s-logo">Perennia</div><span class="s-ai-tag">AI</span></div>
+    <div class="ai-summary">
+      <h3>Aria Activity — Org-Wide</h3>
+      <div class="sum-row"><span class="sum-label">AI tasks today (all staff)</span><span class="sum-val" style="color:var(--bt-success)">83</span></div>
+      <div class="sum-row"><span class="sum-label">Pending human review</span><span class="sum-val" style="color:var(--bt-warning)">12</span></div>
+      <div class="sum-row"><span class="sum-label">Escalations</span><span class="sum-val" style="color:var(--bt-error)">3</span></div>
+      <div class="sum-row"><span class="sum-label">Conditions auto-cleared</span><span class="sum-val" style="color:var(--bt-success)">24</span></div>
+      <div class="sum-row"><span class="sum-label">Total time saved</span><span class="sum-val">28.4 hrs</span></div>
+    </div>
+    <div class="filters">
+      <button class="chip active">All Roles</button>
+      <button class="chip">Processors</button>
+      <button class="chip">Underwriters</button>
+      <button class="chip">Closers</button>
+      <button class="chip needs-review">Escalations 3</button>
+    </div>
+    <div class="s-spacer"></div>
+  </div>
+
+  <div class="content">
+    <div class="c-head">
+      <div style="display:flex;align-items:center;gap:10px"><span class="live-dot"></span><h2>AI Operations Overview</h2></div>
+      <span style="font-size:13px;color:var(--bt-text-muted);margin-left:12px">Ops Manager — Karen Mitchell</span>
+      <div class="ch-right"><span style="font-size:12px;color:var(--bt-text-muted)">Last updated: just now</span></div>
+    </div>
+
+    <div class="feed">
+      <!-- Org-wide AI summary -->
+      <div class="feed-item" style="border-left:4px solid var(--bt-primary)">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Daily AI Operations Report</div><div class="fi-time">Generated just now</div></div><span class="fi-status" style="background:var(--bt-primary-tint);color:var(--bt-primary)">Summary</span></div>
+        <div class="fi-body">
+          <div class="fi-result">
+            <strong>Today's AI Activity Across All Teams:</strong>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+              <div>
+                <div style="font-size:12px;color:var(--bt-text-muted);margin-bottom:6px">BY TASK TYPE</div>
+                <div class="check-row"><div class="check-icon" style="background:#DBEAFE;color:var(--bt-info)">📄</div> Document processing: <strong>31 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:var(--bt-accent-light);color:var(--bt-accent)">✉</div> Communication drafts: <strong>18 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:#DFF0E3;color:var(--bt-success)">✓</div> Data verification: <strong>22 tasks</strong></div>
+                <div class="check-row"><div class="check-icon" style="background:#FEF3C7;color:var(--bt-warning)">◎</div> Condition clearing: <strong>12 tasks</strong></div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--bt-text-muted);margin-bottom:6px">BY TEAM</div>
+                <div class="check-row"><div class="check-icon pass">P</div> Processors: <strong>34 tasks</strong> (5 pending review)</div>
+                <div class="check-row"><div class="check-icon pass">U</div> Underwriters: <strong>18 tasks</strong> (3 pending)</div>
+                <div class="check-row"><div class="check-icon pass">C</div> Closers: <strong>16 tasks</strong> (2 pending)</div>
+                <div class="check-row"><div class="check-icon pass">F</div> Funders: <strong>9 tasks</strong> (1 pending)</div>
+                <div class="check-row"><div class="check-icon pass">L</div> Loan Officers: <strong>6 tasks</strong> (1 pending)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-error">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Escalation: Fraud indicators — Garcia file (UW team)</div><div class="fi-time">45 minutes ago · via Mark Thompson</div></div><span class="fi-status error">Escalated</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Risk Escalation</div>
+          <div class="fi-result">
+            <span class="file-ref">Garcia</span> <span class="lo-ref">Conv $485K</span> <span class="lo-ref" style="background:#FDE8E8;color:var(--bt-error)">UW: M. Thompson</span>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> SSN mismatch with credit bureau records</div>
+              <div class="check-row"><div class="check-icon fail">!</div> Employer phone routes to residential line</div>
+              <div class="check-row"><div class="check-icon warn">?</div> Pay stub font inconsistencies detected</div>
+            </div>
+          </div>
+          <div style="background:#FDE8E8;border:1px solid #F5C6C6;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-error)">
+            <strong>Manager attention required.</strong> UW Mark Thompson has suspended the file. May require SAR filing and LO notification. Aria recommends compliance review.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn reject">Initiate SAR Review</button>
+            <button class="fi-btn">Review Full File</button>
+            <button class="fi-btn">Notify LO & Compliance</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item needs-human">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">SLA breach alert — 3 files approaching limits</div><div class="fi-time">1 hour ago</div></div><span class="fi-status review">Action Needed</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Pipeline Monitoring</div>
+          <div class="fi-result">
+            Aria detected 3 files approaching or exceeding SLA targets:
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon fail">!</div> <span class="file-ref">Martinez</span> Processing: <strong>18 days</strong> (SLA: 10 days) — VOE bottleneck. Processor: M. Santos</div>
+              <div class="check-row"><div class="check-icon warn">!</div> <span class="file-ref">Hall</span> UW Review: <strong>6 days</strong> (SLA: 5 days) — Manual UW, complex income. UW: M. Thompson</div>
+              <div class="check-row"><div class="check-icon warn">!</div> <span class="file-ref">Rivera</span> Closing: <strong>8 days</strong> (SLA: 7 days) — Title delay. Closer: S. Chen</div>
+            </div>
+          </div>
+          <div style="background:#FFF8EE;border:1px solid #F0D9B5;border-radius:var(--bt-radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--bt-warning)">
+            <strong>Aria recommendation:</strong> Reassign Martinez to a senior processor. Hall needs UW manager override on employment gap. Rivera — contact Lowcountry Title directly for survey status.
+          </div>
+          <div class="fi-actions">
+            <button class="fi-btn approve">Accept Recommendations</button>
+            <button class="fi-btn">Reassign Files</button>
+            <button class="fi-btn">Review Individually</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Team efficiency report generated</div><div class="fi-time">2 hours ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Analytics</div>
+          <div class="fi-result">
+            <strong>Weekly team AI adoption metrics:</strong>
+            <div style="margin-top:10px">
+              <div class="check-row"><div class="check-icon pass">✓</div> AI task acceptance rate: <strong>91%</strong> (↑ 3% from last week)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Auto-cleared conditions: <strong>24 this week</strong> (avg 18)</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Time saved per team member: <strong>4.2 hrs/day</strong></div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Lowest AI utilization: <strong>Closers (68%)</strong> — recommend training</div>
+              <div class="check-row"><div class="check-icon pass">✓</div> Highest accuracy: <strong>Condition clearing (98.2%)</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item ai-complete">
+        <div class="fi-header"><div class="fi-avatar">A</div><div class="fi-meta"><div class="fi-title">Compliance audit — TRID violations: 0 this month</div><div class="fi-time">3 hours ago</div></div><span class="fi-status complete">Complete</span></div>
+        <div class="fi-body">
+          <div class="fi-type"><span class="fi-type-dot verify"></span> Compliance</div>
+          <div class="fi-result">
+            <div class="check-row"><div class="check-icon pass">✓</div> TRID violations MTD: <strong>0</strong></div>
+            <div class="check-row"><div class="check-icon pass">✓</div> Tolerance cures issued: <strong>2</strong> (both auto-detected by Aria)</div>
+            <div class="check-row"><div class="check-icon pass">✓</div> QC findings rate: <strong>4.2%</strong> (below 5% target)</div>
+            <div class="check-row"><div class="check-icon pass">✓</div> HMDA data completeness: <strong>100%</strong></div>
+          </div>
+          <div style="font-size:12px;color:var(--bt-success);font-weight:600">Clean compliance month. No regulatory concerns.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+
+<script>
+function showRole(id) {
+  document.querySelectorAll('.role-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
